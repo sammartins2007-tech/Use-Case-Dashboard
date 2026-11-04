@@ -223,6 +223,45 @@
         {
           "name": "SourceId",
           "type": "number"
+        },
+        {
+          "name": "Wave",
+          "type": "text"
+        },
+        {
+          "name": "CustomerDecision",
+          "type": "choice",
+          "choices": [
+            "Prioritised",
+            "On hold",
+            "Not yet decided",
+            "Not prioritised",
+            "Cancelled"
+          ]
+        },
+        {
+          "name": "WaveSource",
+          "type": "text"
+        },
+        {
+          "name": "CustomerStatus",
+          "type": "text"
+        },
+        {
+          "name": "StartDate",
+          "type": "date/time"
+        },
+        {
+          "name": "TargetDate",
+          "type": "date/time"
+        },
+        {
+          "name": "PercentDone",
+          "type": "number"
+        },
+        {
+          "name": "RoadmapNote",
+          "type": "multiline text"
         }
       ]
     },
@@ -381,6 +420,10 @@
         {
           "name": "RateNote",
           "type": "text"
+        },
+        {
+          "name": "Waves",
+          "type": "multiline text"
         }
       ]
     }

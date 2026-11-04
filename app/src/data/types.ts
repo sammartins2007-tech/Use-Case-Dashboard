@@ -72,6 +72,14 @@ export interface UseCase {
   valueBasis?: string;
   priorityFit?: string;
   priorityWhy?: string;
+  wave?: string;
+  customerDecision?: CustomerDecision;
+  waveSource?: string;
+  customerStatus?: string;
+  startDate?: string;
+  targetDate?: string;
+  percentDone?: number;
+  roadmapNote?: string;
 }
 
 export const CLASSIFICATIONS = [
@@ -175,6 +183,12 @@ export const TEXT_FIELDS = [
 export type TextField = (typeof TEXT_FIELDS)[number];
 
 export type UseCasePatch = {
+  wave?: string;
+  customerDecision?: CustomerDecision;
+  waveSource?: string;
+  startDate?: string | null;
+  targetDate?: string | null;
+  roadmapNote?: string;
   department?: string;
   valueLevel?: Level;
   kpiValues?: string;
@@ -238,3 +252,7 @@ export const DEPARTMENTS = [
   "Strategy & Management",
   "Other",
 ] as const;
+
+export const CUSTOMER_DECISIONS = ["Prioritised", "On hold", "Not yet decided", "Not prioritised", "Cancelled"] as const;
+export type CustomerDecision = (typeof CUSTOMER_DECISIONS)[number];
+export const UNPLANNED = "Unplanned";

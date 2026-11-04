@@ -12,6 +12,7 @@ import { ConnectorErrorState, EmptyState, LoadingState } from "@/components/stat
 import { PdfExportButton } from "@/components/pdf-export-button";
 import { KpiTable } from "@/components/kpi-table";
 import { PriorityFitBox } from "@/components/priority-fit-box";
+import { RoadmapFields } from "@/components/roadmap-fields";
 import { FinOpsSizing } from "@/components/finops-sizing";
 import { useFeatures, useHourlyRate, useSignalsFor, useUpdateUseCase, useUseCase, useUseCases } from "@/data/repo";
 import {
@@ -365,6 +366,7 @@ function UseCaseDossier({ u, signals, features }: { u: UseCase; signals: Signal[
               </Select>
             </div>
           </div>
+          <RoadmapFields u={u} busy={update.isPending} onSave={save} />
           <p className="mt-2 hidden text-xs print:block">
             {u.department ? `Department: ${u.department}` : ""} {u.valueLevel ? `· Value: ${u.valueLevel}` : ""}
           </p>

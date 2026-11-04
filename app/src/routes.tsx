@@ -6,6 +6,7 @@ import { UseCasePage } from "@/pages/use-case";
 import { CustomersPage } from "@/pages/customers";
 import { CustomerPage } from "@/pages/customer";
 import { CustomerPortfolioPage } from "@/pages/customer-portfolio";
+import { RoadmapPage } from "@/pages/roadmap";
 import { FinOpsPage } from "@/pages/finops";
 import { MethodPage } from "@/pages/method";
 import { FeaturesPage } from "@/pages/features";
@@ -20,6 +21,7 @@ export const routes: AppRoute[] = [
   { path: "/customers", element: SINGLE_CUSTOMER ? <Navigate to={`/customer/${encodeURIComponent(SINGLE_CUSTOMER)}`} replace /> : <CustomersPage /> },
   { path: "/customer/:account", element: <CustomerPage /> },
   { path: "/customer/:account/portfolio", element: <CustomerPortfolioPage /> },
+  { path: "/customer/:account/roadmap", element: <RoadmapPage /> },
   { path: "/use-case/:id", element: <UseCasePage /> },
   { path: "/finops", element: <FinOpsPage /> },
   { path: "/method", element: <MethodPage /> },

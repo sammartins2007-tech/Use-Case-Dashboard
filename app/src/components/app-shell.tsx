@@ -11,6 +11,7 @@ const NAV = [
   SINGLE_CUSTOMER
     ? { to: `/customer/${encodeURIComponent(SINGLE_CUSTOMER)}`, label: `${SINGLE_CUSTOMER} use cases`, end: false }
     : { to: "/customers", label: "Customers", end: false },
+  ...(SINGLE_CUSTOMER ? [{ to: `/customer/${encodeURIComponent(SINGLE_CUSTOMER)}/roadmap`, label: "Roadmap", end: false }] : []),
   { to: "/finops", label: "FinOps", end: false },
   { to: "/method", label: "How it works", end: false },
   { to: "/features", label: "Feature radar", end: false },
@@ -45,7 +46,7 @@ export function AppShell() {
                 className={({ isActive }) =>
                   cn(
                     "rounded-full px-3.5 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                    isActive || (n.label !== "Welcome" && n.to.startsWith("/customer") && inCustomer)
+                    isActive || (n.label !== "Welcome" && n.label !== "Roadmap" && n.to.startsWith("/customer") && inCustomer && !pathname.endsWith("/roadmap"))
                       ? "bg-[#1B2A41] text-white"
                       : "text-[#3D4757] hover:bg-[#EFEBE3]",
                   )

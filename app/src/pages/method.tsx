@@ -9,6 +9,7 @@ const TOC = [
   ["signals", "Which signals we keep"],
   ["gates", "Five gates and five inputs"],
   ["stages", "Stages, decisions and discard"],
+  ["roadmap", "Waves and roadmap"],
   ["routes", "Platform classification"],
   ["map", "Complexity and effort"],
   ["finops", "FinOps sizing"],
@@ -125,7 +126,19 @@ export function MethodPage() {
           </section>
 
           <section>
-            <H id="routes" n={5}>Platform classification</H>
+            <H id="roadmap" n={5}>Waves and roadmap</H>
+            <P>
+              A wave is a batch of use cases the customer plans to deliver together (W1, W2, …), each with an optional start and end month. Where
+              the customer has already decided — for example in its own pipeline — the use case keeps the customer's wave, decision (Prioritised, On
+              hold, Not yet decided, Not prioritised, Cancelled), status, dates and progress, and shows as a gold "Customer decided" card.
+              Anything moved in the app is marked as a proposal with the date, so customer decisions and account-team proposals never get mixed
+              up. Candidates are use cases not yet in a wave, ranked by a 0–10 score: value (0–3) + low effort (0–3; 1.5 when unknown) +
+              leadership-priority fit (2) + readiness of the five gates (0–2). Cancelled use cases leave the roadmap.
+            </P>
+          </section>
+
+          <section>
+            <H id="routes" n={6}>Platform classification</H>
             <P>
               Each use case gets the one route that solves the pain most simply, with a confidence (High, Medium, Low) and a one-line reason.
               We pick the lightest route that works: no AI before AI, out-of-the-box before custom.
@@ -164,7 +177,7 @@ export function MethodPage() {
           </section>
 
           <section>
-            <H id="map" n={6}>The two maps: complexity, value and effort</H>
+            <H id="map" n={7}>The two maps: complexity, value and effort</H>
             <P>
               The map places each use case on two three-level scales. Customer scores are used when they exist; otherwise the account team
               sets them on the use case page.
@@ -211,7 +224,7 @@ export function MethodPage() {
           </section>
 
           <section>
-            <H id="finops" n={7}>FinOps sizing</H>
+            <H id="finops" n={8}>FinOps sizing</H>
             <Box>
               <p className="font-[family-name:var(--font-serif)] text-lg">AI run cost / month = the sum of every AI cost line</p>
               <ul className="mt-2 space-y-1 text-sm text-[#3D4757]">
@@ -235,7 +248,7 @@ export function MethodPage() {
           </section>
 
           <section>
-            <H id="sources" n={8}>Sources and evidence</H>
+            <H id="sources" n={9}>Sources and evidence</H>
             <P>
               Each use case lists the mails, chats, meetings, documents and public pages that fed it, with a date and a link. Insights from
               the web are kept separate from customer evidence. If a fact cannot be traced to a source, it is not written.
@@ -243,7 +256,7 @@ export function MethodPage() {
           </section>
 
           <section>
-            <H id="refresh" n={9}>The daily refresh</H>
+            <H id="refresh" n={10}>The daily refresh</H>
             <P>
               Every morning an agent reads new Work IQ activity (mail, Teams, meetings, documents) and new product announcements, keeps only
               signals that change a use case, enriches or creates use cases, reclassifies when the evidence changes, and logs what it cost.
@@ -251,7 +264,7 @@ export function MethodPage() {
           </section>
 
           <section>
-            <H id="ai" n={10}>How AI consumption is measured</H>
+            <H id="ai" n={11}>How AI consumption is measured</H>
             <P>
               Each run is logged with input tokens, output tokens and cost. Where no billing meter is available the run is marked estimated:
               tokens are derived from the number of agent steps and the size of their context, priced at an illustrative list rate ($3 per

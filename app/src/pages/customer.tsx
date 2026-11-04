@@ -12,6 +12,7 @@ import { DEPARTMENTS } from "@/data/types";
 import { isReady } from "@/lib/readiness";
 import { ROUTES, UNCLASSIFIED, routeOf } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+import { RoadmapTeaser } from "@/components/roadmap-teaser";
 
 const card = "rounded-2xl border border-border bg-card p-5 shadow-[0_1px_2px_rgba(27,42,65,0.04)]";
 
@@ -74,6 +75,8 @@ export function CustomerPage() {
         ) : (
           <>
             <CustomerSavings name={name} useCases={active} />
+
+            <RoadmapTeaser name={name} useCases={active} />
 
             <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,0.65fr)]">
               <figure className={cn(card, "min-w-0")}>

@@ -7,7 +7,7 @@ import { Customers_704f56Service } from "../../generated/services/Customers_704f
 import type { UseCases_704f56Read, UseCases_704f56Write } from "../../generated/models/UseCases_704f56Model";
 import type { Signals_704f56Read } from "../../generated/models/Signals_704f56Model";
 import type { FeatureRadar_704f56Read } from "../../generated/models/FeatureRadar_704f56Model";
-import { TEXT_FIELDS, type Account, type Confidence, type Decision, type Feature, type Level, type Signal, type SignalKind, type SourceType, type Stage, type TextField, type UseCase, type UseCasePatch } from "./types";
+import { TEXT_FIELDS, type CustomerDecision, type Account, type Confidence, type Decision, type Feature, type Level, type Signal, type SignalKind, type SourceType, type Stage, type TextField, type UseCase, type UseCasePatch } from "./types";
 
 import { RADAR } from "@/radar.config";
 
@@ -72,6 +72,14 @@ function toUseCase(r: UseCases_704f56Read): UseCase {
     valueBasis: r.ValueBasis,
     priorityFit: r.PriorityFit,
     priorityWhy: r.PriorityWhy,
+    wave: r.Wave?.trim() || undefined,
+    customerDecision: choice<CustomerDecision>(r.CustomerDecision),
+    waveSource: r.WaveSource,
+    customerStatus: r.CustomerStatus,
+    startDate: day(r.StartDate),
+    targetDate: day(r.TargetDate),
+    percentDone: typeof r.PercentDone === "number" ? r.PercentDone : undefined,
+    roadmapNote: r.RoadmapNote,
   };
 }
 
@@ -191,6 +199,12 @@ export function useUpdateUseCase() {
       if (typeof patch.kpiValues === "string") changed.KPIValues = patch.kpiValues;
       if (patch.department) changed.Department = { Value: patch.department };
       if (patch.valueLevel) changed.ValueLevel = { Value: patch.valueLevel };
+      if (typeof patch.wave === "string") changed.Wave = patch.wave;
+      if (patch.customerDecision) changed.CustomerDecision = { Value: patch.customerDecision };
+      if (typeof patch.waveSource === "string") changed.WaveSource = patch.waveSource;
+      if (patch.startDate !== undefined) (changed as Record<string, unknown>).StartDate = patch.startDate ? `${patch.startDate}T00:00:00Z` : null;
+      if (patch.targetDate !== undefined) (changed as Record<string, unknown>).TargetDate = patch.targetDate ? `${patch.targetDate}T00:00:00Z` : null;
+      if (typeof patch.roadmapNote === "string") changed.RoadmapNote = patch.roadmapNote;
       if (patch.effort) changed.Effort = { Value: patch.effort };
       if (typeof patch.monthlyCost === "number") changed.MonthlyCostEUR = patch.monthlyCost;
       if (typeof patch.monthlyValue === "number") changed.MonthlyValueEUR = patch.monthlyValue;
@@ -287,7 +301,28 @@ export interface CustomerSetting {
   reportYear?: string;
   headline?: string;
   priorities: Priority[];
+  waves: WaveDef[];
 }
+
+export interface WaveDef {
+  id: string;
+  label: string;
+  /** YYYY-MM */
+  start?: string;
+  /** YYYY-MM */
+  end?: string;
+}
+
+/** Waves field: one line per wave, "W1 | label | start YYYY-MM | end YYYY-MM". */
+export function parseWaves(s?: string): WaveDef[] {
+  return (s ?? "")
+    .split(/\r?\n/)
+    .map((l) => l.split("|").map((x) => x.trim()))
+    .filter((p) => p[0])
+    .map((p) => ({ id: p[0], label: p[1] || p[0], start: p[2] || undefined, end: p[3] || undefined }));
+}
+export const serializeWaves = (w: WaveDef[]) =>
+  w.map((x) => [x.id, x.label, x.start ?? "", x.end ?? ""].map((v) => v.replace(/\|/g, "/")).join(" | ")).join("\n");
 
 export interface Priority {
   id: string;
@@ -329,6 +364,7 @@ export function useCustomerSettings() {
         reportYear: r.ReportYear,
         headline: r.Headline,
         priorities: parsePriorities(r.Priorities),
+        waves: parseWaves(r.Waves),
       }));
     },
   });
@@ -348,6 +384,22 @@ export function useSaveHourlyRate() {
       const result = id
         ? await Customers_704f56Service.update(String(id), { HourlyRateUSD: rate, RateNote: "Set in the app" })
         : await Customers_704f56Service.create({ Title: account, HourlyRateUSD: rate, RateNote: "Set in the app" });
+      if (!result.success) {
+        console.error("connector error", result.error);
+        throw result.error;
+      }
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["customerSettings"] }),
+  });
+}
+
+export function useSaveWaves() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, account, waves }: { id?: number; account: string; waves: WaveDef[] }) => {
+      const result = id
+        ? await Customers_704f56Service.update(String(id), { Waves: serializeWaves(waves) })
+        : await Customers_704f56Service.create({ Title: account, Waves: serializeWaves(waves) });
       if (!result.success) {
         console.error("connector error", result.error);
         throw result.error;
