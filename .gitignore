@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+# instance files never belong in the kit
+app/src/radar.config.ts
+app/src/assets/logos/*
+!app/src/assets/logos/microsoft.png

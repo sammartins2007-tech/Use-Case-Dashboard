@@ -1,0 +1,388 @@
+{
+  "_readme": "List designs for one AI Use Case Radar instance. Create all five lists on the instance's SharePoint site with EXACTLY these names (the app code is generated from them). Replace the Account choices placeholder {{ACCOUNTS}} with the customer names from radar.config.ts plus \"Internal\" if used. Never rename a list or a column.",
+  "lists": [
+    {
+      "name": "UseCases-704f56",
+      "description": "AI use cases detected from customer and account-team signals",
+      "columns": [
+        {
+          "name": "Account",
+          "type": "choice",
+          "choices": "{{ACCOUNTS}}"
+        },
+        {
+          "name": "Pain",
+          "type": "multiline text"
+        },
+        {
+          "name": "Process",
+          "type": "text"
+        },
+        {
+          "name": "Outcome",
+          "type": "multiline text"
+        },
+        {
+          "name": "Stage",
+          "type": "choice",
+          "choices": [
+            "Signal",
+            "Qualified",
+            "Shaping",
+            "Pilot",
+            "Scale",
+            "Parked",
+            "Stopped"
+          ]
+        },
+        {
+          "name": "Products",
+          "type": "text"
+        },
+        {
+          "name": "MonthlyCostEUR",
+          "type": "number"
+        },
+        {
+          "name": "MonthlyValueEUR",
+          "type": "number"
+        },
+        {
+          "name": "FinOpsBasis",
+          "type": "multiline text"
+        },
+        {
+          "name": "Owner",
+          "type": "text"
+        },
+        {
+          "name": "NextStep",
+          "type": "multiline text"
+        },
+        {
+          "name": "FeatureUnlock",
+          "type": "multiline text"
+        },
+        {
+          "name": "Confidence",
+          "type": "choice",
+          "choices": [
+            "High",
+            "Medium",
+            "Low"
+          ]
+        },
+        {
+          "name": "Decision",
+          "type": "choice",
+          "choices": [
+            "Undecided",
+            "Fund",
+            "Test",
+            "Hold",
+            "Stop"
+          ]
+        },
+        {
+          "name": "LastSignal",
+          "type": "date/time"
+        },
+        {
+          "name": "SignalCount",
+          "type": "number"
+        },
+        {
+          "name": "Evidence",
+          "type": "multiline text"
+        },
+        {
+          "name": "Users",
+          "type": "multiline text"
+        },
+        {
+          "name": "FunctionalFlow",
+          "type": "multiline text"
+        },
+        {
+          "name": "DataSystems",
+          "type": "multiline text"
+        },
+        {
+          "name": "Volumes",
+          "type": "multiline text"
+        },
+        {
+          "name": "KPIs",
+          "type": "multiline text"
+        },
+        {
+          "name": "OpenQuestions",
+          "type": "multiline text"
+        },
+        {
+          "name": "Analysis",
+          "type": "multiline text"
+        },
+        {
+          "name": "Complexity",
+          "type": "choice",
+          "choices": [
+            "Low",
+            "Medium",
+            "High"
+          ]
+        },
+        {
+          "name": "Effort",
+          "type": "choice",
+          "choices": [
+            "Low",
+            "Medium",
+            "High"
+          ]
+        },
+        {
+          "name": "SizingBasis",
+          "type": "multiline text"
+        },
+        {
+          "name": "Classification",
+          "type": "choice",
+          "choices": [
+            "1 · No AI",
+            "2 · No AI – Code App (Power Platform)",
+            "3 · M365 Copilot",
+            "4 · Copilot Cowork",
+            "5 · Copilot Studio",
+            "6 · Microsoft Fabric (data agents & apps)",
+            "7 · Microsoft Foundry",
+            "8 · Unknown – not enough information"
+          ]
+        },
+        {
+          "name": "ClassificationConfidence",
+          "type": "choice",
+          "choices": [
+            "High",
+            "Medium",
+            "Low"
+          ]
+        },
+        {
+          "name": "ClassificationWhy",
+          "type": "multiline text"
+        },
+        {
+          "name": "ClassificationNext",
+          "type": "multiline text"
+        },
+        {
+          "name": "Flag",
+          "type": "text"
+        },
+        {
+          "name": "Discarded",
+          "type": "boolean"
+        },
+        {
+          "name": "DiscardReason",
+          "type": "multiline text"
+        },
+        {
+          "name": "Sources",
+          "type": "multiline text"
+        },
+        {
+          "name": "Insights",
+          "type": "multiline text"
+        },
+        {
+          "name": "RelatedUseCases",
+          "type": "multiline text"
+        },
+        {
+          "name": "InternalRef",
+          "type": "text"
+        },
+        {
+          "name": "Description",
+          "type": "multiline text"
+        },
+        {
+          "name": "PotentialSolution",
+          "type": "multiline text"
+        },
+        {
+          "name": "Readiness",
+          "type": "text"
+        },
+        {
+          "name": "KPIValues",
+          "type": "multiline text"
+        },
+        {
+          "name": "SourceId",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "name": "Signals-704f56",
+      "description": "Work IQ signals feeding the use cases",
+      "columns": [
+        {
+          "name": "Account",
+          "type": "choice",
+          "choices": "{{ACCOUNTS}}"
+        },
+        {
+          "name": "UseCaseRef",
+          "type": "text"
+        },
+        {
+          "name": "SourceType",
+          "type": "choice",
+          "choices": [
+            "Email",
+            "Teams",
+            "Meeting",
+            "Document"
+          ]
+        },
+        {
+          "name": "Sender",
+          "type": "text"
+        },
+        {
+          "name": "SignalDate",
+          "type": "date/time"
+        },
+        {
+          "name": "Insight",
+          "type": "multiline text"
+        },
+        {
+          "name": "Kind",
+          "type": "choice",
+          "choices": [
+            "New use case",
+            "Enrichment",
+            "Risk",
+            "Next step",
+            "FinOps",
+            "Feature"
+          ]
+        },
+        {
+          "name": "SourceRef",
+          "type": "text"
+        },
+        {
+          "name": "SourceId",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "name": "FeatureRadar-704f56",
+      "description": "New Microsoft capabilities relevant to tracked use cases",
+      "columns": [
+        {
+          "name": "Product",
+          "type": "text"
+        },
+        {
+          "name": "Status",
+          "type": "choice",
+          "choices": [
+            "GA",
+            "Public preview"
+          ]
+        },
+        {
+          "name": "ReleaseDate",
+          "type": "date/time"
+        },
+        {
+          "name": "Summary",
+          "type": "multiline text"
+        },
+        {
+          "name": "FinOpsImpact",
+          "type": "multiline text"
+        },
+        {
+          "name": "RelevantUseCases",
+          "type": "multiline text"
+        },
+        {
+          "name": "Link",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "name": "AIConsumption-704f56",
+      "description": "AI consumed by the radar (estimated tokens and cost per run)",
+      "columns": [
+        {
+          "name": "RunDate",
+          "type": "date/time"
+        },
+        {
+          "name": "Kind",
+          "type": "choice",
+          "choices": [
+            "Daily refresh",
+            "Deep analysis",
+            "Import & classification",
+            "Interactive analysis"
+          ]
+        },
+        {
+          "name": "Status",
+          "type": "choice",
+          "choices": [
+            "Completed",
+            "Stalled",
+            "Failed"
+          ]
+        },
+        {
+          "name": "InputTokens",
+          "type": "number"
+        },
+        {
+          "name": "OutputTokens",
+          "type": "number"
+        },
+        {
+          "name": "CostUSD",
+          "type": "number"
+        },
+        {
+          "name": "Estimated",
+          "type": "boolean"
+        },
+        {
+          "name": "Basis",
+          "type": "multiline text"
+        }
+      ]
+    },
+    {
+      "name": "Customers-704f56",
+      "description": "Per-customer settings (average loaded hourly cost in USD)",
+      "columns": [
+        {
+          "name": "HourlyRateUSD",
+          "type": "number"
+        },
+        {
+          "name": "RateNote",
+          "type": "text"
+        }
+      ]
+    }
+  ]
+}
