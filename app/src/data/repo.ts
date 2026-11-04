@@ -67,6 +67,11 @@ function toUseCase(r: UseCases_704f56Read): UseCase {
     potentialSolution: r.PotentialSolution,
     readiness: r.Readiness,
     kpiValues: r.KPIValues,
+    department: choice<string>(r.Department),
+    valueLevel: choice<Level>(r.ValueLevel),
+    valueBasis: r.ValueBasis,
+    priorityFit: r.PriorityFit,
+    priorityWhy: r.PriorityWhy,
   };
 }
 
@@ -184,6 +189,8 @@ export function useUpdateUseCase() {
       if (typeof patch.discarded === "boolean") changed.Discarded = patch.discarded;
       if (typeof patch.discardReason === "string") changed.DiscardReason = patch.discardReason;
       if (typeof patch.kpiValues === "string") changed.KPIValues = patch.kpiValues;
+      if (patch.department) changed.Department = { Value: patch.department };
+      if (patch.valueLevel) changed.ValueLevel = { Value: patch.valueLevel };
       if (patch.effort) changed.Effort = { Value: patch.effort };
       if (typeof patch.monthlyCost === "number") changed.MonthlyCostEUR = patch.monthlyCost;
       if (typeof patch.monthlyValue === "number") changed.MonthlyValueEUR = patch.monthlyValue;
@@ -275,7 +282,32 @@ export interface CustomerSetting {
   account: string;
   hourlyRate: number;
   note?: string;
+  reportTitle?: string;
+  reportUrl?: string;
+  reportYear?: string;
+  headline?: string;
+  priorities: Priority[];
 }
+
+export interface Priority {
+  id: string;
+  title: string;
+  summary: string;
+  quote?: string;
+  source?: string;
+  aiAngle?: string;
+}
+
+/** Priorities field: one line per priority, "P1 | title | summary | quote | source URL | AI angle". */
+export function parsePriorities(s?: string): Priority[] {
+  return (s ?? "")
+    .split(/\r?\n/)
+    .map((l) => l.split("|").map((x) => x.trim()))
+    .filter((p) => /^P\d+$/.test(p[0] ?? ""))
+    .map((p) => ({ id: p[0], title: p[1] ?? "", summary: p[2] ?? "", quote: p[3] || undefined, source: p[4] || undefined, aiAngle: p[5] || undefined }));
+}
+
+export const fitsOf = (s?: string) => (s ?? "").split(/[;,\s]+/).map((x) => x.trim().toUpperCase()).filter((x) => /^P\d+$/.test(x));
 
 export function useCustomerSettings() {
   return useQuery({
@@ -292,6 +324,11 @@ export function useCustomerSettings() {
         account: r.Title ?? "",
         hourlyRate: typeof r.HourlyRateUSD === "number" && r.HourlyRateUSD > 0 ? r.HourlyRateUSD : RADAR.defaultHourlyRateUSD,
         note: r.RateNote,
+        reportTitle: r.ReportTitle,
+        reportUrl: r.ReportUrl,
+        reportYear: r.ReportYear,
+        headline: r.Headline,
+        priorities: parsePriorities(r.Priorities),
       }));
     },
   });

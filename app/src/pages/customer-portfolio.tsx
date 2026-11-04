@@ -3,7 +3,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ConnectorErrorState, EmptyState, LoadingState } from "@/components/states";
 import { Pager, usePageTokens } from "@/components/pager";
 import { CustomerHeader } from "@/components/customer-header";
-import { useHourlyRate, useUseCases } from "@/data/repo";
+import { fitsOf, useCustomerSettings, useHourlyRate, useUseCases } from "@/data/repo";
 import { caseSavingUsd, usd0, usdCompact } from "@/lib/kpi";
 import { isValidated, stripRef } from "@/lib/validated";
 import { CLOSED_STAGES, PIPELINE_STAGES, type UseCase } from "@/data/types";
@@ -24,6 +24,11 @@ export function CustomerPortfolioPage() {
   const routeKey = params.get("route") ?? "";
   const showDiscarded = params.get("discarded") === "1";
   const onlyValidated = params.get("validated") === "1";
+  const dept = params.get("dept") ?? "";
+  const priority = params.get("priority") ?? "";
+  const settings = useCustomerSettings();
+  const prios = settings.data?.find((c) => c.account === name)?.priorities ?? [];
+  const prio = prios.find((p) => p.id === priority);
   const { rate } = useHourlyRate(name);
   const pages = usePageTokens();
   const q = useUseCases(pages.token);
@@ -35,12 +40,19 @@ export function CustomerPortfolioPage() {
         .filter((u) => (showDiscarded ? u.discarded : !u.discarded))
         .filter((u) => !routeKey || routeOf(u.classification).key === routeKey)
         .filter((u) => !onlyValidated || isValidated(u))
+        .filter((u) => !dept || (u.department ?? "Not set") === dept)
+        .filter((u) => !priority || (priority === "any" ? fitsOf(u.priorityFit).length > 0 : fitsOf(u.priorityFit).includes(priority)))
         .sort((a, b) => gatesMet(b) - gatesMet(a) || a.title.localeCompare(b.title)),
-    [forCustomer, routeKey, showDiscarded, onlyValidated],
+    [forCustomer, routeKey, showDiscarded, onlyValidated, dept, priority],
   );
   const route = routeKey ? routeOf(routeKey) : null;
   const total = list.reduce((a, u) => a + (caseSavingUsd(u.kpiValues, rate) ?? 0), 0);
 
+  const clearParam = (k: string) => {
+    const p = new URLSearchParams(params);
+    p.delete(k);
+    setParams(p, { replace: true });
+  };
   const setRoute = (k: string) => {
     const p = new URLSearchParams(params);
     if (k) p.set("route", k);
@@ -86,6 +98,20 @@ export function CustomerPortfolioPage() {
           ))}
         </div>
 
+        {(dept || priority) && (
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
+            {dept && <FilterTag label={`Department: ${dept}`} onClear={() => clearParam("dept")} />}
+            {priority && <FilterTag label={priority === "any" ? "Fits a leadership priority" : `Leadership priority ${priority}${prio ? ` · ${prio.title}` : ""}`} onClear={() => clearParam("priority")} />}
+          </div>
+        )}
+        {prio && (
+          <p className="mt-3 max-w-3xl rounded-xl border border-[#E8D9B8] bg-[#FBF6EA] px-4 py-3 text-sm">
+            <span className="font-medium">
+              {prio.id} · {prio.title}:
+            </span>{" "}
+            {prio.summary}
+          </p>
+        )}
         {route && route.key !== "none" && (
           <p className="mt-4 max-w-3xl rounded-xl border border-border bg-card px-4 py-3 text-sm">
             <span className="font-medium">{route.short}:</span> {route.definition}{" "}
@@ -131,6 +157,17 @@ export function CustomerPortfolioPage() {
   );
 }
 
+function FilterTag({ label, onClear }: { label: string; onClear: () => void }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#D9D2C4] bg-white py-0.5 pl-3 pr-1">
+      {label}
+      <button type="button" onClick={onClear} aria-label={`Remove filter ${label}`} className="rounded-full px-1.5 text-muted-foreground hover:bg-[#F1ECE2] hover:text-foreground">
+        ×
+      </button>
+    </span>
+  );
+}
+
 function Chip({ active, onClick, label, color }: { active: boolean; onClick: () => void; label: string; color?: string }) {
   return (
     <button
@@ -160,6 +197,11 @@ function Card({ u, saving }: { u: UseCase; saving?: number }) {
         {r.short}
       </span>
       <span className="line-clamp-3 block font-medium">{stripRef(u.title)}</span>
+      {fitsOf(u.priorityFit).length > 0 && (
+        <span className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-[#8A6420]">
+          <span className="size-2 rounded-full ring-2 ring-[#C8962E]" aria-hidden="true" /> Leadership fit {fitsOf(u.priorityFit).join(", ")}
+        </span>
+      )}
       {typeof saving === "number" && saving > 0 && <span className="mt-1 block text-[11px] tabular-nums text-[#1E5B3E]">{usd0.format(saving)} / year</span>}
       <span className="mt-2 flex items-center gap-1" aria-label={`${met} of ${GATES.length} gates evidenced`}>
         {GATES.map((g, i) => (

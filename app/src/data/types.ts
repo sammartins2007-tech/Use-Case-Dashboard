@@ -67,6 +67,11 @@ export interface UseCase {
   potentialSolution?: string;
   readiness?: string;
   kpiValues?: string;
+  department?: string;
+  valueLevel?: Level;
+  valueBasis?: string;
+  priorityFit?: string;
+  priorityWhy?: string;
 }
 
 export const CLASSIFICATIONS = [
@@ -170,6 +175,8 @@ export const TEXT_FIELDS = [
 export type TextField = (typeof TEXT_FIELDS)[number];
 
 export type UseCasePatch = {
+  department?: string;
+  valueLevel?: Level;
   kpiValues?: string;
   discarded?: boolean;
   discardReason?: string;
@@ -211,3 +218,23 @@ export function parseBasis(s?: string): FinOpsInputs | null {
     eurPerHour: map.get("eurPerHour")!,
   };
 }
+
+/** Business functions used for the department view (fixed list, same as the SharePoint choice column). */
+export const DEPARTMENTS = [
+  "Finance",
+  "Procurement",
+  "Supply Chain & Logistics",
+  "Manufacturing & Operations",
+  "Maintenance & Engineering",
+  "Quality",
+  "HSE & Sustainability",
+  "R&I / R&D",
+  "Sales & Marketing",
+  "Customer Service",
+  "HR",
+  "IT & Digital",
+  "Legal & Compliance",
+  "Communication",
+  "Strategy & Management",
+  "Other",
+] as const;

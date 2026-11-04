@@ -164,14 +164,22 @@ export function MethodPage() {
           </section>
 
           <section>
-            <H id="map" n={6}>Complexity and effort</H>
+            <H id="map" n={6}>The two maps: complexity, value and effort</H>
             <P>
               The map places each use case on two three-level scales. Customer scores are used when they exist; otherwise the account team
               sets them on the use case page.
             </P>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <Box>
-                <p className="text-sm font-medium">Complexity (horizontal)</p>
+                <p className="text-sm font-medium">Value (horizontal, value map)</p>
+                <p className="mt-1 text-sm text-[#3D4757]">
+                  From the counted KPI saving per year: below $50k Low, $50k to below $250k Medium, $250k and above High. Without a quantified saving
+                  the analysis judges it from users, volumes, criticality and fit with leadership priorities, and says so in the value basis. Editable on
+                  the use case page.
+                </p>
+              </Box>
+              <Box>
+                <p className="text-sm font-medium">Complexity (horizontal, complexity map)</p>
                 <p className="mt-1 text-sm text-[#3D4757]">From the customer's implementation complexity score: below 2 Low, 2 to below 3 Medium, 3 and above High.</p>
               </Box>
               <Box>
@@ -179,7 +187,27 @@ export function MethodPage() {
                 <p className="mt-1 text-sm text-[#3D4757]">From estimated effort: under 1 FTE-month or 20 days Low, up to 3 FTE-months or 60 days Medium, more is High.</p>
               </Box>
             </div>
-            <P>Bottom-left is quick wins. Dots are spread inside a cell for readability; their position within a cell carries no meaning.</P>
+            <P>
+              On the complexity map, bottom-left is quick wins. On the value map, bottom-right (high value, low effort) is quick wins, top-right is
+              strategic bets, bottom-left fill-ins and top-left to avoid. Dots are spread inside a cell for readability; their position within a cell
+              carries no meaning.
+            </P>
+            <Box>
+              <p className="text-sm font-medium">Department</p>
+              <p className="mt-1 text-sm text-[#3D4757]">
+                The business function that owns the process (Finance, Procurement, Supply Chain & Logistics, Manufacturing & Operations, Maintenance &
+                Engineering, Quality, HSE & Sustainability, R&I / R&D, Sales & Marketing, Customer Service, HR, IT & Digital, Legal & Compliance,
+                Communication, Strategy & Management, Other), taken from the customer's process taxonomy where it exists.
+              </p>
+            </Box>
+            <Box>
+              <p className="text-sm font-medium">Leadership priorities</p>
+              <p className="mt-1 text-sm text-[#3D4757]">
+                For each customer we read the latest annual report (and a newer official strategy update when one exists) and summarise, in our own
+                words, the 4–6 priorities leadership commits to, with a link to the source. A use case "fits" a priority only when its process or
+                outcome directly advances what leadership committed to; generic efficiency is not enough. At most two priorities per use case.
+              </p>
+            </Box>
           </section>
 
           <section>

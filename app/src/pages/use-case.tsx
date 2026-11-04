@@ -11,10 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ConnectorErrorState, EmptyState, LoadingState } from "@/components/states";
 import { PdfExportButton } from "@/components/pdf-export-button";
 import { KpiTable } from "@/components/kpi-table";
+import { PriorityFitBox } from "@/components/priority-fit-box";
 import { FinOpsSizing } from "@/components/finops-sizing";
 import { useFeatures, useHourlyRate, useSignalsFor, useUpdateUseCase, useUseCase, useUseCases } from "@/data/repo";
 import {
   DECISIONS,
+  DEPARTMENTS,
   LEVELS,
   STAGES,
   parseRelated,
@@ -76,6 +78,8 @@ const SECTIONS: { id: string; title: string; intro?: string; fields: { key: Text
     fields: [{ key: "volumes", label: "Volumes", hint: "Transactions, cases or runs per month, number of users" }],
   },
 ];
+
+const LEVEL_LABEL = { complexity: "Complexity", effort: "Effort", valueLevel: "Value" } as const;
 
 const STAGE_MEANING: Record<string, string> = {
   Signal: "Heard about, not yet qualified.",
@@ -324,12 +328,12 @@ function UseCaseDossier({ u, signals, features }: { u: UseCase; signals: Signal[
             <EditableField label="Next step" hint="The next concrete move" value={u.nextStep} busy={update.isPending} compact onSave={(v, done) => save({ nextStep: v }, "Next step saved", done)} />
           </div>
           <div className="mt-3 grid grid-cols-2 gap-3" data-pdf-exclude>
-            {(["complexity", "effort"] as const).map((k) => (
+            {(["complexity", "effort", "valueLevel"] as const).map((k) => (
               <div key={k} className="space-y-1">
                 <Label htmlFor={`${k}-select`} className="text-xs text-muted-foreground">
-                  {k === "complexity" ? "Complexity" : "Effort"}
+                  {LEVEL_LABEL[k]}
                 </Label>
-                <Select value={u[k] ?? ""} onValueChange={(v) => save({ [k]: v as Level } as UseCasePatch, `${k === "complexity" ? "Complexity" : "Effort"} set to ${v}`)}>
+                <Select value={u[k] ?? ""} onValueChange={(v) => save({ [k]: v as Level } as UseCasePatch, `${LEVEL_LABEL[k]} set to ${v}`)}>
                   <SelectTrigger id={`${k}-select`} size="sm" className="w-full bg-white">
                     <SelectValue placeholder="Not set" />
                   </SelectTrigger>
@@ -343,8 +347,29 @@ function UseCaseDossier({ u, signals, features }: { u: UseCase; signals: Signal[
                 </Select>
               </div>
             ))}
+            <div className="space-y-1">
+              <Label htmlFor="dept-select" className="text-xs text-muted-foreground">
+                Department
+              </Label>
+              <Select value={u.department ?? ""} onValueChange={(v) => save({ department: v }, `Department set to ${v}`)}>
+                <SelectTrigger id="dept-select" size="sm" className="w-full bg-white">
+                  <SelectValue placeholder="Not set" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DEPARTMENTS.map((d) => (
+                    <SelectItem key={d} value={d}>
+                      {d}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          {u.sizingBasis && <p className="mt-2 text-[11px] text-muted-foreground">{u.sizingBasis}</p>}
+          <p className="mt-2 hidden text-xs print:block">
+            {u.department ? `Department: ${u.department}` : ""} {u.valueLevel ? `· Value: ${u.valueLevel}` : ""}
+          </p>
+          {u.valueBasis && <p className="mt-2 text-[11px] text-muted-foreground">Value · {u.valueBasis}</p>}
+          {u.sizingBasis && <p className="mt-1 text-[11px] text-muted-foreground">{u.sizingBasis}</p>}
         </section>
       </div>
 
@@ -377,6 +402,8 @@ function UseCaseDossier({ u, signals, features }: { u: UseCase; signals: Signal[
           </Link>
         </section>
       </div>
+
+      <PriorityFitBox u={u} />
 
       {/* Readiness */}
       <section aria-labelledby="readiness-title" className={card}>
