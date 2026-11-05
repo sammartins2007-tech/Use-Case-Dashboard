@@ -389,10 +389,9 @@ function SizeExample() {
   const credits = 10;
   const price = 0.01;
   const minutes = 6;
-  const hourly = 55;
   const cost = runs * credits * price;
-  const value = (runs * minutes * hourly) / 60;
-  const eur = new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+  const hours = (runs * minutes) / 60;
+  const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
   return (
     <Visual label="Try it: a worked example">
       <label htmlFor="ex-runs" className="text-sm">
@@ -409,20 +408,20 @@ function SizeExample() {
         className="mt-2 w-full accent-[#0E7C86]"
       />
       <p className="mt-1 text-xs text-muted-foreground">
-        Example values: {credits} credits per run at €{price} each; {minutes} minutes saved per run at €{hourly} per hour.
+        Example values: {credits} credits per run at ${price} each; {minutes} minutes saved per run.
       </p>
       <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
         <div className="rounded-lg bg-[#FBF4E4] p-2">
-          <dt className="text-[11px] text-muted-foreground">Run cost</dt>
-          <dd className="font-[family-name:var(--font-serif)] text-xl tabular-nums">{eur.format(cost)}</dd>
+          <dt className="text-[11px] text-muted-foreground">AI run cost / month</dt>
+          <dd className="font-[family-name:var(--font-serif)] text-xl tabular-nums">{usd.format(cost)}</dd>
         </div>
         <div className="rounded-lg bg-[#E8F3EF] p-2">
-          <dt className="text-[11px] text-muted-foreground">Value</dt>
-          <dd className="font-[family-name:var(--font-serif)] text-xl tabular-nums">{eur.format(value)}</dd>
+          <dt className="text-[11px] text-muted-foreground">Time saved / month</dt>
+          <dd className="font-[family-name:var(--font-serif)] text-xl tabular-nums">{Math.round(hours).toLocaleString("en-US")} h</dd>
         </div>
         <div className="rounded-lg bg-[#1B2A41] p-2 text-white">
-          <dt className="text-[11px] text-white/75">Net / month</dt>
-          <dd className="font-[family-name:var(--font-serif)] text-xl tabular-nums">{eur.format(value - cost)}</dd>
+          <dt className="text-[11px] text-white/75">AI cost per hour saved</dt>
+          <dd className="font-[family-name:var(--font-serif)] text-xl tabular-nums">{usd.format(hours ? cost / hours : 0)}</dd>
         </div>
       </dl>
     </Visual>

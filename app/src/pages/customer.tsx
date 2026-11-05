@@ -75,7 +75,6 @@ export function CustomerPage() {
         ) : (
           <>
             <CustomerSavings name={name} useCases={active} />
-
             <RoadmapTeaser name={name} useCases={active} />
 
             <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,0.65fr)]">

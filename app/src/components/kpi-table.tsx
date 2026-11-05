@@ -3,12 +3,11 @@ import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { KPI_UNITS, parseKpis, savingUsd, serializeKpis, toUsd, usd0, type Kpi, type KpiUnit } from "@/lib/kpi";
+import { KPI_EDIT_UNITS, KPI_KINDS, fmtHours, kindOf, kpiGain, parseKpis, serializeKpis, usd0, type Kpi, type KpiKind, type KpiUnit } from "@/lib/kpi";
 import { cn } from "@/lib/utils";
 
-const MONEY_UNITS: KpiUnit[] = ["h/yr", "USD/yr", "EUR/yr"];
 
-export function KpiTable({ value, rate, busy, onSave }: { value?: string; rate: number; busy: boolean; onSave: (v: string, done: () => void) => void }) {
+export function KpiTable({ value, busy, onSave }: { value?: string; rate: number; busy: boolean; onSave: (v: string, done: () => void) => void }) {
   const list = parseKpis(value);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Kpi[]>(list);
@@ -34,15 +33,24 @@ export function KpiTable({ value, rate, busy, onSave }: { value?: string; rate: 
             <div className="space-y-1">
               <Label htmlFor={`k-unit-${i}`} className="text-xs text-muted-foreground">Unit</Label>
               <select id={`k-unit-${i}`} value={k.unit} onChange={(e) => set(i, { unit: e.target.value as KpiUnit })} className="h-8 w-full rounded-md border border-input bg-white px-2 text-sm">
-                {KPI_UNITS.map((u) => (
-                  <option key={u} value={u}>{u}</option>
+                {[...KPI_EDIT_UNITS, ...(k.unit === "EUR/yr" ? (["EUR/yr"] as const) : [])].map((u) => (
+                  <option key={u} value={u}>{u === "USD/yr" ? "$/yr" : u === "EUR/yr" ? "€/yr (old, shown in $)" : u}</option>
                 ))}
               </select>
             </div>
-            <div className="flex items-end gap-2 sm:col-span-2">
+            <div className="space-y-1">
+              <Label htmlFor={`k-kind-${i}`} className="text-xs text-muted-foreground">Measures</Label>
+              <select id={`k-kind-${i}`} value={k.kind ?? ""} onChange={(e) => set(i, { kind: (e.target.value || undefined) as KpiKind | undefined })} className="h-8 w-full rounded-md border border-input bg-white px-2 text-sm">
+                <option value="">Automatic</option>
+                {KPI_KINDS.map((kk) => (
+                  <option key={kk} value={kk}>{kk === "Time" ? "Time saved" : kk === "Cost" ? "Cost savings" : "Revenue gain"}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-end gap-2">
               <label className="flex h-8 items-center gap-2 text-xs">
                 <input type="radio" name="primary" checked={k.primary} onChange={() => set(i, { primary: true })} />
-                Counts as the saving
+                Preferred
               </label>
               <Button type="button" variant="ghost" size="sm" className="ml-auto" aria-label={`Remove KPI ${i + 1}`} onClick={() => setDraft((d) => d.filter((_, j) => j !== i))}>
                 <Trash2 className="size-4" aria-hidden="true" />
@@ -86,7 +94,7 @@ export function KpiTable({ value, rate, busy, onSave }: { value?: string; rate: 
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-medium">KPIs: current value and expected outcome</p>
-          <p className="text-[11px] text-muted-foreground">Hours are valued at the customer's average cost of {usd0.format(rate)} per hour.</p>
+          <p className="text-[11px] text-muted-foreground">Hours stay in hours; money is in US dollars. Each KPI counts as time saved, cost savings or revenue gain.</p>
         </div>
         <Button variant="ghost" size="sm" data-pdf-exclude onClick={() => { setDraft(list); setEditing(true); }} aria-label={list.length ? "Edit KPIs" : "Add KPIs"}>
           <Pencil className="size-3.5" aria-hidden="true" />
@@ -98,31 +106,31 @@ export function KpiTable({ value, rate, busy, onSave }: { value?: string; rate: 
       ) : (
         <div className="mt-3 overflow-x-auto rounded-xl border border-border">
           <table className="w-full min-w-[640px] text-sm">
-            <caption className="sr-only">KPIs with current value, expected outcome and value in dollars</caption>
+            <caption className="sr-only">KPIs with current value, expected outcome and annual gain</caption>
             <thead>
               <tr className="border-b border-border bg-[#FBF9F5] text-left text-xs text-muted-foreground">
                 <th scope="col" className="px-3 py-2 font-medium">KPI</th>
                 <th scope="col" className="px-3 py-2 font-medium">Current value</th>
                 <th scope="col" className="px-3 py-2 font-medium">Expected outcome</th>
-                <th scope="col" className="px-3 py-2 text-right font-medium">Current $ / yr</th>
-                <th scope="col" className="px-3 py-2 text-right font-medium">Saving $ / yr</th>
+                <th scope="col" className="px-3 py-2 font-medium">Measures</th>
+                <th scope="col" className="px-3 py-2 text-right font-medium">Gain / year</th>
               </tr>
             </thead>
             <tbody>
               {list.map((k, i) => {
-                const cur = MONEY_UNITS.includes(k.unit) ? toUsd(k.unit, k.currentNum, rate) : undefined;
-                const sav = savingUsd(k, rate);
+                const kind = kindOf(k);
+                const gain = kpiGain(k);
                 return (
                   <tr key={i} className={cn("border-b border-border align-top last:border-b-0", k.primary && "bg-[#E9F5EE]/60")}>
                     <th scope="row" className="px-3 py-2.5 text-left font-medium">
                       {k.name}
-                      {k.primary && <span className="ml-1.5 rounded-full bg-[#2F9461] px-1.5 py-0.5 text-[10px] font-medium text-white">counted</span>}
+                      {k.primary && <span className="ml-1.5 rounded-full bg-[#2F9461] px-1.5 py-0.5 text-[10px] font-medium text-white">preferred</span>}
                       {k.basis && <span className="mt-0.5 block text-[11px] font-normal text-muted-foreground">{k.basis}</span>}
                     </th>
                     <td className="px-3 py-2.5">{k.current || "Not stated"}</td>
                     <td className="px-3 py-2.5">{k.expected || "Not stated"}</td>
-                    <td className="px-3 py-2.5 text-right tabular-nums">{typeof cur === "number" ? usd0.format(cur) : "—"}</td>
-                    <td className="px-3 py-2.5 text-right font-medium tabular-nums">{typeof sav === "number" ? usd0.format(sav) : "—"}</td>
+                    <td className="px-3 py-2.5 text-xs text-muted-foreground">{kind === "Time" ? "Time saved" : kind === "Cost" ? "Cost savings" : kind === "Revenue" ? "Revenue gain" : "—"}</td>
+                    <td className="px-3 py-2.5 text-right font-medium tabular-nums">{typeof gain === "number" ? (kind === "Time" ? fmtHours(gain) : usd0.format(gain)) : "—"}</td>
                   </tr>
                 );
               })}

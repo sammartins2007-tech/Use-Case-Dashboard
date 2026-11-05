@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { RADAR } from "@/radar.config";
 import { ELEMENTS } from "@/lib/readiness";
 import { ROUTES } from "@/lib/routes";
 import { onRoute } from "@/lib/routes";
@@ -236,12 +235,12 @@ export function MethodPage() {
                 <li>· Other Azure services (AI Search, Document Intelligence, compute): monthly amount</li>
                 <li>· Build and run effort: one-off cost ÷ months of life</li>
               </ul>
-              <p className="mt-3 font-[family-name:var(--font-serif)] text-lg">Value / month = counted KPI saving per year ÷ 12</p>
+              <p className="mt-3 font-[family-name:var(--font-serif)] text-lg">Three measures: time saved (hours), cost savings ($) and revenue gain ($)</p>
               <p className="mt-2 text-sm text-[#3D4757]">
-                Every KPI shows its current value and expected outcome. Hours are valued at the customer’s average cost per hour (set on the
-                customer page, ${RADAR.defaultHourlyRateUSD} by default); euro figures are shown in dollars at 1 € = $1.08. Only one KPI per use case is counted as its
-                saving, so benefits are never added twice. A customer’s estimated saving adds up the validated use cases: stage Qualified,
-                Shaping, Pilot or Scale, or a Fund/Test decision. Prices are illustrative list prices until the customer agreement is known.
+                Every KPI shows its current value and expected outcome and measures one of three things: time saved, kept in hours and never
+                converted into money; cost savings in US dollars; or revenue gain in US dollars. Per use case, one KPI per measure is counted, so
+                benefits are never added twice. The three totals on every customer page follow the filters applied. FinOps value per month = the
+                dollar KPIs ÷ 12, compared with the AI run cost. Prices are illustrative list prices until the customer agreement is known.
               </p>
             </Box>
             <Link to="/finops" className="mt-3 inline-flex text-sm text-[#0E7C86] hover:underline">Open FinOps →</Link>

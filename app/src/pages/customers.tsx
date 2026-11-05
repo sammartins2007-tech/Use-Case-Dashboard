@@ -1,6 +1,7 @@
 import { ConnectorErrorState, LoadingState } from "@/components/states";
 import { CustomerLogos } from "@/components/customer-logos";
 import { useUseCases } from "@/data/repo";
+import { ValueMetrics } from "@/components/value-metrics";
 
 export function CustomersPage() {
   const q = useUseCases();
@@ -14,7 +15,10 @@ export function CustomersPage() {
         ) : q.isError ? (
           <ConnectorErrorState error={q.error} connector="SharePoint" />
         ) : (
-          <CustomerLogos useCases={q.data?.rows ?? []} nextToken={q.data?.nextToken} />
+          <>
+            <ValueMetrics className="mb-6" useCases={(q.data?.rows ?? []).filter((u) => !u.discarded)} scope="All customers, active use cases" />
+            <CustomerLogos useCases={q.data?.rows ?? []} nextToken={q.data?.nextToken} />
+          </>
         )}
       </div>
     </div>

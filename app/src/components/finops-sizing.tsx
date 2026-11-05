@@ -5,14 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { UseCase, UseCasePatch } from "@/data/types";
 import { COST_KINDS, defaultKind, kindDef, lineCost, newLine, parseLines, serializeLines, type CostKind, type CostLine } from "@/lib/finops";
-import { caseSavingUsd, usd0 } from "@/lib/kpi";
+import { caseValue, fmtHours, usd0 } from "@/lib/kpi";
 import { cn } from "@/lib/utils";
 
 export function FinOpsSizing({ u, rate, busy, onSave }: { u: UseCase; rate: number; busy: boolean; onSave: (patch: UseCasePatch, msg: string) => void }) {
   const [lines, setLines] = useState<CostLine[]>(() => parseLines(u.finOpsBasis) ?? [newLine(defaultKind(u.classification))]);
   const [addKind, setAddKind] = useState<CostKind>("tokens");
-  const annualSaving = caseSavingUsd(u.kpiValues, rate);
-  const value = typeof annualSaving === "number" ? annualSaving / 12 : 0;
+  void rate;
+  const cv = caseValue(u.kpiValues);
+  const annualDollars = (cv.costUsd ?? 0) + (cv.revenueUsd ?? 0);
+  const value = annualDollars / 12;
   const cost = lines.reduce((s, l) => s + lineCost(l), 0);
   const net = value - cost;
   const set = (i: number, key: string, v: string) =>
@@ -88,7 +90,7 @@ export function FinOpsSizing({ u, rate, busy, onSave }: { u: UseCase; rate: numb
           <dd className="font-[family-name:var(--font-serif)] text-xl tabular-nums">{usd0.format(cost)}</dd>
         </div>
         <div>
-          <dt className="text-xs text-muted-foreground">Value / month</dt>
+          <dt className="text-xs text-muted-foreground">Cost savings + revenue / month</dt>
           <dd className="font-[family-name:var(--font-serif)] text-xl tabular-nums">{usd0.format(value)}</dd>
         </div>
         <div>
@@ -97,7 +99,8 @@ export function FinOpsSizing({ u, rate, busy, onSave }: { u: UseCase; rate: numb
         </div>
       </dl>
       <p className="mt-1 text-xs text-muted-foreground">
-        Value = the counted KPI saving ÷ 12{typeof annualSaving === "number" ? "" : " (no KPI saving yet: add one in Target outcome)"}. Hours at {usd0.format(rate)} per hour.
+        Value = the KPI cost savings and revenue gain ÷ 12{annualDollars > 0 ? "" : " (no dollar KPI yet: add one in Problem & outcome)"}.
+        {cv.hours ? ` Time saved: ${fmtHours(cv.hours / 12)} per month (kept in hours, not converted).` : ""}
       </p>
       <Button
         size="sm"

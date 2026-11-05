@@ -10,6 +10,8 @@ import { RoadmapPage } from "@/pages/roadmap";
 import { FinOpsPage } from "@/pages/finops";
 import { MethodPage } from "@/pages/method";
 import { FeaturesPage } from "@/pages/features";
+import { SolutionPage } from "@/pages/solution";
+import { WavePlanPage } from "@/pages/wave-plan";
 
 export interface AppRoute {
   path: string;
@@ -23,6 +25,8 @@ export const routes: AppRoute[] = [
   { path: "/customer/:account/portfolio", element: <CustomerPortfolioPage /> },
   { path: "/customer/:account/roadmap", element: <RoadmapPage /> },
   { path: "/use-case/:id", element: <UseCasePage /> },
+  { path: "/use-case/:id/solution", element: <SolutionPage /> },
+  { path: "/customer/:account/wave/:wave", element: <WavePlanPage /> },
   { path: "/finops", element: <FinOpsPage /> },
   { path: "/method", element: <MethodPage /> },
   { path: "/features", element: <FeaturesPage /> },

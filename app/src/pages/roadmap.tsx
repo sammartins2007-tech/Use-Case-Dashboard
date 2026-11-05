@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { CalendarRange, Plus, Settings2, Trash2 } from "lucide-react";
+import { Plus, Settings2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,10 +12,13 @@ import { CustomerHeader } from "@/components/customer-header";
 import { PdfExportButton } from "@/components/pdf-export-button";
 import { fitsOf, useCustomerSettings, useHourlyRate, useSaveWaves, useUpdateUseCase, useUseCases, type WaveDef } from "@/data/repo";
 import { CUSTOMER_DECISIONS, DEPARTMENTS, UNPLANNED, type CustomerDecision, type UseCase } from "@/data/types";
-import { caseSavingUsd, usd0, usdCompact } from "@/lib/kpi";
-import { isCustomerDecided, monthsBetween, nextWaveId, placementOf, suggestionScore, wavesFor } from "@/lib/roadmap";
+import { caseDollars, caseValue, fmtHours, totalsOf, usd0, usdCompact } from "@/lib/kpi";
+import { ValueMetrics } from "@/components/value-metrics";
+import { isCustomerDecided, nextWaveId, placementOf, suggestionScore, wavesFor } from "@/lib/roadmap";
 import { routeOf, onRoute } from "@/lib/routes";
 import { stripRef } from "@/lib/validated";
+import { hasWavePlan } from "@/lib/solutions";
+import { RoadmapTimeline } from "@/components/roadmap-timeline";
 import { cn } from "@/lib/utils";
 
 const card = "rounded-2xl border border-border bg-card p-5 shadow-[0_1px_2px_rgba(27,42,65,0.04)]";
@@ -67,25 +70,9 @@ export function RoadmapPage() {
   const totals = (list: UseCase[]) => ({
     n: list.length,
     decided: list.filter((u) => placementOf(u) === "customer").length,
-    saving: list.reduce((a, u) => a + (caseSavingUsd(u.kpiValues, rate) ?? 0), 0),
+    value: totalsOf(list.map((u) => u.kpiValues)),
   });
 
-  // Timeline range: from waves with dates and use cases with dates.
-  const span = useMemo(() => {
-    const ms: string[] = [];
-    for (const w of waves) {
-      if (w.start) ms.push(w.start);
-      if (w.end) ms.push(w.end);
-    }
-    for (const u of filtered) {
-      if (u.startDate) ms.push(u.startDate.slice(0, 7));
-      if (u.targetDate) ms.push(u.targetDate.slice(0, 7));
-    }
-    if (!ms.length) return null;
-    ms.sort();
-    return monthsBetween(ms[0], ms[ms.length - 1]);
-  }, [waves, filtered]);
-  const dated = filtered.filter((u) => u.startDate || u.targetDate).sort((a, b) => (a.startDate ?? a.targetDate ?? "").localeCompare(b.startDate ?? b.targetDate ?? ""));
 
   return (
     <div id="work" tabIndex={-1} className="outline-none">
@@ -151,6 +138,7 @@ export function RoadmapPage() {
           <EmptyState title={`No use cases for ${name} yet`} />
         ) : (
           <div ref={ref} className="space-y-6">
+            <ValueMetrics useCases={filtered} scope={[dept || "All departments", decidedOnly ? "customer decisions only" : "all waves and candidates"].join(" · ")} />
             {/* Wave summary */}
             <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {waves.map((w) => {
@@ -165,7 +153,20 @@ export function RoadmapPage() {
                     <p className="mt-1 text-sm">
                       <span className="font-medium tabular-nums">{t.n}</span> use cases · <span className="tabular-nums">{t.decided}</span> customer-decided
                     </p>
-                    {t.saving > 0 && <p className="text-sm tabular-nums text-[#1E5B3E]">{usdCompact.format(t.saving)} / year estimated saving</p>}
+                    <p className="mt-1 flex flex-wrap gap-x-3 text-xs tabular-nums text-[#1E5B3E]">
+                      <span title="Estimated time saved">{fmtHours(t.value.hours, true)} / yr</span>
+                      <span title="Estimated cost savings">{usdCompact.format(t.value.costUsd)} cost</span>
+                      <span title="Estimated revenue gain">{usdCompact.format(t.value.revenueUsd)} revenue</span>
+                    </p>
+                    {hasWavePlan(name, w.id) && (
+                      <Link
+                        to={`/customer/${encodeURIComponent(name)}/wave/${encodeURIComponent(w.id)}`}
+                        data-pdf-exclude
+                        className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#1B2A41] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
+                      >
+                        Delivery plan →
+                      </Link>
+                    )}
                   </li>
                 );
               })}
@@ -177,47 +178,7 @@ export function RoadmapPage() {
             </ol>
 
             {/* Timeline */}
-            {span && (
-              <section aria-labelledby="tl-title" className={cn(card, "overflow-x-auto")}>
-                <h3 id="tl-title" className="flex items-center gap-2 font-[family-name:var(--font-serif)] text-lg">
-                  <CalendarRange className="size-4 text-[#0E7C86]" aria-hidden="true" /> Timeline
-                </h3>
-                <div className="mt-3 min-w-[720px]">
-                  <div className="grid text-[11px] text-muted-foreground" style={{ gridTemplateColumns: `220px repeat(${span.length}, minmax(28px, 1fr))` }}>
-                    <span />
-                    {span.map((m) => (
-                      <span key={m} className="border-l border-border pl-1">
-                        {monthLabel(m)}
-                      </span>
-                    ))}
-                  </div>
-                  {[...waves.filter((w) => w.start && w.end).map((w) => ({ key: w.id, label: `${w.id} · ${w.label}`, s: w.start!, e: w.end!, wave: true, href: "" })),
-                    ...dated.map((u) => ({ key: String(u.id), label: stripRef(u.title), s: (u.startDate ?? u.targetDate)!.slice(0, 7), e: (u.targetDate ?? u.startDate)!.slice(0, 7), wave: false, href: `/use-case/${u.id}` }))].map((r) => {
-                    const a = Math.max(0, span.indexOf(r.s));
-                    const b = Math.max(a, span.indexOf(r.e));
-                    return (
-                      <div key={r.key} className="grid items-center py-0.5" style={{ gridTemplateColumns: `220px repeat(${span.length}, minmax(28px, 1fr))` }}>
-                        {r.href ? (
-                          <Link to={r.href} className="truncate pr-2 text-sm hover:underline" title={r.label}>
-                            {r.label}
-                          </Link>
-                        ) : (
-                          <span className="truncate pr-2 text-sm font-medium">{r.label}</span>
-                        )}
-                        <span
-                          className={cn("h-3.5 rounded-full", r.wave ? "bg-[#1B2A41]" : "bg-[#0E7C86]/70")}
-                          style={{ gridColumn: `${a + 2} / ${b + 3}` }}
-                          aria-label={`${r.label}: ${monthLabel(r.s)} to ${monthLabel(r.e)}`}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-                {waves.some((w) => !w.start || !w.end) && (
-                  <p className="mt-2 text-xs text-muted-foreground">Waves without dates are not on the timeline; set their dates under Waves.</p>
-                )}
-              </section>
-            )}
+            <RoadmapTimeline account={name} waves={waves} useCases={filtered} />
 
             {/* Board */}
             <div className="grid gap-4 overflow-x-auto pb-2" style={{ gridTemplateColumns: `repeat(${waves.length + 1}, minmax(270px, 1fr))` }}>
@@ -280,7 +241,6 @@ export function RoadmapPage() {
 
 function RoadmapCard({
   u,
-  rate,
   waves,
   busy,
   onMove,
@@ -297,7 +257,8 @@ function RoadmapCard({
 }) {
   const r = routeOf(u.classification);
   const place = placementOf(u);
-  const saving = caseSavingUsd(u.kpiValues, rate);
+  const saving = caseDollars(u.kpiValues);
+  const hrs = caseValue(u.kpiValues).hours;
   const fit = fitsOf(u.priorityFit);
   return (
     <article
@@ -322,8 +283,9 @@ function RoadmapCard({
         {u.department ?? "No department"} · value {u.valueLevel ?? "?"} · effort {u.effort ?? "?"}
         {u.internalRef ? ` · ${u.internalRef}` : ""}
       </p>
-      {(saving || fit.length > 0 || u.targetDate || u.customerStatus) && (
+      {(saving || hrs || fit.length > 0 || u.targetDate || u.customerStatus) && (
         <p className="mt-1 flex flex-wrap gap-x-2 text-[11px]">
+          {typeof hrs === "number" && hrs > 0 && <span className="tabular-nums text-[#1E5B3E]">{fmtHours(hrs, true)}/yr</span>}
           {typeof saving === "number" && saving > 0 && <span className="tabular-nums text-[#1E5B3E]">{usd0.format(saving)}/yr</span>}
           {fit.length > 0 && <span className="text-[#8A6420]">Leadership fit {fit.join(", ")}</span>}
           {u.targetDate && <span>target {u.targetDate}</span>}
