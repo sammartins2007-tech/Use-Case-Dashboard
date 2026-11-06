@@ -1,6 +1,6 @@
 import json, sys
 i = sys.argv[1]
-d = json.load(open(ff'solutions/{i}.json'))
+d = json.load(open(f'solutions/{i}.json'))
 ICONS = set("mail inbox file-text file-search scan search database server bot sparkles brain message-square users user-check clipboard-check check-circle alert-triangle bell gauge line-chart bar-chart calendar clock globe languages shield-check lock factory flask truck ship package receipt banknote scale handshake pen-tool book-open graduation-cap leaf zap wrench settings send share-2 archive target trophy rocket lightbulb map compass layers git-branch repeat timer".split())
 err = []
 c = d.get("creative")

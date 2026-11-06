@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.1 — fix
+- prompts/creative-validate.py: fixed a typo that stopped the check script from running.
+
 ## 1.5.0 — search, creative experiences, multi-view architecture, resilience
 - Search in the header (button or Ctrl+K): find a use case by a word in the title, a reference number or its id; jump straight to the dossier or the solution.
 - Solution experience: larger hero images with a slow pan, a slim sticky chapter bar with mouse-friendly scroll arrows and wheel scrolling, and a per-use-case "creative" block: six journey styles (metro, swimlanes, before/after split, story cards, spiral, curve), animated headline numbers, a signature line, a day-in-the-life clock, a fun fact, a short quiz and a domain background motif.
