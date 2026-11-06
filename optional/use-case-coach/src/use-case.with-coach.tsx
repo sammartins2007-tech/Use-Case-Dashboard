@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Ban, Bot, ChevronLeft, ChevronRight, ExternalLink, HelpCircle, Pencil, RotateCcw, Sparkles } from "lucide-react";
 import { hasSolution } from "@/lib/solutions";
 import { UseCaseCoach } from "@/components/use-case-coach";
+import { PageBoundary } from "@/components/page-boundary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -406,7 +407,9 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
         </div>
       </div>
 
-      <UseCaseCoach u={u} open={coachOpen} onOpenChange={setCoachOpen} accent={inkOf(brand.primary)} />
+      <PageBoundary label="Coach" compact onReset={() => setCoachOpen(false)}>
+        <UseCaseCoach u={u} open={coachOpen} onOpenChange={setCoachOpen} accent={inkOf(brand.primary)} />
+      </PageBoundary>
       <div className="pt-5">
         {panel(
           "overview",

@@ -28,9 +28,9 @@ export function AiMeter({ className }: { className?: string }) {
       aria-label={q.isSuccess ? `AI consumed so far: ${usd.format(cost)}, ${tokensFmt(tokens)} tokens${estimated ? ", estimated" : ""}` : "AI consumed so far"}
     >
       <Sparkles className="size-4 text-[#8A6420]" aria-hidden="true" />
-      <span className="text-xs text-[#5B6474]">AI used so far</span>
-      <span className="font-semibold tabular-nums">{q.isSuccess ? usd.format(cost) : q.isError ? "unavailable" : "…"}</span>
-      {q.isSuccess && <span className="text-xs tabular-nums text-[#5B6474]">· {tokensFmt(tokens)} tokens</span>}
+      <span className="hidden whitespace-nowrap text-xs text-[#5B6474] 2xl:inline">AI used so far</span>
+      <span className="whitespace-nowrap font-semibold tabular-nums">{q.isSuccess ? usd.format(cost) : q.isError ? "unavailable" : "…"}</span>
+      {q.isSuccess && <span className="hidden whitespace-nowrap text-xs tabular-nums text-[#5B6474] 2xl:inline">· {tokensFmt(tokens)} tokens</span>}
     </Link>
   );
 }

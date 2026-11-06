@@ -144,7 +144,10 @@ function validate(raw: unknown): CoachReply {
 export async function askCoach(u: UseCase, history: CoachTurn[]): Promise<{ reply: CoachReply; promptChars: number; answerChars: number }> {
   const prompt = buildPrompt(u, history);
   const answer = await invokeInlineAgent(prompt, { locale: "en-GB", timeoutMs: 4 * 60 * 1000 });
-  const text = answer.message ?? (typeof answer.structuredOutput === "string" ? answer.structuredOutput : JSON.stringify(answer.structuredOutput ?? ""));
+  const acts = (answer.activities ?? []) as { type?: string; text?: unknown }[];
+  const actText = [...acts].reverse().find((a) => a.type === "message" && typeof a.text === "string")?.text as string | undefined;
+  const so = answer.structuredOutput;
+  const text = answer.message ?? actText ?? (typeof so === "string" ? so : so != null ? JSON.stringify(so) : "");
   if (!text) throw new AgentNodeError("empty", "The coach returned no answer.");
   return { reply: validate(extractJson(text)), promptChars: prompt.length, answerChars: text.length };
 }

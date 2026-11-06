@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.0 — search, creative experiences, multi-view architecture, resilience
+- Search in the header (button or Ctrl+K): find a use case by a word in the title, a reference number or its id; jump straight to the dossier or the solution.
+- Solution experience: larger hero images with a slow pan, a slim sticky chapter bar with mouse-friendly scroll arrows and wheel scrolling, and a per-use-case "creative" block: six journey styles (metro, swimlanes, before/after split, story cards, spiral, curve), animated headline numbers, a signature line, a day-in-the-life clock, a fun fact, a short quiz and a domain background motif.
+- Reference architecture with four views per use case: Layers (experience, intelligence, orchestration, data, platform), System context, Data (sources, classification, pipeline, outputs, residency) and Decisions & requirements (options, choice, Microsoft Learn link, non-functional requirements). The previous diagram remains as "Deployment view" next to "How it runs".
+- Resilience: a crash stays inside the page or panel ("Try again"), and the app reloads itself once when old and new code are mixed after a publish.
+- Compact top bar on smaller screens; customer-neutral search examples.
+- Prompts: creative-brief.md, tech-views-brief.md and their validators.
+- Optional Use Case Coach: reads answers returned only as activities; failures stay inside the coach panel.
+
 ## 1.4.0 — value measures, dollars only, unique solution experiences
 - Three value measures everywhere: estimated time saved (hours, never converted to money), cost savings ($) and revenue gain ($). A shared metrics strip sits at the top of the customers overview, customer page, portfolio, roadmap and wave plans and follows every filter.
 - KPI lines gain an optional 10th field, Kind (Time, Cost or Revenue); money is in US dollars only (old euro values are read and shown in dollars at 1.08).

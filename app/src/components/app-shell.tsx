@@ -2,6 +2,8 @@ import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { motion } from "motion/react";
 import { Toaster } from "@/components/ui/sonner";
 import { AiMeter } from "@/components/ai-meter";
+import { UseCaseSearch } from "@/components/use-case-search";
+import { PageBoundary } from "@/components/page-boundary";
 import { cn } from "@/lib/utils";
 import { RADAR } from "@/radar.config";
 import { SINGLE_CUSTOMER } from "@/lib/brands";
@@ -29,15 +31,15 @@ export function AppShell() {
         Skip to content
       </a>
       <header className="sticky top-0 z-30 border-b border-border bg-[#F7F5F0]/95 backdrop-blur">
-        <div className="mx-auto flex h-16 w-full max-w-[1440px] items-center gap-6 px-6">
-          <NavLink to="/" className="flex items-center gap-3 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+        <div className="mx-auto flex h-16 w-full max-w-[1440px] items-center gap-4 px-6">
+          <NavLink to="/" className="flex shrink-0 items-center gap-3 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
             <RadarMark />
             <span className="leading-tight">
-              <span className="block font-[family-name:var(--font-serif)] text-[18px] tracking-tight">{RADAR.appTitle}</span>
-              <span className="block text-[11px] text-muted-foreground">{RADAR.owner} · {RADAR.team}</span>
+              <span className="block whitespace-nowrap font-[family-name:var(--font-serif)] text-[18px] tracking-tight">{RADAR.appTitle}</span>
+              <span className="block whitespace-nowrap text-[11px] text-muted-foreground">{RADAR.owner} · {RADAR.team}</span>
             </span>
           </NavLink>
-          <nav aria-label="Main" className="flex items-center gap-1">
+          <nav aria-label="Main" className="flex min-w-0 items-center gap-0.5">
             {NAV.map((n) => (
               <NavLink
                 key={n.to}
@@ -45,7 +47,7 @@ export function AppShell() {
                 end={n.end}
                 className={({ isActive }) =>
                   cn(
-                    "rounded-full px-3.5 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                    "whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
                     isActive || (n.label !== "Welcome" && n.label !== "Roadmap" && n.to.startsWith("/customer") && inCustomer && !pathname.endsWith("/roadmap"))
                       ? "bg-[#1B2A41] text-white"
                       : "text-[#3D4757] hover:bg-[#EFEBE3]",
@@ -56,7 +58,14 @@ export function AppShell() {
               </NavLink>
             ))}
           </nav>
-          <AiMeter className="ml-auto" />
+          <div className="ml-auto flex shrink-0 items-center gap-2">
+            <PageBoundary label="Search" silent>
+              <UseCaseSearch />
+            </PageBoundary>
+            <PageBoundary label="Meter" silent>
+              <AiMeter />
+            </PageBoundary>
+          </div>
         </div>
       </header>
       <main className="flex flex-1 flex-col">
@@ -67,7 +76,9 @@ export function AppShell() {
           transition={{ duration: 0.18, ease: "easeOut" }}
           className="flex-1"
         >
-          <Outlet />
+          <PageBoundary key={pathname}>
+            <Outlet />
+          </PageBoundary>
         </motion.div>
       </main>
       <Toaster />

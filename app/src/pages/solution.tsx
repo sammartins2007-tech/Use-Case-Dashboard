@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, BadgeCheck, Boxes, ChevronDown, ChevronLeft, ChevronRight, ExternalLink, Pause, Play, Plug, ShieldCheck, Sparkles, Users, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,9 @@ import { safeUrl } from "@/lib/safe-url";
 import { LAYER_LABEL, LAYER_ORDER, useHeroImage, useSolution, type ChapterId, type Layout, type Solution, type SolNode } from "@/lib/solutions";
 import { SolutionDemo } from "@/components/solution-demos";
 import { TechArchitecture } from "@/components/tech-architecture";
+import { ArchViews } from "@/components/arch-views";
+import { Challenge, ClockStory, JourneyViz, NumbersStrip, Signature, motifStyle } from "@/components/solution-creative";
+import { ScrollRow } from "@/components/scroll-row";
 import { cn } from "@/lib/utils";
 
 const serif = "font-[family-name:var(--font-serif)]";
@@ -62,9 +65,13 @@ function SolutionView({ s, id, account, classification, owner, accent }: { s: So
   const ch = chapters[idx];
   const hero = useHeroImage(id, s.theme);
   const route = routeOf(classification);
+  const contentRef = useRef<HTMLDivElement>(null);
   const go = (k: ChapterId) => {
     setActive(k);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    requestAnimationFrame(() => {
+      const el = contentRef.current;
+      if (el && el.getBoundingClientRect().top < 0) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
   const wave = s.wave === "W1" ? "Wave 1" : s.wave === "W2" ? "Wave 2" : s.wave;
   const facts = (
@@ -124,7 +131,7 @@ function SolutionView({ s, id, account, classification, owner, accent }: { s: So
     </div>
   );
   const tabs = (dark = false) => (
-    <div role="tablist" aria-label="Chapters" className="flex gap-1 overflow-x-auto no-scrollbar">
+    <ScrollRow label="Chapters" dark={dark} activeKey={active}>
       {chapters.map((c, i) => (
         <button
           key={c.id}
@@ -143,34 +150,59 @@ function SolutionView({ s, id, account, classification, owner, accent }: { s: So
           <span className={cn("absolute inset-x-3 -bottom-px h-0.5 rounded-full transition-opacity", active === c.id ? "opacity-100" : "opacity-0")} style={{ background: dark ? "white" : "var(--sol)" }} />
         </button>
       ))}
-    </div>
+    </ScrollRow>
   );
   const style = { ["--sol" as string]: accent } as React.CSSProperties;
+  const motif = motifStyle(s.creative?.motif);
+  const tagline = exp?.tagline ?? s.headline;
+  const content = (
+    <div ref={contentRef} className="scroll-mt-32">
+      {body}
+    </div>
+  );
+  const stickyBar = (inner: React.ReactNode, cls = "bg-[#F7F5F0]/95") => (
+    <div className={cn("sticky top-16 z-20 border-b border-border backdrop-blur", cls)}>
+      <div className="mx-auto flex max-w-[1440px] items-center gap-4 px-6">
+        <span className={cn(serif, "hidden shrink-0 text-lg xl:block")} style={{ color: "var(--sol)" }}>
+          {s.creative?.signature?.emoji ? `${s.creative.signature.emoji} ` : ""}
+          {s.solutionName}
+        </span>
+        <div className="min-w-0 flex-1">{inner}</div>
+      </div>
+    </div>
+  );
 
-  /* ---- Layout: editorial / blueprint — left chapter rail ---- */
+  /* ---- Layout: editorial / blueprint — split hero, chapter rail ---- */
   if (layout === "editorial" || layout === "blueprint") {
     const bp = layout === "blueprint";
     return (
       <div className={cn("min-h-[calc(100vh-4rem)] pb-10", bp && "bg-[#F3F6F9]")} style={style}>
-        <header className={cn("sticky top-16 z-20 border-b border-border", bp ? "bg-[#F3F6F9]/95" : "bg-[#F7F5F0]/95", "backdrop-blur")}>
-          <div className="mx-auto grid max-w-[1440px] items-center gap-6 px-6 py-3 lg:grid-cols-[minmax(0,1fr)_340px]">
-            <div className="min-w-0">
+        <header className="relative overflow-hidden border-b border-border" style={motif}>
+          <div className="mx-auto grid max-w-[1440px] items-stretch gap-8 px-6 py-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+            <div className="flex min-w-0 flex-col justify-center gap-4">
               {back}
-              <h1 className={cn(bp ? "font-mono text-3xl font-semibold tracking-tight" : cn(serif, "text-4xl"), "mt-1 leading-tight")} style={{ color: "var(--sol)" }}>
+              <h1 className={cn(bp ? "font-mono text-4xl font-semibold tracking-tight md:text-5xl" : cn(serif, "text-5xl md:text-6xl"), "leading-[1.02]")} style={{ color: "var(--sol)" }}>
                 {s.solutionName}
               </h1>
-              <p className={cn(bp ? "text-sm" : cn(serif, "text-lg"), "mt-1 max-w-3xl text-foreground/85")}>{exp?.tagline ?? s.headline}</p>
-              <div className="mt-2 flex flex-wrap gap-1.5 text-xs">{facts}</div>
+              <p className={cn(bp ? "text-lg" : cn(serif, "text-2xl"), "max-w-xl leading-snug text-foreground/85")}>{tagline}</p>
+              <Signature s={s} />
+              <NumbersStrip s={s} />
+              <div className="flex flex-wrap gap-1.5 text-xs">{facts}</div>
             </div>
-            <div className="relative hidden h-32 overflow-hidden rounded-2xl lg:block">
-              {hero && <img src={hero} alt="" className={cn("h-full w-full object-cover", bp && "grayscale-[35%]")} />}
-              {bp && <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_15px,rgba(255,255,255,.35)_15px_16px),repeating-linear-gradient(90deg,transparent_0_15px,rgba(255,255,255,.35)_15px_16px)] mix-blend-overlay" />}
+            <div className={cn("relative min-h-[300px] overflow-hidden lg:min-h-[440px]", bp ? "rounded-xl ring-1 ring-[#C9D3DE]" : "rounded-[2rem]")}>
+              {hero && <img src={hero} alt="" className={cn("absolute inset-0 h-full w-full object-cover transition-transform duration-[8s] hover:scale-105", bp && "saturate-[.8]")} />}
+              {bp && <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_23px,rgba(255,255,255,.35)_23px_24px),repeating-linear-gradient(90deg,transparent_0_23px,rgba(255,255,255,.35)_23px_24px)]" />}
+              {bp && <span className="absolute right-3 bottom-3 rounded bg-white/90 px-2 py-1 font-mono text-[10px] tracking-wider">DWG · {s.title.slice(0, 32).toUpperCase()}</span>}
             </div>
           </div>
         </header>
-        <div className="mx-auto grid max-w-[1440px] gap-8 px-6 pt-6 lg:grid-cols-[240px_minmax(0,1fr)]">
-          <nav aria-label="Chapters" className="lg:sticky lg:top-[13.5rem] lg:self-start">
-            <ol className="flex gap-1 overflow-x-auto lg:flex-col">
+        {stickyBar(<div className="lg:hidden">{tabs()}</div>, bp ? "bg-[#F3F6F9]/95 lg:hidden" : "bg-[#F7F5F0]/95 lg:hidden")}
+        <div className="mx-auto grid max-w-[1440px] gap-8 px-6 pt-6 lg:grid-cols-[250px_minmax(0,1fr)]">
+          <nav aria-label="Chapters" className="hidden lg:sticky lg:top-20 lg:block lg:self-start">
+            <p className={cn(serif, "mb-2 px-3 text-sm")} style={{ color: "var(--sol)" }}>
+              {s.solutionName}
+            </p>
+            <ol className="space-y-1">
               {chapters.map((c, i) => (
                 <li key={c.id}>
                   <button
@@ -187,121 +219,140 @@ function SolutionView({ s, id, account, classification, owner, accent }: { s: So
               ))}
             </ol>
           </nav>
-          <main className="min-w-0">{body}</main>
+          <main className="min-w-0">{content}</main>
         </div>
       </div>
     );
   }
 
-  /* ---- Layout: storyboard — chapter cards along the bottom of a wide hero ---- */
+  /* ---- Layout: storyboard — tall full-bleed scene, scene cards ---- */
   if (layout === "storyboard") {
     return (
       <div className="pb-10" style={style}>
-        <div className="sticky top-16 z-20">
-          <header className="relative isolate overflow-hidden border-b border-border">
-            {hero && <img src={hero} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover" />}
-            <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#F7F5F0] via-[#F7F5F0]/80 to-[#F7F5F0]/10" />
-            <div className="mx-auto max-w-[1440px] px-6 pt-4">
-              {back}
-              <div className="mt-6 text-center">
-                <h1 className={cn(serif, "text-4xl leading-tight md:text-5xl")} style={{ color: "var(--sol)" }}>
-                  {s.solutionName}
-                </h1>
-                <p className={cn(serif, "mx-auto mt-1 max-w-2xl text-lg")}>{exp?.tagline ?? s.headline}</p>
-              </div>
-              <ol className="mt-4 grid grid-cols-3 gap-2 pb-3 sm:grid-cols-4 lg:grid-cols-7">
-                {chapters.map((c, i) => (
-                  <li key={c.id}>
-                    <button
-                      onClick={() => go(c.id)}
-                      aria-current={active === c.id ? "step" : undefined}
-                      className={cn("h-full w-full rounded-xl border p-2 text-left text-xs transition-all", active === c.id ? "-translate-y-1 border-transparent text-white shadow-lg" : "border-border bg-white/85 backdrop-blur hover:-translate-y-0.5")}
-                      style={active === c.id ? { background: "var(--sol)" } : undefined}
-                    >
-                      <span className="block text-[10px] opacity-70">Scene {i + 1}</span>
-                      <span className="line-clamp-2 font-medium">{c.title}</span>
-                    </button>
-                  </li>
-                ))}
-              </ol>
+        <header className="relative isolate overflow-hidden">
+          {hero && <img src={hero} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover" />}
+          <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#F7F5F0] via-[#F7F5F0]/55 to-transparent" />
+          <div className="mx-auto flex min-h-[520px] max-w-[1440px] flex-col justify-between px-6 pt-5 pb-6">
+            <span className="w-fit rounded-full bg-white/80 px-3 py-1 backdrop-blur">{back}</span>
+            <div className="mx-auto max-w-3xl text-center">
+              {s.creative?.signature?.emoji && <span className="text-5xl drop-shadow">{s.creative.signature.emoji}</span>}
+              <h1 className={cn(serif, "mt-2 text-5xl leading-tight md:text-6xl")} style={{ color: "var(--sol)" }}>
+                {s.solutionName}
+              </h1>
+              <p className={cn(serif, "mx-auto mt-2 max-w-2xl text-xl")}>{tagline}</p>
+              {s.creative?.signature?.line && <p className="mt-2 text-sm text-foreground/75">“{s.creative.signature.line}”</p>}
             </div>
-          </header>
+            <div className="mx-auto w-full max-w-3xl">
+              <NumbersStrip s={s} />
+            </div>
+          </div>
+        </header>
+        <div className="sticky top-16 z-20 border-b border-border bg-[#F7F5F0]/95 backdrop-blur">
+          <ol className="mx-auto grid max-w-[1440px] grid-cols-3 gap-2 px-6 py-2 sm:grid-cols-4 lg:grid-cols-7">
+            {chapters.map((c, i) => (
+              <li key={c.id}>
+                <button
+                  onClick={() => go(c.id)}
+                  aria-current={active === c.id ? "step" : undefined}
+                  className={cn("h-full w-full rounded-xl border p-2 text-left text-xs transition-all", active === c.id ? "border-transparent text-white shadow-md" : "border-border bg-white hover:-translate-y-0.5")}
+                  style={active === c.id ? { background: "var(--sol)" } : undefined}
+                >
+                  <span className="block text-[10px] opacity-70">Scene {i + 1}</span>
+                  <span className="line-clamp-2 font-medium">{c.title}</span>
+                </button>
+              </li>
+            ))}
+          </ol>
         </div>
-        <div className="mx-auto max-w-[1300px] px-6 pt-6">
+        <div className="mx-auto max-w-[1300px] px-6 pt-6" style={motif}>
           <div className="mb-4 flex flex-wrap justify-center gap-1.5 text-xs">{facts}</div>
-          {body}
+          {content}
         </div>
       </div>
     );
   }
 
-  /* ---- Layout: console / dashboard — compact operational header ---- */
+  /* ---- Layout: console / dashboard — operational hero with big visual ---- */
   if (layout === "console" || layout === "dashboard") {
     const dash = layout === "dashboard";
     const kpis = s.kpis.slice(0, 4);
     return (
       <div className="pb-10" style={style}>
-        <div className="sticky top-16 z-20 border-b border-border bg-white/95 backdrop-blur">
-          <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-x-6 gap-y-2 px-6 py-3">
-            {hero && <img src={hero} alt="" className="hidden size-14 rounded-xl object-cover sm:block" />}
-            <div className="min-w-0 flex-1">
-              {back}
-              <h1 className={cn(dash ? serif : "font-mono", "mt-0.5 text-2xl font-semibold leading-tight")} style={{ color: "var(--sol)" }}>
-                {!dash && <span className="mr-2 inline-block size-2.5 animate-pulse rounded-full bg-emerald-500 align-middle" aria-hidden />}
+        <header className={cn("border-b border-border", dash ? "bg-white" : "bg-[#0F1B2D] text-white")} style={dash ? motif : undefined}>
+          <div className="mx-auto grid max-w-[1440px] gap-6 px-6 py-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+            <div className="flex min-w-0 flex-col justify-center gap-4">
+              <span className={cn("[&_a]:text-inherit", dash ? "" : "opacity-80")}>{back}</span>
+              <h1 className={cn(dash ? serif : "font-mono", "text-4xl leading-tight font-semibold md:text-5xl")} style={dash ? { color: "var(--sol)" } : undefined}>
+                {!dash && <span className="mr-3 inline-block size-3 animate-pulse rounded-full bg-emerald-400 align-middle" aria-hidden />}
                 {s.solutionName}
               </h1>
-              <p className="text-sm text-muted-foreground">{exp?.tagline ?? s.headline}</p>
+              <p className={cn("max-w-xl text-lg", dash ? "text-foreground/80" : "text-white/80")}>{tagline}</p>
+              <Signature s={s} onDark={!dash} />
+              <NumbersStrip s={s} onDark={!dash} />
             </div>
-            <div className="flex flex-wrap gap-1.5 text-xs">{facts}</div>
-          </div>
-          {dash && kpis.length > 0 && (
-            <div className="mx-auto grid max-w-[1440px] gap-2 px-6 pb-3 sm:grid-cols-2 lg:grid-cols-4">
-              {kpis.map((k, i) => (
-                <div key={i} className="rounded-xl border border-border px-3 py-2" style={{ background: "color-mix(in srgb, var(--sol) 5%, white)" }}>
-                  <p className="truncate text-[11px] text-muted-foreground">{k.name}</p>
-                  <p className="truncate text-sm">
-                    <span className="text-muted-foreground">{k.baseline || "Not stated"}</span> <span aria-hidden>→</span>{" "}
-                    <span className="font-semibold" style={{ color: "var(--sol)" }}>
-                      {k.target || "To confirm"}
-                    </span>
-                  </p>
+            <div className="relative min-h-[300px] overflow-hidden rounded-3xl lg:min-h-[420px]">
+              {hero && <img src={hero} alt="" className="absolute inset-0 h-full w-full object-cover" />}
+              {!dash && (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-tr from-[#0F1B2D]/70 to-transparent" />
+                  <div className="absolute bottom-4 left-4 rounded-xl bg-black/50 px-3 py-2 font-mono text-[11px] text-emerald-300 backdrop-blur">
+                    ● LIVE · {exp?.demo?.title ?? "agent running"}
+                  </div>
+                </>
+              )}
+              {dash && kpis.length > 0 && (
+                <div className="absolute inset-x-3 bottom-3 grid gap-2 sm:grid-cols-2">
+                  {kpis.slice(0, 2).map((k, i) => (
+                    <div key={i} className="rounded-xl bg-white/90 px-3 py-2 backdrop-blur">
+                      <p className="truncate text-[11px] text-muted-foreground">{k.name}</p>
+                      <p className="truncate text-sm">
+                        <span className="text-muted-foreground">{k.baseline || "Not stated"}</span> → <span className="font-semibold" style={{ color: "var(--sol)" }}>{k.target || "To confirm"}</span>
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
-          )}
-          <div className={cn("mx-auto max-w-[1440px] px-6", !dash && "bg-[#F4F6F8]")}>{tabs()}</div>
+          </div>
+        </header>
+        {stickyBar(tabs(), dash ? "bg-white/95" : "bg-[#F4F6F8]/95")}
+        <div className="mx-auto max-w-[1440px] px-6 pt-6">
+          <div className="mb-4 flex flex-wrap gap-1.5 text-xs">{facts}</div>
+          {content}
         </div>
-        <div className={cn("mx-auto max-w-[1440px] px-6 pt-6", !dash && "font-[450]")}>{body}</div>
       </div>
     );
   }
 
-  /* ---- Layout: cinematic (default) — full-bleed image band ---- */
+  /* ---- Layout: cinematic (default) — tall full-bleed image ---- */
   return (
     <div className="pb-10" style={style}>
-      <div className="sticky top-16 z-20">
-        <header className="relative isolate overflow-hidden border-b border-border">
-          {hero && <img src={hero} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover" />}
-          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#F7F5F0] via-[#F7F5F0]/90 to-[#F7F5F0]/10" />
-          <div className="mx-auto grid max-w-[1440px] gap-x-8 gap-y-2 px-6 pt-4 pb-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-            <div className="min-w-0">
-              {back}
-              <h1 className={cn(serif, "mt-2 text-5xl leading-none")} style={{ color: "var(--sol)" }}>
-                {s.solutionName}
-              </h1>
-              <p className={cn(serif, "mt-2 max-w-3xl text-xl leading-snug text-foreground/90")}>{exp?.tagline ?? s.headline}</p>
-            </div>
-            <div className="flex flex-wrap gap-1.5 text-xs lg:max-w-[520px] lg:justify-end">{facts}</div>
+      <header className="relative isolate overflow-hidden">
+        {hero && <img src={hero} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover animate-[sol-kenburns_24s_ease-in-out_infinite_alternate]" />}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#F7F5F0] via-[#F7F5F0]/80 to-transparent" />
+        <div className="mx-auto flex min-h-[540px] max-w-[1440px] flex-col justify-center gap-5 px-6 py-8">
+          {back}
+          <h1 className={cn(serif, "max-w-3xl text-6xl leading-[0.95] md:text-7xl")} style={{ color: "var(--sol)" }}>
+            {s.solutionName}
+          </h1>
+          <p className={cn(serif, "max-w-2xl text-2xl leading-snug text-foreground/90")}>{tagline}</p>
+          <div className="max-w-2xl">
+            <Signature s={s} />
           </div>
-          <nav aria-label="Chapters" className="mx-auto max-w-[1440px] px-6">
-            {tabs()}
-          </nav>
-        </header>
+          <div className="max-w-2xl">
+            <NumbersStrip s={s} />
+          </div>
+          <div className="flex flex-wrap gap-1.5 text-xs">{facts}</div>
+        </div>
+      </header>
+      {stickyBar(tabs())}
+      <div className="mx-auto max-w-[1440px] px-6 pt-6" style={motif}>
+        {content}
       </div>
-      <div className="mx-auto max-w-[1440px] px-6 pt-6">{body}</div>
     </div>
   );
 }
+
 
 /* ---------- Needs ---------- */
 const NEED_CATS = ["Platform", "Licences & capacity", "Data & integration", "Security & compliance", "People & process"];
@@ -367,24 +418,24 @@ function NeedsSection({ s }: { s: Solution }) {
 
 /* ---------- Architecture: technical + business flow ---------- */
 function ArchitectureChapter({ s }: { s: Solution }) {
-  const [view, setView] = useState<"tech" | "flow">(s.technical ? "tech" : "flow");
+  type V = "arch" | "tech" | "flow";
+  const opts: [V, string][] = [];
+  if (s.techViews) opts.push(["arch", "Reference architecture"]);
+  if (s.technical) opts.push(["tech", "Deployment view"]);
+  opts.push(["flow", "How it runs"]);
+  const [view, setView] = useState<V>(opts[0][0]);
   return (
     <div>
-      {s.technical && (
-        <div role="tablist" aria-label="Architecture view" className="mb-4 inline-flex rounded-full bg-muted p-1 text-sm">
-          {(
-            [
-              ["tech", "Technical architecture"],
-              ["flow", "How it runs"],
-            ] as const
-          ).map(([k, l]) => (
-            <button key={k} role="tab" aria-selected={view === k} onClick={() => setView(k)} className={cn("rounded-full px-4 py-1.5", view === k ? "bg-white font-medium shadow-sm" : "text-muted-foreground")}>
+      {opts.length > 1 && (
+        <div role="tablist" aria-label="Architecture perspective" className="mb-5 inline-flex rounded-full bg-muted p-1 text-sm">
+          {opts.map(([k, l]) => (
+            <button key={k} type="button" role="tab" aria-selected={view === k} onClick={() => setView(k)} className={cn("rounded-full px-4 py-1.5", view === k ? "bg-white font-medium shadow-sm" : "text-muted-foreground")}>
               {l}
             </button>
           ))}
         </div>
       )}
-      {view === "tech" && s.technical ? <TechArchitecture t={s.technical} /> : <ArchitectureSection s={s} />}
+      {view === "arch" && s.techViews ? <ArchViews v={s.techViews} /> : view === "tech" && s.technical ? <TechArchitecture t={s.technical} /> : <ArchitectureSection s={s} />}
     </div>
   );
 }
@@ -412,7 +463,7 @@ function StorySection({ s }: { s: Solution }) {
   return (
     <section id="story">
       <SectionTitle kicker="The story" title="From today's friction to the solved state" />
-      <div className="grid gap-6 lg:grid-cols-[1.15fr_1fr]">
+      <div className={cn("grid gap-6", !s.creative?.dayInTheLife?.length && "lg:grid-cols-[1.15fr_1fr]")}>
         <div className="rounded-3xl border border-border bg-card p-6 md:p-8">
           <div role="tablist" aria-label="Before or after" className="inline-flex rounded-full bg-muted p-1 text-sm">
             {[false, true].map((v) => (
@@ -444,13 +495,15 @@ function StorySection({ s }: { s: Solution }) {
             ))}
           </ul>
         </div>
-        <figure className="relative rounded-3xl p-6 md:p-8" style={{ background: "color-mix(in srgb, var(--sol) 8%, #FFFDF8)" }}>
+        {s.creative?.dayInTheLife?.length ? null : (
+<figure className="relative rounded-3xl p-6 md:p-8" style={{ background: "color-mix(in srgb, var(--sol) 8%, #FFFDF8)" }}>
           <span className={cn(serif, "absolute -top-4 left-6 text-7xl leading-none")} style={{ color: "var(--sol)" }} aria-hidden>
             “
           </span>
           <figcaption className="text-xs tracking-[0.14em] text-muted-foreground">A DAY IN THE LIFE</figcaption>
           <blockquote className={cn(serif, "mt-3 text-lg leading-relaxed")}>{s.story.dayInTheLife}</blockquote>
         </figure>
+)}
       </div>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {s.personas.map((p) => (
@@ -477,12 +530,22 @@ function StorySection({ s }: { s: Solution }) {
           </div>
         ))}
       </div>
+          {s.creative?.dayInTheLife?.length ? (
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+          <ClockStory s={s} />
+          <Challenge s={s} />
+        </div>
+      ) : null}
     </section>
   );
 }
 
 /* ---------- Journey ---------- */
 function JourneySection({ s }: { s: Solution }) {
+  return <JourneyViz s={s} fallback={<CurveJourney s={s} />} />;
+}
+
+function CurveJourney({ s }: { s: Solution }) {
   const [sel, setSel] = useState(0);
   const j = s.journey;
   const step = j[Math.min(sel, j.length - 1)];

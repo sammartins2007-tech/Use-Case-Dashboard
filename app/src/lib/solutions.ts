@@ -23,6 +23,8 @@ export interface Solution {
   needs?: SolNeed[];
   technical?: SolTechnical;
   experience?: SolExperience;
+  creative?: SolCreative;
+  techViews?: TechViews;
   plan: {
     summary: string;
     prerequisites: string[];
@@ -44,6 +46,16 @@ export interface Solution {
   sources: SolLink[];
 }
 
+export interface SolCreative {
+  journeyStyle: "metro" | "swimlane" | "split" | "cards" | "spiral" | "curve";
+  stepIcons: string[];
+  numbers: { value: number; prefix?: string; suffix?: string; label: string; basis: "Dossier" | "Illustrative" }[];
+  dayInTheLife: { time: string; scene: string; icon: string }[];
+  motif: string;
+  signature: { kicker: string; line: string; emoji: string };
+  funFact?: string;
+  challenge?: { question: string; options: string[]; answer: number; explain: string };
+}
 export interface SolNeed { item: string; category: string; why: string; status: "In place" | "To set up" | "To confirm" }
 export interface SolZone { id: string; label: string; kind: string }
 export interface SolComponent { id: string; zone: string; name: string; service: string; detail: string; kind: string }
@@ -133,9 +145,9 @@ export function useSolutions(ids: string[]) {
   const [data, setData] = useState<Record<string, Solution>>({});
   useEffect(() => {
     let alive = true;
-    Promise.all(ids.filter((i) => solMods[solKey(i)]).map((i) => solMods[solKey(i)]().then((m) => [i, m.default] as const))).then(
-      (rows) => alive && setData(Object.fromEntries(rows)),
-    );
+    void Promise.allSettled(ids.filter((i) => solMods[solKey(i)]).map((i) => solMods[solKey(i)]().then((m) => [i, m.default] as const))).then((rs) => {
+      if (alive) setData(Object.fromEntries(rs.flatMap((r) => (r.status === "fulfilled" ? [r.value] : []))));
+    });
     return () => {
       alive = false;
     };
@@ -190,3 +202,29 @@ export const SPECIALIST_SHORT: Record<string, string> = {
   "SE - Security & Compliance L2": "Security & Compliance",
   "SE - D365": "Dynamics 365",
 };
+
+export type LayerId = "experience" | "intelligence" | "orchestration" | "data" | "platform";
+export interface TechComponent {
+  name: string;
+  product: string;
+  role: string;
+  status: "existing" | "new" | "to-confirm";
+}
+export interface TechViews {
+  layers: { headline: string; layers: { id: LayerId; components: TechComponent[] }[] };
+  context: {
+    headline: string;
+    system: string;
+    actors: { name: string; interaction: string }[];
+    systems: { name: string; kind: "customer" | "microsoft" | "external"; direction: "in" | "out" | "both"; exchange: string }[];
+  };
+  data: {
+    headline: string;
+    sources: { name: string; system: string; format: string; classification: string; volume: string; access: string }[];
+    pipeline: { stage: string; what: string; product: string }[];
+    outputs: { name: string; store: string; retention: string }[];
+    residency: string;
+  };
+  decisions: { question: string; options: string[]; choice: string; why: string; ref: string }[];
+  nfr: { area: string; point: string }[];
+}
