@@ -34,4 +34,6 @@ export interface RadarConfig {
   customers: CustomerBrand[];
   internal: (CustomerBrand & { label: string }) | null;
   microsoftLogo?: string;
+  /** Customer-facing edition: hides internal views (AI cost meter, feature radar, analysis, evidence). */
+  customerEdition?: boolean;
 }

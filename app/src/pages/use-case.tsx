@@ -1,9 +1,12 @@
+import { RADAR } from "@/radar.config";
 import { useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { toast } from "sonner";
-import { Ban, ChevronLeft, ChevronRight, ExternalLink, HelpCircle, Pencil, RotateCcw, Sparkles } from "lucide-react";
+import { Ban, Bot, ChevronLeft, ChevronRight, ExternalLink, HelpCircle, Pencil, RotateCcw, Sparkles } from "lucide-react";
 import { hasSolution } from "@/lib/solutions";
+import { UseCaseCoach } from "@/components/use-case-coach";
+import { PageBoundary } from "@/components/page-boundary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,7 +85,7 @@ const SECTIONS: { id: string; title: string; intro?: string; fields: { key: Text
 ];
 
 type TabId = "overview" | "problem" | "landscape" | "analysis" | "solution" | "evidence";
-const TABS: { id: TabId; label: string }[] = [
+const ALL_TABS: { id: TabId; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "problem", label: "Problem & outcome" },
   { id: "landscape", label: "Landscape & value" },
@@ -90,6 +93,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "solution", label: "Potential solution" },
   { id: "evidence", label: "Evidence" },
 ];
+const TABS = RADAR.customerEdition ? ALL_TABS.filter((t) => t.id !== "analysis" && t.id !== "evidence") : ALL_TABS;
 
 const LEVEL_LABEL = { complexity: "Complexity", effort: "Effort", valueLevel: "Value" } as const;
 
@@ -225,6 +229,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
   const [tab, setTab] = useState<TabId>("overview");
   const [printAll, setPrintAll] = useState(false);
   const [descOpen, setDescOpen] = useState(false);
+  const [coachOpen, setCoachOpen] = useState(false);
   const update = useUpdateUseCase();
   const ref = useRef<HTMLDivElement>(null);
   const save = (patch: UseCasePatch, msg: string, done?: () => void) =>
@@ -280,7 +285,8 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
     </section>
   );
   const sec = (id: string) => SECTIONS.find((x) => x.id === id)!;
-  const panel = (id: TabId, children: React.ReactNode) => (
+  const panel = (id: TabId, children: React.ReactNode) =>
+    !TABS.some((t) => t.id === id) ? null : (
     <div
       role="tabpanel"
       id={`panel-${id}`}
@@ -323,6 +329,14 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
           )}
           <div className="ml-auto flex items-center gap-2" data-pdf-exclude>
             {nav}
+            {!RADAR.customerEdition && (<button
+              type="button"
+              onClick={() => setCoachOpen(true)}
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-sm font-medium shadow-sm hover:bg-muted"
+              style={{ borderColor: inkOf(brand.primary), color: inkOf(brand.primary) }}
+            >
+              <Bot className="size-4" aria-hidden /> Complete with AI
+            </button>)}
             {hasSolution(u.id) && (
               <Link
                 to={`/use-case/${u.id}/solution`}
@@ -396,6 +410,9 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
         </div>
       </div>
 
+      {!RADAR.customerEdition && <PageBoundary label="Coach" compact onReset={() => setCoachOpen(false)}>
+        <UseCaseCoach u={u} open={coachOpen} onOpenChange={setCoachOpen} accent={inkOf(brand.primary)} />
+      </PageBoundary>}
       <div className="pt-5">
         {panel(
           "overview",
@@ -506,9 +523,9 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
                   {u.flag && <span className="rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs text-amber-900">{u.flag}</span>}
                 </div>
                 {u.classificationWhy && <p className="mt-2 text-sm">{u.classificationWhy}</p>}
-                <Link to="/method#routes" className="mt-2 inline-block text-xs text-[#0E7C86] hover:underline" data-pdf-exclude>
+                {!RADAR.customerEdition && (<Link to="/method#routes" className="mt-2 inline-block text-xs text-[#0E7C86] hover:underline" data-pdf-exclude>
                   How we classify
-                </Link>
+                </Link>)}
               </section>
             </div>
 
@@ -540,9 +557,16 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
                     </li>
                   ))}
                 </ol>
-                <Link to="/method#stages" className="mt-2 inline-block text-xs text-[#0E7C86] hover:underline" data-pdf-exclude>
-                  How stages, confidence, decisions and readiness are defined
-                </Link>
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-2" data-pdf-exclude>
+                  {!RADAR.customerEdition && (<Link to="/method#stages" className="text-xs text-[#0E7C86] hover:underline">
+                    How stages, confidence, decisions and readiness are defined
+                  </Link>)}
+                  {!RADAR.customerEdition && nG < ELEMENTS.length && (
+                    <button type="button" onClick={() => setCoachOpen(true)} className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-white hover:opacity-90" style={{ background: inkOf(brand.primary) }}>
+                      <Bot className="size-3.5" aria-hidden /> Complete the {ELEMENTS.length - nG} open items with the coach
+                    </button>
+                  )}
+                </div>
               </section>
           </>,
         )}

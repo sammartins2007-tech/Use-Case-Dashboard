@@ -201,6 +201,11 @@ export type UseCasePatch = {
   monthlyCost?: number;
   monthlyValue?: number;
   finOpsBasis?: string;
+  readiness?: string;
+  openQuestions?: string;
+  analysis?: string;
+  evidence?: string;
+  lastSignal?: string;
 } & Partial<Record<TextField, string>>;
 
 /** FinOps sizing: cost = runs x credits per run x EUR per credit; value = runs x minutes saved / 60 x EUR per hour. */

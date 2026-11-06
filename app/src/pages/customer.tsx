@@ -1,3 +1,4 @@
+import { RADAR } from "@/radar.config";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ConnectorErrorState, EmptyState, LoadingState } from "@/components/states";
@@ -124,9 +125,9 @@ export function CustomerPage() {
                 {axis === "value" && (
                   <p className="mt-2 text-xs text-muted-foreground">
                     Value: High ≥ $250k a year, Medium $50k–$250k, Low below $50k (counted KPI saving), or judged from the evidence when not quantified.{" "}
-                    <Link to="/method#map" className="text-[#0E7C86] hover:underline">
+                    {!RADAR.customerEdition && (<Link to="/method#map" className="text-[#0E7C86] hover:underline">
                       How
-                    </Link>
+                    </Link>)}
                   </p>
                 )}
                 <MatrixMap useCases={active} axis={axis} name={name} highlight={highlight ? fitSet : null} />

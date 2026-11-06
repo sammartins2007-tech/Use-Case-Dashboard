@@ -1,3 +1,4 @@
+import { RADAR } from "@/radar.config";
 import { useMemo } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ConnectorErrorState, EmptyState, LoadingState } from "@/components/states";
@@ -119,9 +120,9 @@ export function CustomerPortfolioPage() {
         {route && route.key !== "none" && (
           <p className="mt-4 max-w-3xl rounded-xl border border-border bg-card px-4 py-3 text-sm">
             <span className="font-medium">{route.short}:</span> {route.definition}{" "}
-            <Link to="/method#routes" className="text-[#0E7C86] hover:underline">
+            {!RADAR.customerEdition && (<Link to="/method#routes" className="text-[#0E7C86] hover:underline">
               How we classify
-            </Link>
+            </Link>)}
           </p>
         )}
 

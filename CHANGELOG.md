@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.0 — Use Case Coach built in, customer edition, static snapshot
+- Use Case Coach (in-app agent) is now part of the core app: "Complete with AI" on every dossier asks the missing readiness questions and saves answers (with undo). Needs the Agents (shared_agentnode) data source bound to the app.
+- Customer edition: set `customerEdition: true` in radar.config.ts to hide internal views (AI cost meter, feature radar, FinOps, How it works, Analysis and Evidence tabs, the coach). Point it at a site that holds only customer-safe columns.
+- optional/customer-snapshot: build a single read-only HTML file of the customer edition for external people (no app, licence or guest account needed), rebuildable by the refresh.
+- Fix: Coach reads answers returned only as activities; failures stay inside the panel.
+
 ## 1.5.1 — fix
 - prompts/creative-validate.py: fixed a typo that stopped the check script from running.
 

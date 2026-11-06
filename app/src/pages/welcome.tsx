@@ -102,8 +102,9 @@ export function WelcomePage() {
               <span className="italic text-[#0E7C86]">to AI use cases worth funding.</span>
             </h1>
             <p className="mt-5 max-w-[560px] text-[17px] leading-relaxed text-[#3D4757]">
-              A living radar that listens to what our customers share, qualifies every idea against five gates, routes it to the right
-              Microsoft platform and sizes what it will cost and return.
+              {RADAR.customerEdition
+                ? `One shared view of the AI use cases ${RADAR.customers[0]?.name ?? "the customer"} and Microsoft are shaping together: what each one solves, the value it can bring, the proposed solution and when it is planned.`
+                : "A living radar that listens to what our customers share, qualifies every idea against five gates, routes it to the right Microsoft platform and sizes what it will cost and return."}
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <a
@@ -112,12 +113,12 @@ export function WelcomePage() {
               >
                 {SINGLE_CUSTOMER ? `Open ${SINGLE_CUSTOMER}` : "Choose a customer"} <ArrowRight className="size-4" aria-hidden="true" />
               </a>
-              <Link
+              {!RADAR.customerEdition && (<Link
                 to="/method"
                 className="inline-flex items-center gap-2 rounded-full border border-[#D9D2C4] bg-white px-5 py-2.5 text-sm font-medium transition-colors hover:bg-[#FBF9F5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
                 Definitions and method
-              </Link>
+              </Link>)}
             </div>
             <dl className="mt-10 grid max-w-[560px] grid-cols-3 gap-6">
               <HeroStat label="Use cases tracked" value={q.isSuccess ? String(rows.length) : "…"} />
@@ -130,10 +131,12 @@ export function WelcomePage() {
             </dl>
           </div>
 
-          <AiConsumptionCard ai={ai} />
+          {!RADAR.customerEdition && <AiConsumptionCard ai={ai} />}
         </div>
       </section>
 
+      {!RADAR.customerEdition && (
+        <>
       {/* How it works */}
       <section aria-labelledby="how-title" className="mx-auto w-full max-w-[1280px] px-6 py-14">
         <p className="text-sm text-[#8A6420]">How it works</p>
@@ -215,6 +218,8 @@ export function WelcomePage() {
           </article>
         </div>
       </section>
+        </>
+      )}
 
       {/* Customers */}
       <section id="customers" aria-labelledby="cust-title" className="scroll-mt-20 border-t border-border bg-[#FBF9F5]">

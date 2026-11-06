@@ -225,6 +225,11 @@ export function useUpdateUseCase() {
         potentialSolution: "PotentialSolution",
         internalRef: "InternalRef",
       };
+      if (typeof patch.readiness === "string") changed.Readiness = patch.readiness;
+      if (typeof patch.openQuestions === "string") changed.OpenQuestions = patch.openQuestions;
+      if (typeof patch.analysis === "string") changed.Analysis = patch.analysis;
+      if (typeof patch.evidence === "string") changed.Evidence = patch.evidence;
+      if (typeof patch.lastSignal === "string") changed.LastSignal = patch.lastSignal;
       for (const k of TEXT_FIELDS) {
         const v = patch[k];
         if (typeof v === "string") (changed as Record<string, unknown>)[text[k]] = v;

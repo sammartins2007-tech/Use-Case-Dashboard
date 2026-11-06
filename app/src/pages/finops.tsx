@@ -1,3 +1,4 @@
+import { RADAR } from "@/radar.config";
 import { Fragment, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { format, parseISO } from "date-fns";
@@ -57,7 +58,7 @@ export function FinOpsPage() {
             {[
               ["Cost per token", "What the model charges. Falling fast, but tokens are not tasks.", "#B8892B"],
               ["Cost per task", "Agents call models many times per task. Measure the whole run.", "#0E7C86"],
-              ["Value per outcome", "Minutes saved, errors avoided, revenue gained. This funds the next euro.", "#2A9D78"],
+              ["Value per outcome", "Minutes saved, errors avoided, revenue gained. This funds the next dollar.", "#2A9D78"],
             ].map(([t, d, c]) => (
               <div key={t} className="rounded-2xl border border-border bg-white/80 p-5">
                 <span className="block h-1 w-10 rounded-full" style={{ backgroundColor: c }} aria-hidden="true" />
@@ -70,6 +71,7 @@ export function FinOpsPage() {
       </section>
 
       <div className="mx-auto w-full max-w-[1280px] space-y-10 px-6 py-10">
+        {!RADAR.customerEdition && (
         <section id="consumption" aria-labelledby="cons-title" className="scroll-mt-20">
           <h2 id="cons-title" className="font-[family-name:var(--font-serif)] text-2xl">
             AI consumed by this radar
@@ -173,6 +175,7 @@ export function FinOpsPage() {
             </div>
           )}
         </section>
+        )}
 
         <section aria-labelledby="uc-title">
           <h2 id="uc-title" className="font-[family-name:var(--font-serif)] text-2xl">
