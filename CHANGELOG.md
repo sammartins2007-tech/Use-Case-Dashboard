@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.0 — Add input: any input, challenged, reviewed and applied
+- New "Add input" button on every use case (internal edition). Paste anything — an email, meeting notes, a Teams thread, a customer document extract, your own remarks — or attach a text file (.txt, .md, .csv, .eml, .vtt transcript).
+- The in-app agent CHALLENGES the input (vague claims, figures without basis, contradictions with the dossier, solutions presented as problems), you can answer its challenges and ask it to review again.
+- It then PROPOSES field-level changes with current vs proposed text, reason, confidence and a conflict flag; you tick, edit and apply. Conflicts and low-confidence proposals start unticked. Nothing is saved before you apply; every apply can be undone.
+- On apply, readiness, open questions and analysis are re-scored, the input is recorded in Evidence and Sources, and the AI use is logged as an estimate.
+- Customer edition: the button is hidden.
+
 ## 1.6.0 — Use Case Coach built in, customer edition, static snapshot
 - Use Case Coach (in-app agent) is now part of the core app: "Complete with AI" on every dossier asks the missing readiness questions and saves answers (with undo). Needs the Agents (shared_agentnode) data source bound to the app.
 - Customer edition: set `customerEdition: true` in radar.config.ts to hide internal views (AI cost meter, feature radar, FinOps, How it works, Analysis and Evidence tabs, the coach). Point it at a site that holds only customer-safe columns.

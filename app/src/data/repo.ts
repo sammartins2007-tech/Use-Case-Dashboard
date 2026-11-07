@@ -230,6 +230,7 @@ export function useUpdateUseCase() {
       if (typeof patch.analysis === "string") changed.Analysis = patch.analysis;
       if (typeof patch.evidence === "string") changed.Evidence = patch.evidence;
       if (typeof patch.lastSignal === "string") changed.LastSignal = patch.lastSignal;
+      if (typeof patch.sources === "string") changed.Sources = patch.sources;
       for (const k of TEXT_FIELDS) {
         const v = patch[k];
         if (typeof v === "string") (changed as Record<string, unknown>)[text[k]] = v;

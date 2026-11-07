@@ -3,9 +3,10 @@ import { useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { toast } from "sonner";
-import { Ban, Bot, ChevronLeft, ChevronRight, ExternalLink, HelpCircle, Pencil, RotateCcw, Sparkles } from "lucide-react";
+import { Ban, Bot, ShieldCheck, ChevronLeft, ChevronRight, ExternalLink, HelpCircle, Pencil, RotateCcw, Sparkles } from "lucide-react";
 import { hasSolution } from "@/lib/solutions";
 import { UseCaseCoach } from "@/components/use-case-coach";
+import { UseCaseInput } from "@/components/use-case-input";
 import { PageBoundary } from "@/components/page-boundary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -230,6 +231,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
   const [printAll, setPrintAll] = useState(false);
   const [descOpen, setDescOpen] = useState(false);
   const [coachOpen, setCoachOpen] = useState(false);
+  const [inputOpen, setInputOpen] = useState(false);
   const update = useUpdateUseCase();
   const ref = useRef<HTMLDivElement>(null);
   const save = (patch: UseCasePatch, msg: string, done?: () => void) =>
@@ -337,6 +339,14 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
             >
               <Bot className="size-4" aria-hidden /> Complete with AI
             </button>)}
+            {!RADAR.customerEdition && (<button
+              type="button"
+              onClick={() => setInputOpen(true)}
+              className="inline-flex h-8 items-center gap-1.5 rounded-md px-3 text-sm font-medium text-white shadow-sm hover:opacity-90"
+              style={{ background: inkOf(brand.primary) }}
+            >
+              <ShieldCheck className="size-4" aria-hidden /> Add input
+            </button>)}
             {hasSolution(u.id) && (
               <Link
                 to={`/use-case/${u.id}/solution`}
@@ -410,6 +420,9 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
         </div>
       </div>
 
+      {!RADAR.customerEdition && <PageBoundary label="Input review" compact onReset={() => setInputOpen(false)}>
+        <UseCaseInput u={u} open={inputOpen} onOpenChange={setInputOpen} accent={inkOf(brand.primary)} />
+      </PageBoundary>}
       {!RADAR.customerEdition && <PageBoundary label="Coach" compact onReset={() => setCoachOpen(false)}>
         <UseCaseCoach u={u} open={coachOpen} onOpenChange={setCoachOpen} accent={inkOf(brand.primary)} />
       </PageBoundary>}
