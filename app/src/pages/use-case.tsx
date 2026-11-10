@@ -1,20 +1,24 @@
 import { RADAR } from "@/radar.config";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { toast } from "sonner";
 import { Ban, Bot, ShieldCheck, ChevronLeft, ChevronRight, ExternalLink, HelpCircle, Pencil, RotateCcw, Sparkles } from "lucide-react";
-import { hasSolution } from "@/lib/solutions";
+import { useHasSolution } from "@/lib/solutions";
 import { UseCaseCoach } from "@/components/use-case-coach";
 import { UseCaseInput } from "@/components/use-case-input";
+import { UseCaseClarifications } from "@/components/clarifications";
 import { PageBoundary } from "@/components/page-boundary";
+import { RouteEditor } from "@/components/route-editor";
+import { WhatIfPanel, shortName, useWhatIf } from "@/components/what-if";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ConnectorErrorState, EmptyState, LoadingState } from "@/components/states";
-import { PdfExportButton } from "@/components/pdf-export-button";
+import { createSectionedPdfBlob, toSafePdfExportError } from "@/lib/pdf-export";
+import { FileDown, Loader2 } from "lucide-react";
 import { KpiTable } from "@/components/kpi-table";
 import { PriorityFitBox } from "@/components/priority-fit-box";
 import { RoadmapFields } from "@/components/roadmap-fields";
@@ -85,7 +89,7 @@ const SECTIONS: { id: string; title: string; intro?: string; fields: { key: Text
   },
 ];
 
-type TabId = "overview" | "problem" | "landscape" | "analysis" | "solution" | "evidence";
+type TabId = "overview" | "problem" | "landscape" | "analysis" | "solution" | "whatif" | "evidence";
 const ALL_TABS: { id: TabId; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "problem", label: "Problem & outcome" },
@@ -227,11 +231,20 @@ export function UseCasePage() {
 }
 
 function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Signal[]; features: Feature[]; nav: React.ReactNode }) {
+  const hasSolution = useHasSolution();
   const [tab, setTab] = useState<TabId>("overview");
+  const wi = useWhatIf(u.id);
+  const tabs = useMemo(() => (wi ? TABS.flatMap((t) => (t.id === "solution" ? [t, { id: "whatif" as TabId, label: "What if Microsoft?" }] : [t])) : TABS), [wi]);
+  useEffect(() => {
+    if (!tabs.some((t) => t.id === tab)) setTab("overview");
+  }, [tabs, tab]);
   const [printAll, setPrintAll] = useState(false);
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const headRef = useRef<HTMLDivElement>(null);
   const [descOpen, setDescOpen] = useState(false);
   const [coachOpen, setCoachOpen] = useState(false);
   const [inputOpen, setInputOpen] = useState(false);
+  const [prefill, setPrefill] = useState<{ text: string; title: string; key: number } | undefined>(undefined);
   const update = useUpdateUseCase();
   const ref = useRef<HTMLDivElement>(null);
   const save = (patch: UseCasePatch, msg: string, done?: () => void) =>
@@ -255,6 +268,45 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
   const gatesGreen = statuses.filter((x) => x.e.group === "gate" && x.s === "G").length;
   const qs = questions(u);
   const safeName = `${u.account ?? "Internal"} - ${title}`.replace(/[^\w\s&-]/g, "").slice(0, 80);
+  const exportPdf = async () => {
+    if (pdfBusy) return;
+    setPdfBusy(true);
+    setPrintAll(true);
+    try {
+      // Let every tab render fully (no fade-in) before capturing.
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      await new Promise((r) => setTimeout(r, 900));
+      const root = ref.current;
+      if (!root || !headRef.current) throw new Error("Dossier not ready");
+      const panels = Array.from(root.querySelectorAll<HTMLElement>("[data-pdf-panel]"));
+      const sections = panels.map((p) => ({ blocks: Array.from(p.children).filter((c): c is HTMLElement => c instanceof HTMLElement) }));
+      if (sections[0]) sections[0].blocks.unshift(headRef.current);
+      else sections.push({ blocks: [headRef.current] });
+      let result;
+      try {
+        result = await createSectionedPdfBlob(sections, `${safeName} - business case input.pdf`);
+      } catch {
+        await new Promise((r) => setTimeout(r, 600));
+        result = await createSectionedPdfBlob(sections, `${safeName} - business case input.pdf`);
+      }
+      const url = URL.createObjectURL(result.blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = result.fileName;
+      a.style.display = "none";
+      document.body.append(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      toast.success("PDF ready");
+    } catch (e) {
+      console.warn("PDF export failed", e);
+      toast.error(toSafePdfExportError(e)?.message ?? "PDF export failed");
+    } finally {
+      setPrintAll(false);
+      setPdfBusy(false);
+    }
+  };
   const brand = brandOf(u.account);
   const route = routeOf(u.classification);
   const sources = parseSources(u.sources);
@@ -288,15 +340,16 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
   );
   const sec = (id: string) => SECTIONS.find((x) => x.id === id)!;
   const panel = (id: TabId, children: React.ReactNode) =>
-    !TABS.some((t) => t.id === id) ? null : (
+    !tabs.some((t) => t.id === id) ? null : (
     <div
       role="tabpanel"
       id={`panel-${id}`}
       aria-labelledby={`tab-${id}`}
       hidden={!printAll && tab !== id}
-      className={cn("space-y-5 animate-in fade-in duration-300", printAll && "break-before-page")}
+      className={cn("space-y-5", !printAll && "animate-in fade-in duration-300")}
+      data-pdf-panel
     >
-      {printAll && <h2 className="font-[family-name:var(--font-serif)] text-2xl">{TABS.find((t) => t.id === id)?.label}</h2>}
+      {printAll && <h2 className="font-[family-name:var(--font-serif)] text-2xl">{tabs.find((t) => t.id === id)?.label}</h2>}
       {children}
     </div>
   );
@@ -311,7 +364,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
   return (
     <div ref={ref}>
       {/* Fixed header: brand band, title + description, tabs */}
-      <div className="sticky top-16 z-20 -mx-6 border-b border-border bg-[#F7F5F0]/95 px-6 pt-3 backdrop-blur" data-pdf-sticky>
+      <div ref={headRef} className="sticky top-16 z-20 -mx-6 border-b border-border bg-[#F7F5F0]/95 px-6 pt-3 backdrop-blur" data-pdf-sticky>
         <div className="flex flex-wrap items-center gap-3 overflow-hidden rounded-2xl border border-border bg-white py-1 pr-3" style={{ borderTop: `4px solid ${brand.primary}` }}>
           <Link to={`/customer/${encodeURIComponent(u.account ?? "Internal")}`} className="flex h-10 items-center px-4" aria-label={`${u.account ?? "Internal"} customer page`}>
             {brand.logo ? <img src={brand.logo} alt={`${u.account ?? "Microsoft"} logo`} className="max-h-7 max-w-[120px] object-contain" /> : <span>{u.account}</span>}
@@ -357,16 +410,15 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
               </Link>
             )}
             <DiscardControl u={u} busy={update.isPending} onSave={save} />
-            <div
-              onClickCapture={() => {
-                setPrintAll(true);
-                window.setTimeout(() => setPrintAll(false), 20000);
-              }}
+            <button
+              type="button"
+              onClick={exportPdf}
+              disabled={pdfBusy}
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-white px-3 text-sm font-medium shadow-sm hover:bg-muted disabled:opacity-60"
             >
-              <PdfExportButton targetRef={ref} fileName={`${safeName} - business case input.pdf`}>
-                PDF
-              </PdfExportButton>
-            </div>
+              {pdfBusy ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <FileDown className="size-4" aria-hidden />}
+              {pdfBusy ? "Creating PDF…" : "PDF"}
+            </button>
           </div>
         </div>
 
@@ -378,14 +430,15 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
               {pill("Confidence", u.confidence ?? "Low")}
               {pill("Decision", decision)}
               {u.classification && pill("Route", route.short, route.color)}
+              {wi && pill(`${wi.e.account || u.account || "Customer"}'s choice`, shortName(wi.e.name), wi.e.accent2)}
               {u.wave && u.wave !== "Unplanned" && pill("Wave", u.wave)}
               {u.owner && pill("Owner", u.owner)}
             </div>
           </div>
           <div className="min-w-0 border-l-2 pl-4" style={{ borderColor: brand.primary }}>
-            <div className={cn("relative", !descOpen && "max-h-[6.6rem] overflow-hidden")}>
+            <div className={cn("relative", !descOpen && !printAll && "max-h-[6.6rem] overflow-hidden")}>
               <EditableField label="Description" hideLabel compact hint="What the use case is about, for whom, and what it should achieve" value={u.description} busy={update.isPending} onSave={(v, done) => save({ description: v }, "Description saved", done)} />
-              {!descOpen && (u.description?.length ?? 0) > 260 && <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[#F7F5F0] to-transparent" />}
+              {!descOpen && !printAll && (u.description?.length ?? 0) > 260 && <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[#F7F5F0] to-transparent" />}
             </div>
             {(u.description?.length ?? 0) > 260 && (
               <button className="text-xs text-[#0E7C86] hover:underline" onClick={() => setDescOpen((v) => !v)} data-pdf-exclude>
@@ -395,8 +448,10 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
           </div>
         </div>
 
+        <UseCaseClarifications u={u} onAnswered={(_u, q, a) => { setPrefill({ text: `Answer from the account team to an open clarification.\nQuestion: ${q}\nAnswer: ${a}\nApply this answer to every field it settles, as one current statement (no dates).`, title: "Owner answer to a clarification", key: Date.now() }); setInputOpen(true); }} />
+
         <div role="tablist" aria-label="Dossier sections" className="mt-3 flex gap-1 overflow-x-auto no-scrollbar" data-pdf-exclude>
-          {TABS.map((t) => (
+          {tabs.map((t) => (
             <button
               key={t.id}
               id={`tab-${t.id}`}
@@ -421,7 +476,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
       </div>
 
       {!RADAR.customerEdition && <PageBoundary label="Input review" compact onReset={() => setInputOpen(false)}>
-        <UseCaseInput u={u} open={inputOpen} onOpenChange={setInputOpen} accent={inkOf(brand.primary)} />
+        <UseCaseInput u={u} open={inputOpen} onOpenChange={setInputOpen} accent={inkOf(brand.primary)} prefill={prefill} />
       </PageBoundary>}
       {!RADAR.customerEdition && <PageBoundary label="Coach" compact onReset={() => setCoachOpen(false)}>
         <UseCaseCoach u={u} open={coachOpen} onOpenChange={setCoachOpen} accent={inkOf(brand.primary)} />
@@ -536,6 +591,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
                   {u.flag && <span className="rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs text-amber-900">{u.flag}</span>}
                 </div>
                 {u.classificationWhy && <p className="mt-2 text-sm">{u.classificationWhy}</p>}
+                {!RADAR.customerEdition && <RouteEditor current={u.classification} busy={update.isPending} onSave={save} />}
                 {!RADAR.customerEdition && (<Link to="/method#routes" className="mt-2 inline-block text-xs text-[#0E7C86] hover:underline" data-pdf-exclude>
                   How we classify
                 </Link>)}
@@ -692,6 +748,14 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
             )}
           </section>,
         )}
+
+        {wi &&
+          panel(
+            "whatif",
+            <PageBoundary label="What if Microsoft" compact>
+              <WhatIfPanel id={u.id} printAll={printAll} />
+            </PageBoundary>,
+          )}
 
         {panel(
           "evidence",

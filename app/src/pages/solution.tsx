@@ -7,12 +7,16 @@ import { useUseCase } from "@/data/repo";
 import { brandOf, inkOf } from "@/lib/brands";
 import { routeOf } from "@/lib/routes";
 import { safeUrl } from "@/lib/safe-url";
-import { LAYER_LABEL, LAYER_ORDER, useHeroImage, useSolution, type ChapterId, type Layout, type Solution, type SolNode } from "@/lib/solutions";
+import { BUILD_TITLE, LAYER_LABEL, LAYER_ORDER, useHeroImage, useSolution, type ChapterId, type Layout, type Solution, type SolNode } from "@/lib/solutions";
+import { BlueprintKit, GoLiveSection, KindHero } from "@/components/blueprint";
 import { SolutionDemo } from "@/components/solution-demos";
 import { TechArchitecture } from "@/components/tech-architecture";
 import { ArchViews } from "@/components/arch-views";
 import { Challenge, ClockStory, JourneyViz, NumbersStrip, Signature, motifStyle } from "@/components/solution-creative";
 import { ScrollRow } from "@/components/scroll-row";
+import { HackathonChapter, hasHackathon } from "@/components/hackathon";
+import { PathwayChapter, hasPathway } from "@/components/pathway";
+import { RedesignBar, RequestDesign } from "@/components/redesign-bar";
 import { cn } from "@/lib/utils";
 
 const serif = "font-[family-name:var(--font-serif)]";
@@ -24,6 +28,10 @@ const CH_KICKER: Record<ChapterId, string> = {
   needs: "What is needed",
   plan: "Configure · build · deploy",
   value: "Value, cost and risk",
+  build: "The solution",
+  golive: "Get it live",
+  hackathon: "Route to hackathon",
+  pathway: "Assumptions and path",
 };
 const DEFAULT_CHAPTERS: { id: ChapterId; title: string; intro: string }[] = [
   { id: "story", title: "From today's friction to the solved state", intro: "" },
@@ -34,18 +42,38 @@ const DEFAULT_CHAPTERS: { id: ChapterId; title: string; intro: string }[] = [
   { id: "value", title: "What success looks like", intro: "" },
 ];
 
+/** Route-true chapter sets: light routes get the artefact and how to go live; heavy routes keep architecture and plan. */
+function routeChapters(s: Solution): { id: ChapterId; title: string; intro: string }[] {
+  const b = s.blueprint!;
+  const build = { id: "build" as ChapterId, title: BUILD_TITLE[b.kind], intro: "" };
+  const story = { id: "story" as ChapterId, title: "Today and tomorrow", intro: "" };
+  const golive = { id: "golive" as ChapterId, title: "Get it live", intro: "" };
+  const value = { id: "value" as ChapterId, title: "Value and risks", intro: "" };
+  const hack = hasHackathon(s) ? [{ id: "hackathon" as ChapterId, title: "Route to hackathon", intro: "" }] : [];
+  if (hasPathway(s)) hack.unshift({ id: "pathway" as ChapterId, title: "Assumptions and path", intro: "" });
+  if (b.kind === "m365" || b.kind === "cowork" || b.kind === "noai" || b.kind === "unknown") return [...hack, build, story, golive, value];
+  const out = [...hack, build, story];
+  if ((b.kind === "studio" || b.kind === "fabric" || b.kind === "foundry") && (s.techViews || s.technical)) out.push({ id: "architecture", title: "Architecture", intro: "" });
+  out.push(golive, { id: "plan", title: "Delivery plan", intro: "" }, value);
+  return out;
+}
+
 export function SolutionPage() {
   const { id = "" } = useParams();
   const uc = useUseCase(id);
   const sol = useSolution(id);
+  const [preview, setPreview] = useState(false);
   const brand = brandOf(uc.data?.account);
   const accent = inkOf(brand.primary ?? "#0E7C86");
 
   if (sol.loading) return <div className="mx-auto max-w-5xl p-8"><LoadingState rows={6} /></div>;
-  if (!sol.data)
+  const proposal = sol.set?.proposed?.data;
+  const shown = (preview || !sol.data) && proposal ? proposal : sol.data;
+  if (!shown)
     return (
       <div className="mx-auto max-w-3xl p-8">
-        <EmptyState title="No solution yet" description="This use case has not been solved yet. Solutions exist for the Wave 1 and Wave 2 use cases." />
+        <EmptyState title="No solution yet" description="This use case has no solution design yet." />
+        <RequestDesign id={id} classification={uc.data?.classification} />
         <div className="mt-4 text-center">
           <Link to={`/use-case/${id}`} className="text-primary underline">
             Back to the use case
@@ -53,13 +81,32 @@ export function SolutionPage() {
         </div>
       </div>
     );
-  return <SolutionView s={sol.data} id={id} account={uc.data?.account} classification={uc.data?.classification} owner={uc.data?.owner} accent={accent} />;
+  const look = shown.experience?.look;
+  const pal = PALETTES[[...id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7) % PALETTES.length];
+  const solAccent = look?.accent ?? (shown.blueprint ? pal[0] : accent);
+  const solAccent2 = look?.accent2 ?? (shown.blueprint ? pal[1] : accent);
+  const bar = <RedesignBar id={id} set={sol.set} classification={uc.data?.classification} preview={preview || !sol.data} setPreview={setPreview} lastEvidence={uc.data?.lastSignal} />;
+  return <SolutionView key={shown === proposal ? "proposal" : "current"} bar={bar} s={shown} id={id} account={uc.data?.account} classification={uc.data?.classification} owner={uc.data?.owner} accent={solAccent} accent2={solAccent2} />;
 }
 
-function SolutionView({ s, id, account, classification, owner, accent }: { s: Solution; id: string; account?: string; classification?: string; owner?: string; accent: string }) {
+/** Curated accent pairs; a use case without its own look gets one picked from its id, so pages differ. */
+const PALETTES: [string, string][] = [
+  ["#0F6E6E", "#2BA59A"],
+  ["#5B3FA8", "#9B6FD6"],
+  ["#A3472A", "#D9822B"],
+  ["#1F5FA8", "#3FA0D8"],
+  ["#2F6B3A", "#7FB241"],
+  ["#8A2C5B", "#D0567F"],
+  ["#3D4F66", "#7A93AE"],
+  ["#946B12", "#D4A72C"],
+];
+const KIND_LABEL: Record<string, string> = { noai: "Rules and flows, no AI", codeapp: "Power Apps code app", m365: "Microsoft 365 Copilot", cowork: "Copilot Cowork", studio: "Copilot Studio agent", fabric: "Microsoft Fabric", foundry: "Azure AI Foundry", unknown: "Route to decide" };
+
+function SolutionView({ s, id, account, classification, owner, accent, accent2, bar }: { bar?: React.ReactNode; s: Solution; id: string; account?: string; classification?: string; owner?: string; accent: string; accent2?: string }) {
   const exp = s.experience;
   const layout: Layout = exp?.layout ?? "cinematic";
-  const chapters = exp?.chapters?.length ? exp.chapters.filter((c) => c.id !== "demo" || exp.demo) : DEFAULT_CHAPTERS;
+  const chapters = s.blueprint ? routeChapters(s) : exp?.chapters?.length ? exp.chapters.filter((c) => c.id !== "demo" || exp.demo) : DEFAULT_CHAPTERS;
+  const bp = s.blueprint;
   const [active, setActive] = useState<ChapterId>(chapters[0].id);
   const idx = Math.max(0, chapters.findIndex((c) => c.id === active));
   const ch = chapters[idx];
@@ -77,8 +124,17 @@ function SolutionView({ s, id, account, classification, owner, accent }: { s: So
   const facts = (
     <>
       <Chip label="Route" value={route.short} dot={route.color} />
-      <Chip label="Effort" value={`${s.plan.totalEffortDays} days`} />
-      <Chip label="Duration" value={`${s.plan.durationWeeks} weeks`} />
+      {hasPathway(s) && <Chip label="Assumptions" value={`${(s as unknown as { pathway: { assumptions: unknown[] } }).pathway.assumptions.length} to validate`} dot="#D97706" />}
+      {hasHackathon(s) && <Chip label="Hackathon" value={(s as unknown as { hackathon: { event: { dates: string } } }).hackathon.event.dates} dot="#E11D48" />}
+      {bp ? (
+        <Chip label="Effort" value={`${bp.effort.value} ${bp.effort.value === 1 ? bp.effort.unit.replace(/s$/, "") : bp.effort.unit}`} />
+      ) : (
+        <>
+          <Chip label="Effort" value={`${s.plan.totalEffortDays} days`} />
+          <Chip label="Duration" value={`${s.plan.durationWeeks} weeks`} />
+        </>
+      )}
+      {bp && <Chip label="Runs on" value={bp.runCost.model} />}
       {owner && <Chip label="Owner" value={owner} />}
       <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-white/85 px-3 py-1">
         <span className={cn("size-2 rounded-full", s.readinessVerdict.startsWith("Ready to") ? "bg-emerald-600" : s.readinessVerdict.startsWith("Ready") ? "bg-amber-500" : "bg-rose-500")} />
@@ -95,11 +151,18 @@ function SolutionView({ s, id, account, classification, owner, accent }: { s: So
   );
   const body = (
     <div key={active} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-      <div className="mb-5 max-w-4xl">
+      <div className={cn("mb-5 max-w-4xl", bp && "sr-only")}>
         <p className="text-xs font-medium tracking-[0.14em] text-muted-foreground">{CH_KICKER[ch.id].toUpperCase()}</p>
         <h2 className={cn(serif, "mt-1 text-2xl md:text-3xl")}>{ch.title}</h2>
         {ch.intro && <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{ch.intro}</p>}
       </div>
+      {bar}
+      {ch.id === "build" && bp && (
+        <BlueprintKit b={bp} s={s} />
+      )}
+      {ch.id === "golive" && bp && <GoLiveSection b={bp} s={s} />}
+      {ch.id === "hackathon" && <HackathonChapter s={s} />}
+      {ch.id === "pathway" && <PathwayChapter s={s} />}
       {ch.id === "demo" && exp?.demo && <SolutionDemo demo={exp.demo} />}
       {ch.id === "story" && <StorySection s={s} />}
       {ch.id === "journey" && <JourneySection s={s} />}
@@ -152,7 +215,7 @@ function SolutionView({ s, id, account, classification, owner, accent }: { s: So
       ))}
     </ScrollRow>
   );
-  const style = { ["--sol" as string]: accent } as React.CSSProperties;
+  const style = { ["--sol" as string]: accent, ["--sol2" as string]: accent2 ?? accent } as React.CSSProperties;
   const motif = motifStyle(s.creative?.motif);
   const tagline = exp?.tagline ?? s.headline;
   const content = (
@@ -171,6 +234,47 @@ function SolutionView({ s, id, account, classification, owner, accent }: { s: So
       </div>
     </div>
   );
+
+  /* ---- Route blueprints: compact header, chapter tabs, panels that fit the screen ---- */
+  if (bp) {
+    const look = exp?.look ?? {};
+    const tone = look.tone ?? (layout === "console" ? "dark" : layout === "dashboard" || layout === "blueprint" ? "tint" : "light");
+    const dark = tone === "dark";
+    const titleCls = look.type === "mono" ? "font-mono font-semibold tracking-tight" : look.type === "sans" ? "font-semibold tracking-tight" : serif;
+    const canvas = look.canvas ?? (dark ? "#0F1B2D" : tone === "tint" ? "color-mix(in srgb, var(--sol) 7%, #FFFDF8)" : "#F7F5F0");
+    return (
+      <div className="min-h-[calc(100vh-4rem)] pb-8" style={style}>
+        <header className={cn("relative overflow-hidden border-b border-border", dark && "text-white")} style={{ background: canvas }}>
+          <div className="pointer-events-none absolute inset-0 opacity-70" style={motif} />
+          <div className="pointer-events-none absolute -top-24 -right-24 size-[420px] rounded-full opacity-25 blur-3xl" style={{ background: "var(--sol2)" }} />
+          <div className="relative mx-auto grid max-w-[1440px] items-center gap-6 px-6 py-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
+            <div className="flex min-w-0 flex-col gap-2.5">
+              <span className={cn("[&_a]:text-inherit", dark && "opacity-80")}>{back}</span>
+              <span className="inline-flex w-fit items-center gap-2 rounded-full px-3 py-1 text-[11px] font-medium tracking-wide text-white" style={{ background: "linear-gradient(135deg, var(--sol), var(--sol2))" }}>
+                <Sparkles className="size-3" aria-hidden /> {KIND_LABEL[bp.kind] ?? route.short}
+                {s.creative?.signature?.kicker ? <span className="font-normal opacity-85">· {s.creative.signature.kicker}</span> : null}
+              </span>
+              <h1 className={cn(titleCls, "text-4xl leading-[1.05] md:text-5xl")} style={dark ? undefined : { color: "var(--sol)" }}>
+                {s.solutionName}
+              </h1>
+              <p className={cn("line-clamp-2 max-w-2xl text-lg leading-snug", dark ? "text-white/85" : "text-foreground/80")}>{tagline}</p>
+              {s.creative?.signature?.line && <p className={cn(serif, "line-clamp-1 max-w-2xl text-[15px] italic", dark ? "text-white/70" : "text-foreground/60")}>“{s.creative.signature.line}”</p>}
+              <div className={cn("flex flex-wrap gap-1.5 text-xs", dark && "text-foreground")}>{facts}</div>
+            </div>
+            <div className="relative hidden h-[230px] overflow-hidden rounded-3xl lg:block">
+              {hero && <img src={hero} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-[8s] hover:scale-105" />}
+              <div className="absolute inset-0" style={{ background: "linear-gradient(120deg, color-mix(in srgb, var(--sol) 55%, transparent), transparent 60%)" }} />
+              <div className="absolute inset-0 flex items-center justify-end pr-6">
+                <KindHero b={bp} s={s} />
+              </div>
+            </div>
+          </div>
+        </header>
+        {stickyBar(tabs(), dark ? "bg-[#F4F6F8]/95" : "bg-[#F7F5F0]/95")}
+        <div className="mx-auto max-w-[1440px] px-6 pt-5">{content}</div>
+      </div>
+    );
+  }
 
   /* ---- Layout: editorial / blueprint — split hero, chapter rail ---- */
   if (layout === "editorial" || layout === "blueprint") {

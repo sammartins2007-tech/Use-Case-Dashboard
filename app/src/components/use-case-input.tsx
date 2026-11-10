@@ -31,7 +31,7 @@ const VERDICT = {
 } as const;
 const CONF = { High: "bg-[#E9F5EE] text-[#1E5B3E]", Medium: "bg-[#EEF4FF] text-[#1F4FA8]", Low: "bg-[#FFF7E6] text-[#8A5A12]" } as const;
 
-export function UseCaseInput({ u, open, onOpenChange, accent }: { u: UseCase; open: boolean; onOpenChange: (v: boolean) => void; accent: string }) {
+export function UseCaseInput({ u, open, onOpenChange, accent, prefill }: { u: UseCase; open: boolean; onOpenChange: (v: boolean) => void; accent: string; prefill?: { text: string; title: string; key: number } }) {
   const update = useUpdateUseCase();
   const qc = useQueryClient();
   const [stage, setStage] = useState<Stage>("input");
@@ -50,6 +50,16 @@ export function UseCaseInput({ u, open, onOpenChange, accent }: { u: UseCase; op
   const live = useRef(u);
   live.current = u;
   const input: ReviewInput = { text, sourceType, sourceTitle: sourceTitle.trim() };
+
+  useEffect(() => {
+    if (!prefill) return;
+    setStage("input");
+    setReview(null);
+    setHistory([]);
+    setText(prefill.text);
+    setSourceType("Other");
+    setSourceTitle(prefill.title);
+  }, [prefill?.key]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const ask = useMutation({
     mutationFn: async (h: ReviewTurn[]) => reviewInput(live.current, input, h),

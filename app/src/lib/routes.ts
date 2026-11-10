@@ -92,3 +92,14 @@ export function routeOf(key?: string): Route {
 export function onRoute(r: Route) {
   return ["#BDB4A3", "#E4DED3", "#B8892B", "#8A8F98"].includes(r.color) ? "#1B2A41" : "#FFFFFF";
 }
+
+/** Lenient lookup for route keys written by agents ("5", "5 · Copilot Studio", "Copilot Studio"). */
+export function routeLoose(key?: string): Route {
+  if (!key) return UNCLASSIFIED;
+  const exact = ROUTES.find((r) => r.key === key);
+  if (exact) return exact;
+  const d = key.trim().match(/^([1-8])/);
+  if (d) return ROUTES[Number(d[1]) - 1];
+  const k = key.toLowerCase();
+  return ROUTES.find((r) => k.includes(r.short.toLowerCase())) ?? UNCLASSIFIED;
+}

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useQueries } from "@tanstack/react-query";
+import { fetchDoc, useContentIndex, useDoc } from "@/lib/content";
 
 /** A use case solved end to end by the L2 specialist board (static design artefact bundled with the app). */
 export interface SolLink { title: string; url: string }
@@ -25,6 +26,10 @@ export interface Solution {
   experience?: SolExperience;
   creative?: SolCreative;
   techViews?: TechViews;
+  /** Route-specific design (v3). When present the page shows route-true chapters. */
+  route?: string;
+  routeCheck?: { verdict: "Agree" | "Challenge"; suggested?: string; why: string };
+  blueprint?: Blueprint;
   plan: {
     summary: string;
     prerequisites: string[];
@@ -67,12 +72,14 @@ export interface SolTechnical {
   connections: SolConnection[];
   crossCutting: Record<"identity" | "security" | "networking" | "alm" | "monitoring" | "dataResidency", string>;
 }
-export type ChapterId = "demo" | "story" | "journey" | "architecture" | "needs" | "plan" | "value";
+export type ChapterId = "demo" | "story" | "journey" | "architecture" | "needs" | "plan" | "value" | "build" | "golive" | "hackathon" | "pathway";
 export type Layout = "cinematic" | "editorial" | "blueprint" | "storyboard" | "console" | "dashboard";
 export interface SolDemo { type: string; title: string; intro: string; note: string; data: Record<string, unknown> }
 export interface SolExperience {
   layout: Layout;
   tagline: string;
+  /** Per-use-case look: colours, title type and header tone, so every solution feels its own. */
+  look?: { accent?: string; accent2?: string; canvas?: string; type?: "serif" | "mono" | "sans"; tone?: "light" | "dark" | "tint"; mood?: string };
   hero: string;
   image?: string;
   chapters: { id: ChapterId; title: string; intro: string }[];
@@ -98,81 +105,55 @@ export interface WavePlan {
   decisionsNeeded: { decision: string; owner: string; by: string }[];
 }
 
-const solMods = import.meta.glob<{ default: Solution }>("../data/solutions/*.json");
-const waveMods = import.meta.glob<{ default: WavePlan }>("../data/wave-plans/*.json");
-
-const solKey = (id: string) => `../data/solutions/${id}.json`;
-export const SOLUTION_IDS = new Set(Object.keys(solMods).map((k) => k.replace(/^.*\/(\d+)\.json$/, "$1")));
-export const hasSolution = (id?: string | number) => id != null && SOLUTION_IDS.has(String(id));
-
+/* All use-case-specific content is read from SharePoint (see lib/content.ts); nothing is bundled. */
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const waveKey = (account: string, wave: string) => `../data/wave-plans/${slug(account)}-${slug(wave)}.json`;
-export const hasWavePlan = (account: string, wave: string) => waveKey(account, wave) in waveMods;
+export const waveRef = (account: string, wave: string) => `${slug(account)}-${slug(wave)}`;
 
-function useLoad<T>(loader: (() => Promise<{ default: T }>) | undefined, key: string) {
-  const [state, setState] = useState<{ key: string; data: T | null; loading: boolean }>({ key, data: null, loading: Boolean(loader) });
-  useEffect(() => {
-    let alive = true;
-    if (!loader) {
-      setState({ key, data: null, loading: false });
-      return;
-    }
-    setState({ key, data: null, loading: true });
-    loader().then(
-      (m) => alive && setState({ key, data: m.default, loading: false }),
-      () => alive && setState({ key, data: null, loading: false }),
-    );
-    return () => {
-      alive = false;
-    };
-  }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
-  return state.key === key ? state : { key, data: null, loading: Boolean(loader) };
+/** Which use cases have a current design (from the content index). */
+export function useHasSolution() {
+  const { index } = useContentIndex();
+  return (id?: string | number) => index.has("solution", id);
 }
 
+/** Which customer waves have a delivery plan. */
+export function useHasWavePlan() {
+  const { index } = useContentIndex();
+  return (account: string, wave: string) => index.has("waveplan", waveRef(account, wave));
+}
+
+/** The design of one use case: the current one plus any redesign proposal waiting for review. */
 export function useSolution(id?: string) {
-  const k = id ? solKey(id) : "";
-  return useLoad<Solution>(k ? solMods[k] : undefined, k);
+  const q = useDoc<Solution>("solution", id);
+  return { data: q.data?.current?.data ?? null, loading: q.isLoading, set: q.data, error: q.error };
 }
 
 export function useWavePlan(account: string, wave: string) {
-  const k = waveKey(account, wave);
-  return useLoad<WavePlan>(waveMods[k], k);
+  const q = useDoc<WavePlan>("waveplan", waveRef(account, wave));
+  return { data: q.data?.current?.data ?? null, loading: q.isLoading };
 }
 
-/** Loads the solutions of a set of use case ids (for wave pages). */
+/** Loads the current designs of a set of use case ids (for wave pages). */
 export function useSolutions(ids: string[]) {
-  const key = ids.join(",");
-  const [data, setData] = useState<Record<string, Solution>>({});
-  useEffect(() => {
-    let alive = true;
-    void Promise.allSettled(ids.filter((i) => solMods[solKey(i)]).map((i) => solMods[solKey(i)]().then((m) => [i, m.default] as const))).then((rs) => {
-      if (alive) setData(Object.fromEntries(rs.flatMap((r) => (r.status === "fulfilled" ? [r.value] : []))));
-    });
-    return () => {
-      alive = false;
-    };
-  }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
-  return data;
+  const qs = useQueries({
+    queries: ids.map((id) => ({
+      queryKey: ["doc", "solution", id],
+      staleTime: 5 * 60_000,
+      queryFn: () => fetchDoc<Solution>("solution", id),
+    })),
+  });
+  const out: Record<string, Solution> = {};
+  qs.forEach((q, i) => {
+    const d = q.data?.current?.data;
+    if (d) out[ids[i]] = d;
+  });
+  return out;
 }
 
-const heroMods = import.meta.glob<string>("../assets/solutions/*.webp", { import: "default" });
-/** Lazily loads the use case's own hero image, if it has one. */
+/** The use case's own hero image (stored as a data URL), else its theme image. */
 export function useHeroImage(id: string, fallbackTheme?: string) {
-  const key = `../assets/solutions/${id}.webp`;
-  const [src, setSrc] = useState<string>("");
-  useEffect(() => {
-    let alive = true;
-    const l = heroMods[key];
-    if (!l) {
-      setSrc(themeImage(fallbackTheme));
-      return;
-    }
-    l().then((u) => alive && setSrc(u), () => alive && setSrc(themeImage(fallbackTheme)));
-    return () => {
-      alive = false;
-    };
-  }, [key, fallbackTheme]);
-  return src;
+  const q = useDoc<string>("image", id, false);
+  const own = q.data?.current?.data;
+  return own && own.startsWith("data:image/") ? own : q.isLoading ? "" : themeImage(fallbackTheme);
 }
 
 export const THEMES = ["lab", "plant", "finance", "procurement", "customer", "people", "compliance", "market", "sustainability", "communication", "logistics", "engineering"] as const;
@@ -228,3 +209,30 @@ export interface TechViews {
   decisions: { question: string; options: string[]; choice: string; why: string; ref: string }[];
   nfr: { area: string; point: string }[];
 }
+
+/* ---------- Route-specific blueprint (v3) ---------- */
+export type BlueprintKind = "noai" | "codeapp" | "m365" | "cowork" | "studio" | "fabric" | "foundry" | "unknown";
+export interface Blueprint {
+  kind: BlueprintKind;
+  answer: string;
+  whatItIs: string;
+  notThis: string;
+  effort: { value: number; unit: "hours" | "days" | "weeks"; who: string; basis: string };
+  runCost: { model: string; monthlyUSD: number | null; basis: string };
+  prerequisites: { item: string; status: "In place" | "To set up" | "To confirm" }[];
+  golive: { step: string; who: string; time: string }[];
+  stepUp: { when: string; to: string; what: string };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  kit: Record<string, any>;
+}
+export const KIND_BY_ROUTE: Record<string, BlueprintKind> = { "1": "noai", "2": "codeapp", "3": "m365", "4": "cowork", "5": "studio", "6": "fabric", "7": "foundry", "8": "unknown" };
+export const BUILD_TITLE: Record<BlueprintKind, string> = {
+  noai: "The rules and the automation",
+  codeapp: "The app",
+  m365: "The prompt",
+  cowork: "The task brief",
+  studio: "The agent",
+  fabric: "The data product",
+  foundry: "The model and pipeline",
+  unknown: "What we still need",
+};

@@ -1,5 +1,5 @@
 {
-  "_readme": "List designs for one AI Use Case Radar instance. Create all five lists on the instance's SharePoint site with EXACTLY these names (the app code is generated from them). Replace the Account choices placeholder {{ACCOUNTS}} with the customer names from radar.config.ts plus \"Internal\" if used. Never rename a list or a column.",
+  "_readme": "List designs for one AI Use Case Radar instance. Create all five lists on the instance's SharePoint site with EXACTLY these names (the app code is generated from them). Replace the Account choices placeholder {{ACCOUNTS}} with the customer names from radar.config.ts plus \"Internal\" if used. Never rename a list or a column. Single-line text columns (Process, Owner, CustomerStatus, Products, Readiness, Flag, InternalRef, Wave, WaveSource, PriorityFit, Doc* text) hold at most 255 characters; keep detail in the multi-line columns. Kit 1.8.0: Customers-704f56 also holds the content store (Doc* columns); seed it with schema/playbook.redesign.json as described in skill/SKILL.md.",
   "lists": [
     {
       "name": "UseCases-704f56",
@@ -262,6 +262,49 @@
         {
           "name": "RoadmapNote",
           "type": "multiline text"
+        },
+        {
+          "name": "Department",
+          "type": "choice",
+          "choices": [
+            "Finance",
+            "Procurement",
+            "Supply Chain & Logistics",
+            "Manufacturing & Operations",
+            "Maintenance & Engineering",
+            "Quality",
+            "HSE & Sustainability",
+            "R&I / R&D",
+            "Sales & Marketing",
+            "Customer Service",
+            "HR",
+            "IT & Digital",
+            "Legal & Compliance",
+            "Communication",
+            "Strategy & Management",
+            "Other"
+          ]
+        },
+        {
+          "name": "ValueLevel",
+          "type": "choice",
+          "choices": [
+            "Low",
+            "Medium",
+            "High"
+          ]
+        },
+        {
+          "name": "ValueBasis",
+          "type": "multiline text"
+        },
+        {
+          "name": "PriorityFit",
+          "type": "text"
+        },
+        {
+          "name": "PriorityWhy",
+          "type": "multiline text"
         }
       ]
     },
@@ -411,7 +454,7 @@
     },
     {
       "name": "Customers-704f56",
-      "description": "Per-customer settings (average loaded hourly cost in USD)",
+      "description": "Two kinds of rows. (a) Customer settings, DocKind = 'customer': HourlyRateUSD, RateNote, Waves and the leadership-priority columns (ReportTitle, ReportUrl, ReportYear, Headline, Priorities). (b) Content store, every other DocKind (solution, image, waveplan, whatif-estate, whatif-case, request, playbook): one document = (DocKind, DocRef, DocVersion) split into DocChunks rows of at most 30,000 characters in DocBody, ordered by DocSeq; DocStatus Current | Proposed | Requested | Rejected | Archived. The app holds no use-case content in code; it reads all designs from these rows.",
       "columns": [
         {
           "name": "HourlyRateUSD",
@@ -424,6 +467,70 @@
         {
           "name": "Waves",
           "type": "multiline text"
+        },
+        {
+          "name": "ReportTitle",
+          "type": "text"
+        },
+        {
+          "name": "ReportUrl",
+          "type": "text"
+        },
+        {
+          "name": "ReportYear",
+          "type": "text"
+        },
+        {
+          "name": "Headline",
+          "type": "multiline text"
+        },
+        {
+          "name": "Priorities",
+          "type": "multiline text"
+        },
+        {
+          "name": "DocKind",
+          "type": "text"
+        },
+        {
+          "name": "DocRef",
+          "type": "text"
+        },
+        {
+          "name": "DocPart",
+          "type": "text"
+        },
+        {
+          "name": "DocSeq",
+          "type": "number"
+        },
+        {
+          "name": "DocChunks",
+          "type": "number"
+        },
+        {
+          "name": "DocBody",
+          "type": "multiline text"
+        },
+        {
+          "name": "DocStatus",
+          "type": "text"
+        },
+        {
+          "name": "DocVersion",
+          "type": "number"
+        },
+        {
+          "name": "DocRoute",
+          "type": "text"
+        },
+        {
+          "name": "DocReason",
+          "type": "multiline text"
+        },
+        {
+          "name": "DocOrigin",
+          "type": "text"
         }
       ]
     }

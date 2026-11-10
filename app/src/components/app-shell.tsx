@@ -14,7 +14,8 @@ const NAV = [
     ? { to: `/customer/${encodeURIComponent(SINGLE_CUSTOMER)}`, label: `${SINGLE_CUSTOMER} use cases`, end: false }
     : { to: "/customers", label: "Customers", end: false },
   ...(SINGLE_CUSTOMER ? [{ to: `/customer/${encodeURIComponent(SINGLE_CUSTOMER)}/roadmap`, label: "Roadmap", end: false }] : []),
-  ...(RADAR.customerEdition ? [] : [{ to: "/finops", label: "FinOps", end: false }, { to: "/method", label: "How it works", end: false }]),
+  { to: "/finops", label: "FinOps", end: false },
+  ...(RADAR.customerEdition ? [] : [{ to: "/method", label: "How it works", end: false }]),
   ...(RADAR.customerEdition ? [] : [{ to: "/features", label: "Feature radar", end: false }]),
 ];
 

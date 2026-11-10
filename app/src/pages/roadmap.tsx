@@ -17,7 +17,7 @@ import { ValueMetrics } from "@/components/value-metrics";
 import { isCustomerDecided, nextWaveId, placementOf, suggestionScore, wavesFor } from "@/lib/roadmap";
 import { routeOf, onRoute } from "@/lib/routes";
 import { stripRef } from "@/lib/validated";
-import { hasWavePlan } from "@/lib/solutions";
+import { useHasWavePlan } from "@/lib/solutions";
 import { RoadmapTimeline } from "@/components/roadmap-timeline";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +26,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 const monthLabel = (m: string) => new Date(`${m}-01T00:00:00`).toLocaleDateString("en-GB", { month: "short", year: "2-digit" });
 
 export function RoadmapPage() {
+  const hasWavePlan = useHasWavePlan();
   const { account = "" } = useParams();
   const name = decodeURIComponent(account);
   const pages = usePageTokens();

@@ -207,6 +207,9 @@ export type UseCasePatch = {
   evidence?: string;
   lastSignal?: string;
   sources?: string;
+  classification?: string;
+  classificationConfidence?: Confidence;
+  classificationWhy?: string;
 } & Partial<Record<TextField, string>>;
 
 /** FinOps sizing: cost = runs x credits per run x EUR per credit; value = runs x minutes saved / 60 x EUR per hour. */

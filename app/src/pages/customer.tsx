@@ -9,6 +9,7 @@ import { MatrixMap, placedCount, type MatrixAxis } from "@/components/matrix-map
 import { BarList } from "@/components/bar-list";
 import { LeadershipPriorities } from "@/components/leadership-priorities";
 import { fitsOf, useUseCases } from "@/data/repo";
+import { ClarificationsPanel } from "@/components/clarifications";
 import { DEPARTMENTS } from "@/data/types";
 import { isReady } from "@/lib/readiness";
 import { ROUTES, UNCLASSIFIED, routeOf } from "@/lib/routes";
@@ -75,6 +76,7 @@ export function CustomerPage() {
           <EmptyState title={`No use cases for ${name} yet`} />
         ) : (
           <>
+            <ClarificationsPanel useCases={active} title={`${name}: needs your clarification`} />
             <CustomerSavings name={name} useCases={active} />
             <RoadmapTeaser name={name} useCases={active} />
 

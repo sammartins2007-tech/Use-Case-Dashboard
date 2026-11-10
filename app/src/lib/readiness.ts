@@ -45,11 +45,23 @@ export function isReady(u: UseCase) {
   return gatesMet(u) === GATES.length;
 }
 
-export function questions(u: UseCase) {
+const CLARIFY = /^CLARIFY\s*:\s*/i;
+
+function questionLines(u: UseCase) {
   return (u.openQuestions ?? "")
     .split(/\r?\n/)
     .map((q) => q.replace(/^[-*•\d.)\s]+/, "").trim())
     .filter(Boolean);
+}
+
+/** Questions for the customer (clarifications for the account team are excluded). */
+export function questions(u: UseCase) {
+  return questionLines(u).filter((q) => !CLARIFY.test(q));
+}
+
+/** Unclear or contradictory facts the account team must settle (lines starting "CLARIFY:"). */
+export function clarifications(u: UseCase) {
+  return questionLines(u).filter((q) => CLARIFY.test(q)).map((q) => q.replace(CLARIFY, "").trim()).filter(Boolean);
 }
 
 export type Status = "G" | "O" | "R";

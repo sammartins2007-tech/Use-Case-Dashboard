@@ -10,6 +10,8 @@ for r in sorted(R, key=lambda r: int(r['_id'])):
     o = {'ID': int(r['_id'])}
     for k in KEEP:
         v = r.get(k)
+        if k == 'OpenQuestions' and isinstance(v, str):
+            v = '\n'.join(l for l in v.split('\n') if not l.strip().upper().startswith('CLARIFY'))
         if v in (None, ''):
             continue
         o[k] = {'Value': v, 'Id': 0} if k in CH and isinstance(v, str) else v

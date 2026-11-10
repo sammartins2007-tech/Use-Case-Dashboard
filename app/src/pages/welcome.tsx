@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Ear, Filter, Layers, Grid3x3, Calculator, Scale } from "lucide-react";
 import { ConnectorErrorState, LoadingState } from "@/components/states";
 import { CustomerLogos } from "@/components/customer-logos";
+import { ClarificationsPanel } from "@/components/clarifications";
 import { RADAR } from "@/radar.config";
 import { SINGLE_CUSTOMER } from "@/lib/brands";
 import { isValidated } from "@/lib/validated";
@@ -134,6 +135,12 @@ export function WelcomePage() {
           {!RADAR.customerEdition && <AiConsumptionCard ai={ai} />}
         </div>
       </section>
+
+      {!RADAR.customerEdition && q.isSuccess && (
+        <div className="mx-auto w-full max-w-[1280px] px-6 pt-8">
+          <ClarificationsPanel useCases={rows} />
+        </div>
+      )}
 
       {!RADAR.customerEdition && (
         <>

@@ -8,7 +8,7 @@ import { useUseCases } from "@/data/repo";
 import type { UseCase } from "@/data/types";
 import { brandOf } from "@/lib/brands";
 import { routeOf } from "@/lib/routes";
-import { hasSolution } from "@/lib/solutions";
+import { useHasSolution } from "@/lib/solutions";
 import { cn } from "@/lib/utils";
 
 const norm = (s: string) =>
@@ -43,6 +43,7 @@ function score(u: UseCase, q: string): number {
 }
 
 export function UseCaseSearch() {
+  const hasSolution = useHasSolution();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const navigate = useNavigate();

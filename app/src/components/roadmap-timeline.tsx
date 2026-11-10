@@ -4,7 +4,7 @@ import { CalendarRange, Flag } from "lucide-react";
 import type { WaveDef } from "@/data/repo";
 import type { UseCase } from "@/data/types";
 import { onRoute, routeOf, ROUTES } from "@/lib/routes";
-import { hasSolution, hasWavePlan, useWavePlan, type WavePlan } from "@/lib/solutions";
+import { useHasSolution, useHasWavePlan, useWavePlan, type WavePlan } from "@/lib/solutions";
 import { stripRef } from "@/lib/validated";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +16,7 @@ type Mode = "plan" | "dates";
 
 /** Roadmap timeline: the wave delivery plans as swimlanes, or the customer's own dates. */
 export function RoadmapTimeline({ account, waves, useCases }: { account: string; waves: WaveDef[]; useCases: UseCase[] }) {
+  const hasWavePlan = useHasWavePlan();
   const planned = waves.filter((w) => hasWavePlan(account, w.id));
   const dated = useCases.filter((u) => u.startDate || u.targetDate);
   const [mode, setMode] = useState<Mode>(planned.length ? "plan" : "dates");
@@ -91,6 +92,7 @@ function pack<T extends { startWeek: number; endWeek: number }>(items: T[]) {
 }
 
 function WaveLane({ account, wave, byId }: { account: string; wave: WaveDef; byId: Map<string, UseCase> }) {
+  const hasSolution = useHasSolution();
   const q = useWavePlan(account, wave.id);
   const [hover, setHover] = useState<string | null>(null);
   if (!q.data) return <div className="h-24 animate-pulse rounded-xl bg-muted/60" />;

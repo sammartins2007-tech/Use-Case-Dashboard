@@ -231,6 +231,9 @@ export function useUpdateUseCase() {
       if (typeof patch.evidence === "string") changed.Evidence = patch.evidence;
       if (typeof patch.lastSignal === "string") changed.LastSignal = patch.lastSignal;
       if (typeof patch.sources === "string") changed.Sources = patch.sources;
+      if (patch.classification) changed.Classification = { Value: patch.classification };
+      if (patch.classificationConfidence) changed.ClassificationConfidence = { Value: patch.classificationConfidence };
+      if (typeof patch.classificationWhy === "string") changed.ClassificationWhy = patch.classificationWhy;
       for (const k of TEXT_FIELDS) {
         const v = patch[k];
         if (typeof v === "string") (changed as Record<string, unknown>)[text[k]] = v;
@@ -355,12 +358,13 @@ export function useCustomerSettings() {
     queryKey: ["customerSettings"],
     staleTime: 60_000,
     queryFn: async (): Promise<CustomerSetting[]> => {
-      const result = await Customers_704f56Service.getAll({ top: 100 });
+      // The list also holds the solution content (DocKind rows); customer settings are tagged DocKind = customer.
+      const result = await Customers_704f56Service.getAll({ top: 100, filter: "DocKind eq 'customer'" });
       if (!result.success) {
         console.error("connector error", result.error);
         throw result.error;
       }
-      return (result.data ?? []).map((r) => ({
+      return (result.data ?? []).filter((r) => { const k = (r as unknown as { DocKind?: string }).DocKind; return !k || k === "customer"; }).map((r) => ({
         id: r.ID ?? 0,
         account: r.Title ?? "",
         hourlyRate: typeof r.HourlyRateUSD === "number" && r.HourlyRateUSD > 0 ? r.HourlyRateUSD : RADAR.defaultHourlyRateUSD,
@@ -389,7 +393,7 @@ export function useSaveHourlyRate() {
     mutationFn: async ({ id, account, rate }: { id?: number; account: string; rate: number }) => {
       const result = id
         ? await Customers_704f56Service.update(String(id), { HourlyRateUSD: rate, RateNote: "Set in the app" })
-        : await Customers_704f56Service.create({ Title: account, HourlyRateUSD: rate, RateNote: "Set in the app" });
+        : await Customers_704f56Service.create({ Title: account, HourlyRateUSD: rate, RateNote: "Set in the app", DocKind: "customer" } as never);
       if (!result.success) {
         console.error("connector error", result.error);
         throw result.error;
@@ -405,7 +409,7 @@ export function useSaveWaves() {
     mutationFn: async ({ id, account, waves }: { id?: number; account: string; waves: WaveDef[] }) => {
       const result = id
         ? await Customers_704f56Service.update(String(id), { Waves: serializeWaves(waves) })
-        : await Customers_704f56Service.create({ Title: account, Waves: serializeWaves(waves) });
+        : await Customers_704f56Service.create({ Title: account, Waves: serializeWaves(waves), DocKind: "customer" } as never);
       if (!result.success) {
         console.error("connector error", result.error);
         throw result.error;
