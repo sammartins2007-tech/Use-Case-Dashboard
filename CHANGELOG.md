@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.9.2 — consistency hardening
+- `customer_copy.py` writes its run report to its own folder (`working/sync/`) and creates it; a missing scratch folder can no longer stop the copy sync.
+- Refresh template: related-use-case labels always carry the target's CURRENT title (and are updated when a title changes); the read-only copy step ends with a consistency check that must report 0 bad links, title mismatches and design mismatches.
+- Lesson: before deleting scratch folders, check the live scripts and refresh instructions for paths they write to.
+
 ## 1.9.1 — customer edition for guests, links inside designs fixed
 - Customer edition (optional/customer-edition): `customer_copy.py` now syncs a customer-safe copy of one account to a SEPARATE site, declared by a config line `<Account> | edition customer | site <url>`. It blanks internal fields (analysis, insights, decision, confidence, readiness, sizing basis, internal cost and value), removes CLARIFY lines and internal Microsoft 365 links, strips internal design parts (board, route check, FinOps, evidence, ledger), keeps public web sources only, and copies no FeatureRadar or Signals rows. It refuses a customer edition on the master site.
 - Links inside designs fixed for every copy: use case ids in wave plans (schedule and use case lists), what-if members and dependants, and the solution id are remapped to the copy's ids (a copy could open the wrong use case before). Designs are re-chunked over the same rows after the change.

@@ -36,7 +36,7 @@ Column schema: copied from the master's column definitions (new master columns a
 the next run); Account choices are reduced to the one account so no other customer name is in the copy.
 """
 from aether_tools import tools, set_result, log, args
-import json, re, time
+import json, re, time, os
 
 SITE = "{{SITE_GRAPH_ID}}"
 MASTER = {
@@ -579,7 +579,11 @@ def main():
     for o in out:
         v = o.get("verify") or {}
         o["ok"] = bool(v) and all(x["mismatch_count"] == 0 and not x["extra_rows"] and x["master_selected"] == x["copy_rows"] for x in v.values()) and all(d["equal"] for d in v.get("Customers", {}).get("docs", []))
-    json.dump(out, open("/mnt/workspace/working/ucbapp/customer_copy_last.json", "w"), indent=1, ensure_ascii=False)
+    try:
+        os.makedirs("/mnt/workspace/working/sync", exist_ok=True)
+        json.dump(out, open("/mnt/workspace/working/sync/customer_copy_last.json", "w"), indent=1, ensure_ascii=False)
+    except OSError as e:
+        log(f"report file not saved: {e}")
     set_result({"accounts": accounts, "results": out})
 
 
