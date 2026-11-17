@@ -36,4 +36,9 @@ export interface RadarConfig {
   microsoftLogo?: string;
   /** Customer-facing edition: hides internal views (AI cost meter, feature radar, analysis, evidence). */
   customerEdition?: boolean;
+  /** Live read-only app (one account's copy lists): every edit, AI call and file write is hidden and refused. */
+  readOnly?: boolean;
+  /** The radar's SharePoint site URL (where "Documents > Offline copies" lives). Saving offline copies and PDFs
+   *  to SharePoint is offered only when it is set. */
+  siteUrl?: string;
 }

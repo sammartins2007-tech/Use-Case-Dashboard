@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { useCustomerSettings } from "@/data/repo";
 import { CUSTOMER_DECISIONS, UNPLANNED, type CustomerDecision, type UseCase, type UseCasePatch } from "@/data/types";
 import { placementOf, wavesFor } from "@/lib/roadmap";
+import { LIVE_READ_ONLY } from "@/lib/read-only";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -20,6 +21,21 @@ export function RoadmapFields({ u, busy, onSave }: { u: UseCase; busy: boolean; 
           Open roadmap
         </Link>
       </div>
+      {LIVE_READ_ONLY ? (
+        <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
+          {[
+            ["Wave", u.wave && waves.some((w) => w.id === u.wave) ? `${u.wave} · ${waves.find((w) => w.id === u.wave)?.label ?? ""}` : "Candidate (not in a wave)"],
+            ["Customer decision", u.customerDecision ?? "Not yet decided"],
+            ["Start", u.startDate ?? "Not set"],
+            ["Target", u.targetDate ?? "Not set"],
+          ].map(([k, v]) => (
+            <div key={k}>
+              <dt className="text-muted-foreground">{k}</dt>
+              <dd className="font-medium">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : (
       <div className="mt-2 grid grid-cols-2 gap-2">
         <div className="space-y-1">
           <Label htmlFor="uc-wave" className="text-xs text-muted-foreground">
@@ -90,6 +106,7 @@ export function RoadmapFields({ u, busy, onSave }: { u: UseCase; busy: boolean; 
           />
         </div>
       </div>
+      )}
       <p className="mt-2 text-[11px] text-muted-foreground">
         {place === "customer" ? `Placed by the customer (${u.waveSource})` : place === "proposal" ? `Proposal (${u.waveSource})` : "Not in a wave yet"}
         {u.customerStatus && u.customerStatus !== "Not set" ? ` · customer status: ${u.customerStatus}` : ""}

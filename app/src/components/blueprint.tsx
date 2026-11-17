@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { ArrowRight, BatteryMedium, Bell, Bot, Calculator, Check, ClipboardCopy, Coins, Database, FileText, Gauge, KeyRound, Layers, ListChecks, MessageSquare, MousePointerClick, Plug, Ruler, Scale, ShieldCheck, Smartphone, Sparkles, Table2, Timer, Users, Wifi, WifiOff, Workflow, Zap, type LucideIcon } from "lucide-react";
 import { routeLoose as routeOf } from "@/lib/routes";
-import { safeUrl } from "@/lib/safe-url";
+import { externalUrl } from "@/lib/safe-url";
 import type { Blueprint, Solution } from "@/lib/solutions";
 import { cn } from "@/lib/utils";
 
@@ -751,13 +751,13 @@ export function LicenceCalc({ p }: { p: any }) {
   const lic = p.licence ?? {};
   const nm = txt(p.name) || "their platform";
   const acc = txt(p.account) || "The customer";
-  const [theirCost, setTheirCost] = useState<string>("");
+  const [celonis, setCelonis] = useState<string>("");
   const [users, setUsers] = useState<number>(Number(lic.defaultUsers) || 10);
   const [have, setHave] = useState(false);
   const addOn = Number(lic.addOnMonthly) * 12;
   const seats = have ? 0 : users * Number(lic.premiumUserMonthly) * 12;
   const ms = addOn + seats;
-  const cel = Number(theirCost.replace(/[^0-9.]/g, "")) || 0;
+  const cel = Number(celonis.replace(/[^0-9.]/g, "")) || 0;
   const save = cel - ms;
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -765,7 +765,7 @@ export function LicenceCalc({ p }: { p: any }) {
         <H icon={Calculator}>Licence calculator</H>
         <label className="block text-sm">
           <span className="text-muted-foreground">{acc}'s {nm} contract, $ per year</span>
-          <input value={theirCost} onChange={(e) => setTheirCost(e.target.value)} inputMode="numeric" placeholder="Enter the contract value" className="mt-1 h-10 w-full rounded-lg border border-border bg-white px-3 text-sm tabular-nums" />
+          <input value={celonis} onChange={(e) => setCelonis(e.target.value)} inputMode="numeric" placeholder="Enter the contract value" className="mt-1 h-10 w-full rounded-lg border border-border bg-white px-3 text-sm tabular-nums" />
         </label>
         <div className="text-sm">
           <p className="flex justify-between"><span className="text-muted-foreground">Analysts who need Power Automate Premium</span><span className="font-medium tabular-nums">{users}</span></p>
@@ -830,7 +830,7 @@ export function PlatformChallenge({ p }: { p: any }) {
               {arr(p.fit).map((r, i) => (
                 <tr key={i} className="border-t border-border align-top">
                   <td className="px-3 py-2 font-medium">{txt(r.need)}</td>
-                  <td className="px-3 py-2">{txt(r.theirs)}</td>
+                  <td className="px-3 py-2">{txt(r.theirs ?? r.celonis)}</td>
                   <td className="px-3 py-2">{txt(r.microsoft)}</td>
                   <td className="px-3 py-2"><span className={cn("rounded-full border px-2 py-0.5 text-[11px]", FIT_TONE[txt(r.fit)] ?? "")}>{txt(r.fit)}</span></td>
                 </tr>
@@ -1070,7 +1070,7 @@ export function GoLiveSection({ b, s }: { b: Blueprint; s: Solution }) {
         <div className="flex flex-wrap gap-2 text-xs">
           <span className="text-muted-foreground">Grounded in:</span>
           {s.sources.map((l, i) => {
-            const u = safeUrl(l.url);
+            const u = externalUrl(l.url);
             return u ? (
               <a key={i} href={u} target="_blank" rel="noreferrer" className="rounded-full border border-border bg-white px-2.5 py-0.5 hover:underline">
                 {l.title}

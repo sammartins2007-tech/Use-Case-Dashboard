@@ -8,6 +8,7 @@ import { RADAR } from "@/radar.config";
 import { SINGLE_CUSTOMER } from "@/lib/brands";
 import { isValidated } from "@/lib/validated";
 import { tokensFmt, usd, useAiTotals } from "@/components/ai-meter";
+import { LIVE_READ_ONLY } from "@/lib/read-only";
 import { useUseCases } from "@/data/repo";
 import { isReady } from "@/lib/readiness";
 import { ROUTES } from "@/lib/routes";
@@ -132,7 +133,7 @@ export function WelcomePage() {
             </dl>
           </div>
 
-          {!RADAR.customerEdition && <AiConsumptionCard ai={ai} />}
+          {!RADAR.customerEdition && !LIVE_READ_ONLY && <AiConsumptionCard ai={ai} />}
         </div>
       </section>
 

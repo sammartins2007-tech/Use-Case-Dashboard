@@ -99,7 +99,7 @@ function SignalToDeal({ stages }: { stages: any[] }) {
             <p className="text-[10.5px] font-medium tracking-wider text-rose-800/80">TODAY</p>
             <p className="mt-0.5 leading-snug">{st.today}</p>
           </div>
-          <p className="mt-auto text-[11px] text-muted-foreground">Evidence: {st.evidence}</p>
+          {st.evidence && <p className="mt-auto text-[11px] text-muted-foreground">Evidence: {st.evidence}</p>}
         </div>
         <div className={cn(card, "grid gap-3 sm:grid-cols-2")}>
           <div className="sm:col-span-2 rounded-xl p-3 text-sm" style={{ background: "color-mix(in srgb, var(--sol) 7%, white)" }}>
@@ -387,7 +387,7 @@ function MeasurePanel({ h }: { h: any }) {
       <div className="space-y-3">
         <div className={card}>
           <p className="flex items-center gap-2 text-sm font-medium">
-            <Coins className="size-4" style={{ color: "var(--sol)" }} aria-hidden /> Run cost after the hackathon · about {c.perUnit ?? c.perLead} credits per {c.unit || "item"}
+            <Coins className="size-4" style={{ color: "var(--sol)" }} aria-hidden /> Run cost after the hackathon · about {c.perLead} credits a lead
           </p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {arr(c.scenarios).map((s, i) => (

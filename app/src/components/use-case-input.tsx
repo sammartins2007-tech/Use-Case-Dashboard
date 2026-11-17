@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { AIConsumptionService } from "@/data/services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AlertTriangle, Check, FileUp, Loader2, MessageSquareWarning, RotateCcw, ShieldCheck, Sparkles, Undo2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { AIConsumption_704f56Service } from "../../generated/services/AIConsumption_704f56Service";
 import { useUpdateUseCase } from "@/data/repo";
 import type { UseCase, UseCasePatch } from "@/data/types";
 import {
@@ -107,8 +107,8 @@ export function UseCaseInput({ u, open, onOpenChange, accent, prefill }: { u: Us
       Estimated: true,
       Basis: `${chars.turns} review turns; tokens estimated as characters / 4 of prompts and answers. Estimate, not a meter reading.`,
     };
-    void AIConsumption_704f56Service.create({ ...base, Kind: { Value: "Use Case Coach" } } as never).then((r) => {
-      if (!r.success) void AIConsumption_704f56Service.create({ ...base, Kind: { Value: "Deep analysis" } } as never);
+    void AIConsumptionService.create({ ...base, Kind: { Value: "Use Case Coach" } } as never).then((r) => {
+      if (!r.success) void AIConsumptionService.create({ ...base, Kind: { Value: "Deep analysis" } } as never);
       void qc.invalidateQueries({ queryKey: ["consumption"] });
     });
     setChars({ in: 0, out: 0, turns: 0 });

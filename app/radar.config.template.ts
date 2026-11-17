@@ -24,4 +24,10 @@ export const RADAR: RadarConfig = {
   /** Bucket for account-team work not tied to one customer; set to null to hide it. */
   internal: { name: "Internal", label: "Your team", primary: "#0078D4", dark: "#243A5E", logo: microsoft },
   microsoftLogo: microsoft,
+  /** The radar's SharePoint site URL. Offline copies and PDFs are saved to its "Documents > Offline copies"
+   *  folder; leave it out and the app only downloads them to the computer. */
+  siteUrl: "https://contoso.sharepoint.com/sites/ai-use-case-radar",
+  /** Read-only customer app (optional/read-only-customer-app): true hides every edit, AI call, file write and
+   *  the Evidence tab. Keep it false (or remove it) in the owner's own app. */
+  // readOnly: true,
 };

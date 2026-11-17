@@ -1,6 +1,6 @@
 import { getClient } from "@microsoft/managed-apps/data";
-import dataSources from "../../generated/dataSources";
-import { AgentsService } from "../../generated/services/AgentsService";
+import { AgentsService, dataSources } from "@/data/services";
+import { LIVE_READ_ONLY, LIVE_READ_ONLY_MESSAGE } from "@/lib/read-only";
 
 // Set this to the `data_source` that DataSourceAdd returned for shared_agentnode. It is
 // usually "agentnode", but the binding allocates a suffixed name such as "agentnode_1"
@@ -113,6 +113,7 @@ export async function invokeInlineAgent(
   message: string,
   options: AgentPollOptions = {},
 ): Promise<InlineAgentAnswer> {
+  if (LIVE_READ_ONLY) throw new AgentNodeError("config", `AI is not available here. ${LIVE_READ_ONLY_MESSAGE}`);
   const requestedInterval = options.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS;
   const requestedTimeout = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   if (

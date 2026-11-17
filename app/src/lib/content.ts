@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Customers_704f56Service } from "../../generated/services/Customers_704f56Service";
+import { CustomersService } from "@/data/services";
+import { LIVE_READ_ONLY, ReadOnlyError } from "@/lib/read-only";
 
 /**
  * Content store: every use-case-specific design, image, what-if and wave plan lives in SharePoint
@@ -71,7 +72,7 @@ async function readRows(filter: string, select?: string[]): Promise<DocRow[]> {
   const out: DocRow[] = [];
   let skipToken: string | undefined;
   for (let i = 0; i < 40; i++) {
-    const result = await Customers_704f56Service.getAll({ filter, top: PAGE, skipToken, ...(select ? { select } : {}) });
+    const result = await CustomersService.getAll({ filter, top: PAGE, skipToken, ...(select ? { select } : {}) });
     if (!result.success) {
       console.error("connector error", result.error);
       throw result.error;
@@ -193,8 +194,9 @@ export function useContentIndex() {
 }
 
 async function setStatus(ids: number[], status: DocStatus) {
+  if (LIVE_READ_ONLY) throw new ReadOnlyError();
   for (const id of ids) {
-    const r = await Customers_704f56Service.update(String(id), { DocStatus: status } as never);
+    const r = await CustomersService.update(String(id), { DocStatus: status } as never);
     if (!r.success) {
       console.error("connector error", r.error);
       throw r.error;
@@ -239,7 +241,8 @@ export function useContentActions(kind: DocKind, ref: string) {
   });
   const request = useMutation({
     mutationFn: async ({ route, reason }: { route: string; reason: string }) => {
-      const r = await Customers_704f56Service.create({
+      if (LIVE_READ_ONLY) throw new ReadOnlyError();
+      const r = await CustomersService.create({
         Title: `request ${kind} ${ref}`,
         DocKind: "request",
         DocRef: `${kind}:${ref}`,

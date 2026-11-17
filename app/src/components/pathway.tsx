@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AlertTriangle, ArrowRight, CheckCircle2, Coins, Compass, FlaskConical, Gavel, HelpCircle, Layers, Lightbulb, Route, Target, Users, Workflow, type LucideIcon } from "lucide-react";
 import { SubTabs } from "@/components/blueprint";
 import { iconOf } from "@/components/solution-creative";
-import { safeUrl } from "@/lib/safe-url";
+import { externalUrl } from "@/lib/safe-url";
 import type { Solution } from "@/lib/solutions";
 import { cn } from "@/lib/utils";
 
@@ -282,8 +282,8 @@ function Options({ p }: { p: any }) {
                 <p className="font-medium">{o.run}</p>
               </div>
               <p className="col-span-2 text-muted-foreground">{o.fit}</p>
-              {safeUrl(o.ref) && (
-                <a href={safeUrl(o.ref)} target="_blank" rel="noreferrer" className="col-span-2 underline" style={{ color: "var(--sol)" }}>
+              {externalUrl(o.ref) && (
+                <a href={externalUrl(o.ref)} target="_blank" rel="noreferrer" className="col-span-2 underline" style={{ color: "var(--sol)" }}>
                   Microsoft Learn
                 </a>
               )}
@@ -449,8 +449,8 @@ function Decisions({ p }: { p: any }) {
         <div className="flex flex-wrap gap-x-3 gap-y-1 text-[12px]">
           <span className="text-muted-foreground">Microsoft Learn:</span>
           {arr(p.sources).map((s) =>
-            safeUrl(s.url) ? (
-              <a key={s.url} href={safeUrl(s.url)} target="_blank" rel="noreferrer" className="underline" style={{ color: "var(--sol)" }}>
+            externalUrl(s.url) ? (
+              <a key={s.url} href={externalUrl(s.url)} target="_blank" rel="noreferrer" className="underline" style={{ color: "var(--sol)" }}>
                 {s.title}
               </a>
             ) : null,

@@ -1,15 +1,23 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FeatureRadar_704f56Service } from "../../generated/services/FeatureRadar_704f56Service";
-import { Signals_704f56Service } from "../../generated/services/Signals_704f56Service";
-import { UseCases_704f56Service } from "../../generated/services/UseCases_704f56Service";
-import { AIConsumption_704f56Service } from "../../generated/services/AIConsumption_704f56Service";
-import { Customers_704f56Service } from "../../generated/services/Customers_704f56Service";
-import type { UseCases_704f56Read, UseCases_704f56Write } from "../../generated/models/UseCases_704f56Model";
-import type { Signals_704f56Read } from "../../generated/models/Signals_704f56Model";
-import type { FeatureRadar_704f56Read } from "../../generated/models/FeatureRadar_704f56Model";
+import {
+  AIConsumptionService,
+  CustomersService,
+  FeatureRadarService,
+  HAS_AI_CONSUMPTION,
+  SignalsService,
+  UseCasesService,
+  type FeatureRadarRead,
+  type SignalsRead,
+  type UseCasesRead,
+  type UseCasesWrite,
+} from "./services";
 import { TEXT_FIELDS, type CustomerDecision, type Account, type Confidence, type Decision, type Feature, type Level, type Signal, type SignalKind, type SourceType, type Stage, type TextField, type UseCase, type UseCasePatch } from "./types";
 
 import { RADAR } from "@/radar.config";
+import { LIVE_READ_ONLY, ReadOnlyError } from "@/lib/read-only";
+
+/** A row retired by the customer copy sync (SourceId 0); never present in the master lists. */
+const isTombstone = (r: object) => (r as { SourceId?: unknown }).SourceId === 0;
 
 const PAGE_SIZE = 250;
 
@@ -21,7 +29,7 @@ export interface Page<T> {
 const day = (v?: string) => (v ? v.slice(0, 10) : undefined);
 const choice = <T extends string>(v?: { Value?: string } | null) => (v?.Value ? (v.Value as T) : undefined);
 
-function toUseCase(r: UseCases_704f56Read): UseCase {
+function toUseCase(r: UseCasesRead): UseCase {
   return {
     id: r.ID ?? 0,
     title: r.Title ?? "",
@@ -36,6 +44,8 @@ function toUseCase(r: UseCases_704f56Read): UseCase {
     finOpsBasis: r.FinOpsBasis,
     owner: r.Owner,
     nextStep: r.NextStep,
+    people: r.People,
+    steps: r.Steps,
     featureUnlock: r.FeatureUnlock,
     confidence: choice<Confidence>(r.Confidence),
     decision: choice<Decision>(r.Decision),
@@ -83,7 +93,7 @@ function toUseCase(r: UseCases_704f56Read): UseCase {
   };
 }
 
-function toSignal(r: Signals_704f56Read): Signal {
+function toSignal(r: SignalsRead): Signal {
   return {
     id: r.ID ?? 0,
     title: r.Title ?? "",
@@ -98,7 +108,7 @@ function toSignal(r: Signals_704f56Read): Signal {
   };
 }
 
-function toFeature(r: FeatureRadar_704f56Read): Feature {
+function toFeature(r: FeatureRadarRead): Feature {
   return {
     id: r.ID ?? 0,
     title: r.Title ?? "",
@@ -112,16 +122,31 @@ function toFeature(r: FeatureRadar_704f56Read): Feature {
   };
 }
 
-export function useUseCases(skipToken?: string) {
+/** Every page of a list, in order. Counts, customer pages and search must see ALL rows, never the first page only. */
+async function readAll<T>(fetchPage: (skipToken?: string) => Promise<{ success: boolean; data?: T[]; error?: unknown; skipToken?: string }>): Promise<T[]> {
+  const rows: T[] = [];
+  let token: string | undefined;
+  for (let i = 0; i < 100; i++) {
+    const result = await fetchPage(token);
+    if (!result.success) {
+      console.error("connector error", result.error);
+      throw result.error;
+    }
+    rows.push(...(result.data ?? []));
+    token = result.skipToken?.trim() || undefined;
+    if (!token) break;
+  }
+  return rows;
+}
+
+// The skipToken argument is kept for the pager components; every query now returns the complete list.
+export function useUseCases(_skipToken?: string) {
+  void _skipToken;
   return useQuery({
-    queryKey: ["useCases", { skipToken }],
+    queryKey: ["useCases", "all"],
     queryFn: async (): Promise<Page<UseCase>> => {
-      const result = await UseCases_704f56Service.getAll({ top: PAGE_SIZE, orderBy: ["LastSignal desc"], skipToken });
-      if (!result.success) {
-        console.error("connector error", result.error);
-        throw result.error;
-      }
-      return { rows: (result.data ?? []).map(toUseCase), nextToken: result.skipToken?.trim() || undefined };
+      const rows = await readAll((skipToken) => UseCasesService.getAll({ top: PAGE_SIZE, orderBy: ["LastSignal desc"], skipToken }));
+      return { rows: rows.filter((r) => !isTombstone(r)).map(toUseCase), nextToken: undefined };
     },
   });
 }
@@ -131,12 +156,12 @@ export function useUseCase(id?: string) {
     queryKey: ["useCase", id],
     enabled: Boolean(id),
     queryFn: async (): Promise<UseCase | null> => {
-      const result = await UseCases_704f56Service.get(String(id));
+      const result = await UseCasesService.get(String(id));
       if (!result.success) {
         console.error("connector error", result.error);
         throw result.error;
       }
-      return result.data ? toUseCase(result.data) : null;
+      return result.data && !isTombstone(result.data) ? toUseCase(result.data) : null;
     },
   });
 }
@@ -148,40 +173,34 @@ export function useSignalsFor(title?: string) {
     queryKey: ["signalsFor", title],
     enabled: Boolean(title),
     queryFn: async (): Promise<Signal[]> => {
-      const result = await Signals_704f56Service.getAll({ filter: `UseCaseRef eq '${odataText(title ?? "")}'`, top: 200 });
+      const result = await SignalsService.getAll({ filter: `UseCaseRef eq '${odataText(title ?? "")}'`, top: 200 });
       if (!result.success) {
         console.error("connector error", result.error);
         throw result.error;
       }
-      return (result.data ?? []).map(toSignal);
+      return (result.data ?? []).filter((r) => !isTombstone(r)).map(toSignal);
     },
   });
 }
 
-export function useSignals(skipToken?: string) {
+export function useSignals(_skipToken?: string) {
+  void _skipToken;
   return useQuery({
-    queryKey: ["signals", { skipToken }],
+    queryKey: ["signals", "all"],
     queryFn: async (): Promise<Page<Signal>> => {
-      const result = await Signals_704f56Service.getAll({ top: PAGE_SIZE, orderBy: ["SignalDate desc"], skipToken });
-      if (!result.success) {
-        console.error("connector error", result.error);
-        throw result.error;
-      }
-      return { rows: (result.data ?? []).map(toSignal), nextToken: result.skipToken?.trim() || undefined };
+      const rows = await readAll((skipToken) => SignalsService.getAll({ top: PAGE_SIZE, orderBy: ["SignalDate desc"], skipToken }));
+      return { rows: rows.filter((r) => !isTombstone(r)).map(toSignal), nextToken: undefined };
     },
   });
 }
 
-export function useFeatures(skipToken?: string) {
+export function useFeatures(_skipToken?: string) {
+  void _skipToken;
   return useQuery({
-    queryKey: ["features", { skipToken }],
+    queryKey: ["features", "all"],
     queryFn: async (): Promise<Page<Feature>> => {
-      const result = await FeatureRadar_704f56Service.getAll({ top: PAGE_SIZE, orderBy: ["ReleaseDate desc"], skipToken });
-      if (!result.success) {
-        console.error("connector error", result.error);
-        throw result.error;
-      }
-      return { rows: (result.data ?? []).map(toFeature), nextToken: result.skipToken?.trim() || undefined };
+      const rows = await readAll((skipToken) => FeatureRadarService.getAll({ top: PAGE_SIZE, orderBy: ["ReleaseDate desc"], skipToken }));
+      return { rows: rows.filter((r) => !isTombstone(r)).map(toFeature), nextToken: undefined };
     },
   });
 }
@@ -190,7 +209,8 @@ export function useUpdateUseCase() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, patch }: { id: number; patch: UseCasePatch }) => {
-      const changed: Partial<Omit<UseCases_704f56Write, "ID">> = {};
+      if (LIVE_READ_ONLY) throw new ReadOnlyError();
+      const changed: Partial<Omit<UseCasesWrite, "ID">> = {};
       if (patch.stage) changed.Stage = { Value: patch.stage };
       if (patch.decision) changed.Decision = { Value: patch.decision };
       if (patch.complexity) changed.Complexity = { Value: patch.complexity };
@@ -209,7 +229,7 @@ export function useUpdateUseCase() {
       if (typeof patch.monthlyCost === "number") changed.MonthlyCostEUR = patch.monthlyCost;
       if (typeof patch.monthlyValue === "number") changed.MonthlyValueEUR = patch.monthlyValue;
       if (typeof patch.finOpsBasis === "string") changed.FinOpsBasis = patch.finOpsBasis;
-      const text: Record<TextField, keyof UseCases_704f56Write> = {
+      const text: Record<TextField, keyof UseCasesWrite> = {
         process: "Process",
         users: "Users",
         pain: "Pain",
@@ -226,6 +246,8 @@ export function useUpdateUseCase() {
         internalRef: "InternalRef",
       };
       if (typeof patch.readiness === "string") changed.Readiness = patch.readiness;
+      if (typeof patch.people === "string") changed.People = patch.people;
+      if (typeof patch.steps === "string") changed.Steps = patch.steps;
       if (typeof patch.openQuestions === "string") changed.OpenQuestions = patch.openQuestions;
       if (typeof patch.analysis === "string") changed.Analysis = patch.analysis;
       if (typeof patch.evidence === "string") changed.Evidence = patch.evidence;
@@ -238,7 +260,7 @@ export function useUpdateUseCase() {
         const v = patch[k];
         if (typeof v === "string") (changed as Record<string, unknown>)[text[k]] = v;
       }
-      const result = await UseCases_704f56Service.update(String(id), changed);
+      const result = await UseCasesService.update(String(id), changed);
       if (!result.success) {
         console.error("connector error", result.error);
         throw result.error;
@@ -269,11 +291,12 @@ export function useConsumption() {
   return useQuery({
     queryKey: ["consumption"],
     staleTime: 60_000,
+    enabled: HAS_AI_CONSUMPTION && !LIVE_READ_ONLY,
     queryFn: async (): Promise<ConsumptionRow[]> => {
       const rows: ConsumptionRow[] = [];
       let skipToken: string | undefined;
       for (let page = 0; page < 20; page++) {
-        const result = await AIConsumption_704f56Service.getAll({ top: 500, orderBy: ["RunDate desc"], skipToken });
+        const result = await AIConsumptionService.getAll({ top: 500, orderBy: ["RunDate desc"], skipToken });
         if (!result.success) {
           console.error("connector error", result.error);
           throw result.error;
@@ -359,7 +382,7 @@ export function useCustomerSettings() {
     staleTime: 60_000,
     queryFn: async (): Promise<CustomerSetting[]> => {
       // The list also holds the solution content (DocKind rows); customer settings are tagged DocKind = customer.
-      const result = await Customers_704f56Service.getAll({ top: 100, filter: "DocKind eq 'customer'" });
+      const result = await CustomersService.getAll({ top: 100, filter: "DocKind eq 'customer'" });
       if (!result.success) {
         console.error("connector error", result.error);
         throw result.error;
@@ -391,9 +414,10 @@ export function useSaveHourlyRate() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, account, rate }: { id?: number; account: string; rate: number }) => {
+      if (LIVE_READ_ONLY) throw new ReadOnlyError();
       const result = id
-        ? await Customers_704f56Service.update(String(id), { HourlyRateUSD: rate, RateNote: "Set in the app" })
-        : await Customers_704f56Service.create({ Title: account, HourlyRateUSD: rate, RateNote: "Set in the app", DocKind: "customer" } as never);
+        ? await CustomersService.update(String(id), { HourlyRateUSD: rate, RateNote: "Set in the app" })
+        : await CustomersService.create({ Title: account, HourlyRateUSD: rate, RateNote: "Set in the app", DocKind: "customer" } as never);
       if (!result.success) {
         console.error("connector error", result.error);
         throw result.error;
@@ -407,9 +431,10 @@ export function useSaveWaves() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, account, waves }: { id?: number; account: string; waves: WaveDef[] }) => {
+      if (LIVE_READ_ONLY) throw new ReadOnlyError();
       const result = id
-        ? await Customers_704f56Service.update(String(id), { Waves: serializeWaves(waves) })
-        : await Customers_704f56Service.create({ Title: account, Waves: serializeWaves(waves), DocKind: "customer" } as never);
+        ? await CustomersService.update(String(id), { Waves: serializeWaves(waves) })
+        : await CustomersService.create({ Title: account, Waves: serializeWaves(waves), DocKind: "customer" } as never);
       if (!result.success) {
         console.error("connector error", result.error);
         throw result.error;

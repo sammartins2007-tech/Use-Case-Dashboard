@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { READ_ONLY } from "@/lib/read-only";
 import { Check, Eye, EyeOff, History, RefreshCw, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useContentActions, useContentIndex, type DocSet } from "@/lib/content";
@@ -33,7 +34,7 @@ export function RedesignBar({
   const act = useContentActions("solution", id);
   const [msg, setMsg] = useState<string>("");
   const [showHistory, setShowHistory] = useState(false);
-  if (RADAR.customerEdition) return null;
+  if (RADAR.customerEdition || READ_ONLY) return null;
   const cur = set?.current;
   const prop = set?.proposed;
   const designRoute = cur?.data.route ?? cur?.route;
@@ -183,7 +184,7 @@ export function RequestDesign({ id, classification }: { id: string; classificati
   const { index } = useContentIndex();
   const act = useContentActions("solution", id);
   const [done, setDone] = useState(false);
-  if (RADAR.customerEdition) return null;
+  if (RADAR.customerEdition || READ_ONLY) return null;
   const requested = index.meta("solution", id).requested;
   if (requested || done) return <p className="mt-3 text-center text-sm text-muted-foreground">A design has been requested; the next refresh will propose it here.</p>;
   return (

@@ -6,7 +6,8 @@ import { EmptyState, LoadingState } from "@/components/states";
 import { useUseCase } from "@/data/repo";
 import { brandOf, inkOf } from "@/lib/brands";
 import { routeOf } from "@/lib/routes";
-import { safeUrl } from "@/lib/safe-url";
+import { externalUrl } from "@/lib/safe-url";
+import { READ_ONLY } from "@/lib/read-only";
 import { BUILD_TITLE, LAYER_LABEL, LAYER_ORDER, useHeroImage, useSolution, type ChapterId, type Layout, type Solution, type SolNode } from "@/lib/solutions";
 import { BlueprintKit, GoLiveSection, KindHero } from "@/components/blueprint";
 import { SolutionDemo } from "@/components/solution-demos";
@@ -975,8 +976,9 @@ function ArchitectureSection({ s }: { s: Solution }) {
 }
 
 function LearnLink({ l }: { l: { title: string; url: string } }) {
-  const href = safeUrl(l.url);
-  if (!href) return <span className="rounded-full border border-border px-3 py-1 text-xs">{l.title}</span>;
+  const href = externalUrl(l.url);
+  // Internal sources named in words: shown in the master only (evidence stays in the owner's app).
+  if (!href) return READ_ONLY ? null : <span className="rounded-full border border-border px-3 py-1 text-xs">{l.title}</span>;
   return (
     <a href={href} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs hover:bg-muted">
       {l.title} <ExternalLink className="size-3" aria-hidden />

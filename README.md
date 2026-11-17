@@ -28,6 +28,9 @@ Your customers, logos, data and settings are kept. Only the shared code, list co
 | `prompts/latest-version-consolidation-brief.md` | One current statement per field; contradictions become red CLARIFY questions |
 | `schema/playbook.redesign.json` | Rule book for solution designs, stored in the content store |
 | `prompts/*-brief.md` | Bulk analysis briefs (dossier rewrite, KPI values) |
+| `schema/playbook.l2-chain.json` | The design chain (eight specialists, views, KPIs, experience, creative, FinOps) stored in the content store |
+| `app/SCAFFOLD.md` | The template files and project settings the radar changes |
+| `optional/read-only-customer-app/` | A read-only app per customer account team, synced from your lists |
 | `skill/SKILL.md` | The setup, update and add-customer instructions Cowork follows |
 
 ## Contributing (Git)
@@ -35,8 +38,14 @@ The Git repository is the master copy. Change shared code in `app/src/`, never c
 add a `CHANGELOG.md` entry, open a pull request and, after merge, publish the release zip to the shared folder.
 Keep everything customer-neutral: no customer names, logos or figures in the repository. Examples use fictitious companies.
 
-## Where content lives (1.8.0)
+## Where content lives (1.8.0 and later)
 The app holds no use-case content in code. Solution designs, images, wave plans, what-if scenarios and redesign requests are rows in Customers-704f56 (DocKind, DocRef, DocVersion, DocStatus). The refresh proposes a new design when a use case's route changes; you accept or reject it in the app.
+
+## Sharing with account teams (1.9.0)
+You edit; they read. A read-only app per customer shows that account's use cases, designs, roadmap and FinOps, without evidence, internal questions or any other customer. See `optional/read-only-customer-app/README.md`.
+
+## Sharing with the customer (1.9.1)
+App Builder apps cannot be shared with guest accounts. A customer edition on a separate site strips every internal field, question, link and design part, and an offline HTML copy of it on that site is what the customer opens. See `optional/customer-edition/README.md`.
 
 ## Notes
 - AI consumption figures in the app are estimates (agent steps × context at list price). Billing is in the Microsoft 365 admin centre.

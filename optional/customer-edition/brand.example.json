@@ -1,0 +1,9 @@
+{"appTitle": "Contoso × Microsoft AI Use Cases", "owner": "{{OWNER}}", "team": "{{TEAM}}", "tagline": "{{TAGLINE}}", "defaultHourlyRateUSD": 50,
+ "logo": "/mnt/workspace/apps/{{CUSTOMER_APP_ID}}/src/assets/logos/contoso.png", "hero": "/mnt/workspace/apps/{{CUSTOMER_APP_ID}}/src/assets/brand/contoso-hero.webp",
+ "customer": {"name": "Contoso", "primary": "#0F6CBD", "dark": "#0B3A66",
+   "identity": {"purpose": "{{ONE-LINE PURPOSE FROM THE CUSTOMER'S PUBLIC SITE}}",
+     "about": "{{TWO-SENTENCE PUBLIC DESCRIPTION}}",
+     "accents": ["#0B3A66", "#2E8B57", "#E8743B"],
+     "facts": [{"label": "employees", "value": "{{N}}"}],
+     "factsNote": "{{YEAR}} key figures, {{PUBLIC SOURCE}}", "website": "https://www.contoso.com/"}},
+ "table_keys": {"UseCases": ["usecases_704f56", "usecases_contoso"], "Customers": ["customers_704f56", "customers_contoso"], "Empty": ["signals_704f56", "signals_contoso", "featureradar_704f56", "featureradar_contoso", "aiconsumption_704f56"]}}

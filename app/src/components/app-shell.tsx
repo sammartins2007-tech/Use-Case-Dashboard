@@ -7,6 +7,7 @@ import { PageBoundary } from "@/components/page-boundary";
 import { cn } from "@/lib/utils";
 import { RADAR } from "@/radar.config";
 import { SINGLE_CUSTOMER } from "@/lib/brands";
+import { LIVE_READ_ONLY } from "@/lib/read-only";
 
 const NAV = [
   { to: "/", label: "Welcome", end: true },
@@ -62,10 +63,15 @@ export function AppShell() {
             <PageBoundary label="Search" silent>
               <UseCaseSearch />
             </PageBoundary>
-            {!RADAR.customerEdition && (
+            {!RADAR.customerEdition && !LIVE_READ_ONLY && (
               <PageBoundary label="Meter" silent>
                 <AiMeter />
               </PageBoundary>
+            )}
+            {LIVE_READ_ONLY && (
+              <span role="note" className="whitespace-nowrap rounded-full border border-[#D9D2C4] bg-white px-3 py-1 text-xs text-[#3D4757]">
+                Read-only · maintained by {RADAR.owner}
+              </span>
             )}
           </div>
         </div>

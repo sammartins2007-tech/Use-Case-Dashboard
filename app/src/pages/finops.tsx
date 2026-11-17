@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { ConnectorErrorState, EmptyState, LoadingState } from "@/components/states";
 import { tokensFmt, usd, useAiTotals } from "@/components/ai-meter";
+import { LIVE_READ_ONLY } from "@/lib/read-only";
 import { useUseCases } from "@/data/repo";
 import { ACCOUNTS } from "@/data/types";
 import { usd0 as eur } from "@/lib/kpi";
@@ -71,7 +72,7 @@ export function FinOpsPage() {
       </section>
 
       <div className="mx-auto w-full max-w-[1280px] space-y-10 px-6 py-10">
-        {!RADAR.customerEdition && (
+        {!RADAR.customerEdition && !LIVE_READ_ONLY && (
         <section id="consumption" aria-labelledby="cons-title" className="scroll-mt-20">
           <h2 id="cons-title" className="font-[family-name:var(--font-serif)] text-2xl">
             AI consumed by this radar

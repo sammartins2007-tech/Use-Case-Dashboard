@@ -10,6 +10,7 @@ import { ConnectorErrorState, EmptyState, LoadingState } from "@/components/stat
 import { Pager, usePageTokens } from "@/components/pager";
 import { CustomerHeader } from "@/components/customer-header";
 import { PdfExportButton } from "@/components/pdf-export-button";
+import { LIVE_READ_ONLY } from "@/lib/read-only";
 import { fitsOf, useCustomerSettings, useHourlyRate, useSaveWaves, useUpdateUseCase, useUseCases, type WaveDef } from "@/data/repo";
 import { CUSTOMER_DECISIONS, DEPARTMENTS, UNPLANNED, type CustomerDecision, type UseCase } from "@/data/types";
 import { caseDollars, caseValue, fmtHours, totalsOf, usd0, usdCompact } from "@/lib/kpi";
@@ -118,17 +119,21 @@ export function RoadmapPage() {
             >
               Customer decisions only
             </button>
-            <Button variant="outline" size="sm" className="rounded-full" onClick={() => setEditWaves(true)}>
-              <Settings2 className="size-4" aria-hidden="true" /> Waves
-            </Button>
-            <PdfExportButton targetRef={ref} fileName={`${name} - AI roadmap.pdf`}>
-              Download PDF
-            </PdfExportButton>
+            {!LIVE_READ_ONLY && (
+              <>
+                <Button variant="outline" size="sm" className="rounded-full" onClick={() => setEditWaves(true)}>
+                  <Settings2 className="size-4" aria-hidden="true" /> Waves
+                </Button>
+                <PdfExportButton targetRef={ref} fileName={`${name} - AI roadmap.pdf`}>
+                  Download PDF
+                </PdfExportButton>
+              </>
+            )}
           </div>
         </div>
         <p className="-mt-3 max-w-4xl text-sm text-muted-foreground">
-          Gold cards come from {name}'s own decisions; dashed cards are proposals made in the app. Move a card with its wave menu; candidates are
-          ranked by value, low effort, leadership fit and readiness.
+          Gold cards come from {name}'s own decisions; dashed cards are proposals made in the app.
+          {LIVE_READ_ONLY ? " Candidates are" : " Move a card with its wave menu; candidates are"} ranked by value, low effort, leadership fit and readiness.
         </p>
 
         {q.isLoading || settings.isLoading ? (
@@ -293,6 +298,7 @@ function RoadmapCard({
           {u.customerStatus && u.customerStatus !== "Not set" && <span className="text-muted-foreground">{u.customerStatus}</span>}
         </p>
       )}
+      {!LIVE_READ_ONLY && (
       <div className="mt-2 grid grid-cols-2 gap-1.5" data-pdf-exclude>
         <label className="sr-only" htmlFor={`wave-${u.id}`}>
           Wave for {u.title}
@@ -328,6 +334,7 @@ function RoadmapCard({
           ))}
         </select>
       </div>
+      )}
     </article>
   );
 }

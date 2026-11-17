@@ -36,6 +36,10 @@ export interface UseCase {
   finOpsBasis?: string;
   owner?: string;
   nextStep?: string;
+  /** One line per person: Name | Job title | Organisation | Location | Role in the project | Owner (Y/N). */
+  people?: string;
+  /** One line per next step: Status (Open/Done) | Due (YYYY-MM-DD) | Who | Action | Detail. */
+  steps?: string;
   featureUnlock?: string;
   confidence?: Confidence;
   decision?: Decision;
@@ -202,6 +206,8 @@ export type UseCasePatch = {
   monthlyValue?: number;
   finOpsBasis?: string;
   readiness?: string;
+  people?: string;
+  steps?: string;
   openQuestions?: string;
   analysis?: string;
   evidence?: string;
