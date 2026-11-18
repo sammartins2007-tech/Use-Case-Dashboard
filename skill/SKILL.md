@@ -1,6 +1,6 @@
 ---
 name: ai-use-case-radar
-description: Set up, update or extend an "AI Use Case Radar" — a personal App Builder app that tracks a seller's AI use cases per customer, fed daily by Work IQ (mail, Teams, meetings, documents), with a complexity × effort map, platform classification, KPI values, savings and all-AI FinOps sizing. Use when the user says "set up my AI Use Case Radar", "add a customer to my radar", "update my radar from the kit", or attaches the AI-Use-Case-Radar kit. Not for one-off use case briefs.
+description: 'Set up, update or extend an "AI Use Case Radar" — a personal App Builder app that tracks a seller''s AI use cases per customer, fed daily by Work IQ (mail, Teams, meetings, documents), with a complexity × effort map, platform classification, KPI values, savings and all-AI FinOps sizing. Use when the user says "set up my AI Use Case Radar", "add a customer to my radar", "update my radar from the kit", or attaches the AI-Use-Case-Radar kit. Not for one-off use case briefs. Do not use it for a one-off use-case analysis (use business-analysis-engine) or a demo script (use fromusecase-to-script).'
 ---
 
 # AI Use Case Radar — setup kit
@@ -20,6 +20,17 @@ The kit (this folder) holds four things:
 `VERSION` is the kit version. The instance records the version it runs in `src/KIT_VERSION`.
 
 Kit rules: customer names, logos, colours and people belong ONLY in `src/radar.config.ts`, `src/assets/logos/` and the SharePoint data, never in kit code. Examples use fictitious companies (Contoso, Fabrikam).
+
+## When NOT to Use
+- A one-off analysis of a single use case: use business-analysis-engine.
+- Turning one use case into a demo video script: use fromusecase-to-script.
+- Changing the app's code outside the kit's operations: follow the App Builder process directly.
+
+## Guardrails
+- Confirm with the owner before deleting or overwriting any list, row or app instance, and before moving an instance to a new kit version.
+- Never invent facts, figures, people or dates in any list (see Quality gate); a missing value stays empty with a CLARIFY line.
+- Never share the app, a read-only copy or a customer edition, and never send anything to a customer, without the owner's explicit approval.
+- If a step fails (connector, list schema, publish), stop at that step, report it in plain language and leave the previous working version in place.
 
 ## Operation 1 — Set up a new radar
 
@@ -98,3 +109,6 @@ When the owner doubts a source was analysed deeply enough, or asks for a catch-u
 - Every source is analysed with the segment ledger; never summarise a transcript from its first part only.
 - Test every page and key interaction with the mouse before publishing, then check the published app in the owner's browser; report only what was done and verified.
 - Plain business language to the user; no tool names, ids or paths.
+
+## Example
+Fictitious request: "add Fabrikam to my radar". Operation 3: add Fabrikam's name, colours and logo only in `src/radar.config.ts` and `src/assets/logos/`; the next refresh analyses Fabrikam's mails, meetings and documents with the segment ledger; report the ledger coverage, the CLARIFY questions raised and the AI cost logged.
