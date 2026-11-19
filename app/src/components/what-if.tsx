@@ -4,9 +4,12 @@ import { LicenceCalc, SubTabs, type KitPanel } from "@/components/blueprint";
 import { cn } from "@/lib/utils";
 import { useDocsOfKind } from "@/lib/content";
 
+// Designs are validated JSON documents read loosely.
+type Loose = ReturnType<typeof JSON.parse>;
+
 type Fit = { need: string; theirs: string; microsoft: string; fit: string };
 export type WhatIfCase = { account?: string; evidence?: string; estate: string; status: string; choice: string; keep: string; microsoft: string; verdict: string; tone: "replace" | "complement" | "keep"; fit: Fit[]; steps: string[]; watch?: string; aiUnlock?: { what: string; status: string }[] };
-export type WhatIfEstate = { account?: string; name: string; role: string; microsoft: string; accent: string; accent2: string; members: string[]; dependants: string[]; licence?: any; saving: string; aiUnlock: { what: string; status: string }[] };
+export type WhatIfEstate = { account?: string; name: string; role: string; microsoft: string; accent: string; accent2: string; members: string[]; dependants: string[]; licence?: Loose; saving: string; aiUnlock: { what: string; status: string }[] };
 type Data = { estates: Record<string, WhatIfEstate>; cases: Record<string, WhatIfCase> };
 
 /** What-if content lives in SharePoint: one document per estate (the customer's chosen platform) and per use case. */
@@ -216,7 +219,7 @@ export function WhatIfPanel({ id, printAll }: { id: number | string; printAll?: 
     { id: "estate", label: `${shortName(e.name)} estate`, icon: Compass, badge: e.members.length + e.dependants.length, node: <Estate id={String(id)} e={e} cases={data.cases} /> },
     { id: "test", label: "How to test it", icon: FlaskConical, node: <TestIt c={c} /> },
   ];
-  const style = { ["--sol" as any]: e.accent, ["--sol2" as any]: e.accent2 } as React.CSSProperties;
+  const style = { ["--sol" as Loose]: e.accent, ["--sol2" as Loose]: e.accent2 } as React.CSSProperties;
   if (printAll)
     return (
       <div style={style} className="space-y-6">

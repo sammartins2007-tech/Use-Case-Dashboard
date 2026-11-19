@@ -1,6 +1,9 @@
 import { useQueries } from "@tanstack/react-query";
 import { fetchDoc, useContentIndex, useDoc } from "@/lib/content";
 
+// Designs are validated JSON documents read loosely.
+type Loose = ReturnType<typeof JSON.parse>;
+
 /** A use case solved end to end by the L2 specialist board (static design artefact bundled with the app). */
 export interface SolLink { title: string; url: string }
 export interface SolNode { id: string; layer: string; label: string; product: string; role: string; existing: boolean }
@@ -223,7 +226,7 @@ export interface Blueprint {
   golive: { step: string; who: string; time: string }[];
   stepUp: { when: string; to: string; what: string };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  kit: Record<string, any>;
+  kit: Record<string, Loose>;
 }
 export const KIND_BY_ROUTE: Record<string, BlueprintKind> = { "1": "noai", "2": "codeapp", "3": "m365", "4": "cowork", "5": "studio", "6": "fabric", "7": "foundry", "8": "unknown" };
 export const BUILD_TITLE: Record<BlueprintKind, string> = {

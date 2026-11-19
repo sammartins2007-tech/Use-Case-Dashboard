@@ -7,6 +7,23 @@ export interface Person {
   location: string;
   role: string;
   owner: boolean;
+  /** How the person contributes: Business, Technical or Microsoft (empty = inferred, see contributionOf). */
+  contribution: Contribution | "";
+}
+
+export const CONTRIBUTIONS = ["Business", "Technical", "Microsoft"] as const;
+export type Contribution = (typeof CONTRIBUTIONS)[number];
+
+const TECH_UPPER = /\b(IT|ICT)\b/;
+const TECH = /\b(data|digital|architect\w*|engineer\w*|developer|platform|technical|tech|integration|infrastructure|cloud|security|devops|analytics engineer|power platform|copilot studio|automation|crm|erp|sap|salesforce|application|solution architect|maker|admin\w*)\b/i;
+
+/** The contribution shown for a person: the stored value, else inferred from organisation, job title and role. */
+export function contributionOf(p: Pick<Person, "org" | "title" | "role" | "contribution">, account?: string): Contribution {
+  if (p.contribution) return p.contribution;
+  if (/microsoft/i.test(p.org)) return "Microsoft";
+  const customer = !p.org || (account ? p.org.toLowerCase().includes(account.toLowerCase()) : true);
+  if (!customer) return "Technical"; // partners and integrators
+  return TECH.test(`${p.title} ${p.role}`) || TECH_UPPER.test(`${p.title} ${p.role}`) ? "Technical" : "Business";
 }
 
 export interface Step {
@@ -28,13 +45,16 @@ export function parsePeople(s?: string): Person[] {
   return nonEmptyLines(s)
     .map((l) => l.split("|").map((x) => x.trim()))
     .filter((f) => f[0])
-    .map((f) => ({ name: f[0], title: f[1] ?? "", org: f[2] ?? "", location: f[3] ?? "", role: f[4] ?? "", owner: /^y/i.test(f[5] ?? "") }));
+    .map((f) => {
+      const c = (CONTRIBUTIONS as readonly string[]).find((x) => x.toLowerCase() === (f[6] ?? "").toLowerCase()) as Contribution | undefined;
+      return { name: f[0], title: f[1] ?? "", org: f[2] ?? "", location: f[3] ?? "", role: f[4] ?? "", owner: /^y/i.test(f[5] ?? ""), contribution: c ?? "" };
+    });
 }
 
 export function serializePeople(list: Person[]): string {
   return list
     .filter((p) => p.name.trim())
-    .map((p) => [p.name, p.title, p.org, p.location, p.role, p.owner ? "Y" : "N"].map(clean).join(" | "))
+    .map((p) => [p.name, p.title, p.org, p.location, p.role, p.owner ? "Y" : "N", p.contribution].map(clean).join(" | ").replace(/ \| $/, ""))
     .join("\n");
 }
 
@@ -45,7 +65,7 @@ export function ownerOf(people: Person[], ownerText?: string): Person | undefine
   const t = (ownerText ?? "").trim();
   if (!t) return undefined;
   const [name, ...rest] = t.split(/\s+[—–-]\s+|,\s*/);
-  return { name: name.trim(), title: rest.join(", ").trim(), org: "", location: "", role: "Business owner", owner: true };
+  return { name: name.trim(), title: rest.join(", ").trim(), org: "", location: "", role: "Business owner", owner: true, contribution: "" };
 }
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;

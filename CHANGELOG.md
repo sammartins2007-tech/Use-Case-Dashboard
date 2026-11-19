@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.10.0 — demo stories, full-run date, measured credits, people roles, signal context
+- Play demo (new `components/iq-demo-player.tsx`): any use case can carry a scripted, fictional demo story as a content document of kind `demo` (same storage as designs; the Microsoft IQ Playground scenario format: persona, trigger, five agents across Work / Web / Fabric / Foundry IQ plus a system of record, governance, shell, tracks). The use case header shows **Play demo** only when a story exists. The player opens on the principle first (who, what happened, how it works, the approval rule), then plays inside a Microsoft 365 Copilot-in-Teams look: prompt typed into the composer, reasoning steps, streamed answer, numbered citations with pop-ups, option cards with one Recommended, a Teams Approvals card ("nothing runs until approved"), and a Behind-the-scenes panel (agents, IQ layers lit as used, governance). Hidden in the customer edition. Nothing is published outside the app.
+- Full specialist run date (new `components/full-run-badge.tsx`): a header chip shows the date of the last design produced by the full specialist chain (board with specialists or opinions plus a solution experience), with "current" or "proposal waiting"; amber when no full run exists yet. Hidden in the customer edition.
+- Measured credits (new `components/measured-credits.tsx`, `useMeterReadings()` in data/repo.ts): the FinOps page compares measured daily platform credits (content rows of kind `meter`: DocRef = date, DocSeq = credits) with the logged runs and estimated $, credits per $, and flags days above 1.3 × the median. Interactive build sessions are logged as consumption rows of kind "Build session". Meter rows are never copied to read-only copies.
+- Signal and source context (new `components/input-context.tsx`): clicking a signal or source opens a pop-up with what it said, when, where it came from and its impact on the use case.
+- People: each person on a use case is shown as owner or as a Business, Technical or Microsoft contributor (dossier-people, lib/people-steps).
+- Readable picture labels in the solution visuals.
+- Code: loosely typed design readers use a named `Loose` type instead of `any` (blueprint, hackathon, pathway, what-if, solutions), so the full lint gate passes before a publish.
+- Content kinds: `demo` added to `DocKind` (lib/content.ts).
+
 ## 1.9.2 — consistency hardening
 - `customer_copy.py` writes its run report to its own folder (`working/sync/`) and creates it; a missing scratch folder can no longer stop the copy sync.
 - Refresh template: related-use-case labels always carry the target's CURRENT title (and are updated when a title changes); the read-only copy step ends with a consistency check that must report 0 bad links, title mismatches and design mismatches.

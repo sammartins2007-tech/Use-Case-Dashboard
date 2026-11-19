@@ -4,7 +4,7 @@ import { Briefcase, Building2, MapPin, Pencil, Plus, Star, Trash2, UserRound, Us
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { initials, ownerOf, parsePeople, serializePeople, type Person } from "@/lib/people-steps";
+import { CONTRIBUTIONS, contributionOf, initials, ownerOf, parsePeople, serializePeople, type Contribution, type Person } from "@/lib/people-steps";
 import type { UseCase, UseCasePatch } from "@/data/types";
 import { RADAR } from "@/radar.config";
 import { cn } from "@/lib/utils";
@@ -14,9 +14,16 @@ type Save = (patch: UseCasePatch, msg: string, done?: () => void) => void;
 const ORG_TONE = (org: string, account?: string) =>
   /microsoft/i.test(org) ? "#0E7C86" : account && org.toLowerCase().includes(account.toLowerCase()) ? "#1B2A41" : org ? "#7A4B12" : "#6B7280";
 
+export const CONTRIB_META: Record<Contribution, { label: string; plural: string; tone: string; hint: string }> = {
+  Business: { label: "Business contributor", plural: "Business contributors", tone: "bg-amber-50 text-amber-900 ring-amber-200", hint: "Knows the process, the pain and the expected outcome" },
+  Technical: { label: "Technical contributor", plural: "Technical contributors", tone: "bg-sky-50 text-sky-900 ring-sky-200", hint: "Systems, data, integration or the build (customer IT or partner)" },
+  Microsoft: { label: "Microsoft contributor", plural: "Microsoft contributors", tone: "bg-teal-50 text-teal-900 ring-teal-200", hint: "Microsoft account team or specialist" },
+};
+
 /** One person: name in bold, then job title, organisation and location, then the role in the project. */
 export function PersonCard({ p, account, accent, big }: { p: Person; account?: string; accent?: string; big?: boolean }) {
   const tone = ORG_TONE(p.org, account);
+  const c = CONTRIB_META[contributionOf(p, account)];
   return (
     <div className={cn("flex gap-3 rounded-2xl border border-border bg-white p-4", p.owner && "border-2")} style={p.owner ? { borderColor: accent ?? tone } : undefined}>
       <span
@@ -31,10 +38,15 @@ export function PersonCard({ p, account, accent, big }: { p: Person; account?: s
           {p.name}
           {p.owner && (
             <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 align-middle text-[11px] font-medium text-white" style={{ background: accent ?? tone }}>
-              <Star className="size-3" aria-hidden /> Business owner
+              <Star className="size-3" aria-hidden /> Owner
             </span>
           )}
         </p>
+        {!p.owner && (
+          <p className={cn("inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ring-1", c.tone)} title={c.hint}>
+            {c.label}
+          </p>
+        )}
         {p.title && <p className="text-sm text-[#3D4757]">{p.title}</p>}
         {(p.org || p.location) && (
           <p className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
@@ -63,7 +75,7 @@ export function PersonCard({ p, account, accent, big }: { p: Person; account?: s
 function PeopleEditor({ open, onOpenChange, people, busy, onSave }: { open: boolean; onOpenChange: (v: boolean) => void; people: Person[]; busy: boolean; onSave: (list: Person[]) => void }) {
   const [draft, setDraft] = useState<Person[]>(people);
   const set = (i: number, patch: Partial<Person>) => setDraft((d) => d.map((p, j) => (j === i ? { ...p, ...patch } : patch.owner ? { ...p, owner: false } : p)));
-  const blank: Person = { name: "", title: "", org: "", location: "", role: "", owner: false };
+  const blank: Person = { name: "", title: "", org: "", location: "", role: "", owner: false, contribution: "" };
   return (
     <Dialog
       open={open}
@@ -75,7 +87,7 @@ function PeopleEditor({ open, onOpenChange, people, busy, onSave }: { open: bool
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Use case participants</DialogTitle>
-          <DialogDescription>One card per person. Tick the business owner.</DialogDescription>
+          <DialogDescription>One card per person. Tick the owner; every other person is a business, technical or Microsoft contributor.</DialogDescription>
         </DialogHeader>
         <ul className="space-y-3">
           {draft.map((p, i) => (
@@ -94,10 +106,26 @@ function PeopleEditor({ open, onOpenChange, people, busy, onSave }: { open: bool
                   <Input value={p[k]} onChange={(e) => set(i, { [k]: e.target.value } as Partial<Person>)} className="h-8 bg-white text-sm text-foreground" />
                 </label>
               ))}
-              <div className="flex items-end justify-between gap-2 sm:col-span-6">
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="radio" name="owner" checked={p.owner} onChange={() => set(i, { owner: true })} /> Business owner
-                </label>
+              <div className="flex flex-wrap items-end justify-between gap-3 sm:col-span-6">
+                <div className="flex flex-wrap items-center gap-4">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="radio" name="owner" checked={p.owner} onChange={() => set(i, { owner: true })} /> Owner
+                  </label>
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                    Contributor type
+                    <select
+                      value={p.contribution || contributionOf(p)}
+                      onChange={(e) => set(i, { contribution: e.target.value as Contribution })}
+                      className="h-8 rounded-md border border-border bg-white px-2 text-sm text-foreground"
+                    >
+                      {CONTRIBUTIONS.map((x) => (
+                        <option key={x} value={x}>
+                          {CONTRIB_META[x].label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
                 <Button type="button" variant="ghost" size="sm" onClick={() => setDraft((d) => d.filter((_, j) => j !== i))}>
                   <Trash2 className="size-4" aria-hidden /> Remove
                 </Button>
@@ -124,7 +152,8 @@ function PeopleEditor({ open, onOpenChange, people, busy, onSave }: { open: bool
 function usePeopleEditing(u: UseCase, save: Save) {
   const [open, setOpen] = useState(false);
   const people = parsePeople(u.people);
-  const commit = (list: Person[]) => {
+  const commit = (raw: Person[]) => {
+    const list = raw.map((p) => ({ ...p, contribution: p.contribution || contributionOf(p, u.account) }));
     const owner = list.find((p) => p.owner);
     const patch: UseCasePatch = { people: serializePeople(list) };
     if (owner) patch.owner = [owner.name, owner.title].filter(Boolean).join(" — ").slice(0, 250);
@@ -142,7 +171,7 @@ export function OwnerCard({ u, save, busy, accent, onShowAll }: { u: UseCase; sa
     <section aria-labelledby="owner-title" className="space-y-2">
       <div className="flex items-center justify-between">
         <h2 id="owner-title" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Business owner
+          Owner
         </h2>
         {!RADAR.customerEdition && !READ_ONLY && (
           <Button variant="ghost" size="sm" className="h-7" onClick={() => ed.setOpen(true)}>
@@ -153,7 +182,7 @@ export function OwnerCard({ u, save, busy, accent, onShowAll }: { u: UseCase; sa
       {owner ? <PersonCard p={{ ...owner, owner: true }} account={u.account} accent={accent} big /> : <p className="rounded-2xl border border-dashed border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">No business owner named yet.</p>}
       {others > 0 && (
         <button type="button" onClick={onShowAll} className="inline-flex items-center gap-1.5 text-sm font-medium text-[#0E7C86] hover:underline">
-          <Users className="size-4" aria-hidden /> {others} more participant{others > 1 ? "s" : ""}
+          <Users className="size-4" aria-hidden /> {others} contributor{others > 1 ? "s" : ""}
         </button>
       )}
       <PeopleEditor open={ed.open} onOpenChange={ed.setOpen} people={ed.people} busy={busy} onSave={ed.commit} />
@@ -168,15 +197,16 @@ export function ParticipantsPanel({ u, save, busy, accent }: { u: UseCase; save:
     const o = ownerOf([], u.owner);
     return o ? [o] : [];
   })();
-  const groups = new Map<string, Person[]>();
-  for (const p of list) {
-    const g = p.org || "Other";
-    groups.set(g, [...(groups.get(g) ?? []), p]);
-  }
-  const order = [...groups.keys()].sort((a, b) => {
-    const rank = (g: string) => (u.account && g.toLowerCase().includes(u.account.toLowerCase()) ? 0 : /microsoft/i.test(g) ? 2 : g === "Other" ? 3 : 1);
-    return rank(a) - rank(b);
-  });
+  const owner = list.find((p) => p.owner);
+  const groups: { key: string; label: string; hint?: string; people: Person[] }[] = [
+    { key: "owner", label: "Owner", people: owner ? [owner] : [] },
+    ...CONTRIBUTIONS.map((c) => ({
+      key: c,
+      label: CONTRIB_META[c].plural,
+      hint: CONTRIB_META[c].hint,
+      people: list.filter((p) => p !== owner && contributionOf(p, u.account) === c),
+    })),
+  ].filter((g) => g.people.length > 0);
   return (
     <section aria-labelledby="ppl-title" className="space-y-5">
       <div className="flex items-center justify-between">
@@ -190,11 +220,14 @@ export function ParticipantsPanel({ u, save, busy, accent }: { u: UseCase; save:
         )}
       </div>
       {list.length === 0 && <p className="text-sm text-muted-foreground">No participants named yet.</p>}
-      {order.map((g) => (
-        <div key={g}>
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{g}</h3>
+      {groups.map((g) => (
+        <div key={g.key}>
+          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {g.label} <span className="tabular-nums">{g.people.length}</span>
+            {g.hint && <span className="ml-2 font-normal normal-case tracking-normal">· {g.hint}</span>}
+          </h3>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {[...groups.get(g)!].sort((a, b) => Number(b.owner) - Number(a.owner)).map((p, i) => (
+            {g.people.map((p, i) => (
               <PersonCard key={`${p.name}-${i}`} p={p} account={u.account} accent={accent} />
             ))}
           </div>

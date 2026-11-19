@@ -9,7 +9,7 @@ import { LIVE_READ_ONLY, ReadOnlyError } from "@/lib/read-only";
  * One document = (DocKind, DocRef, DocVersion), split into DocChunks rows ordered by DocSeq.
  * DocStatus: Current (shown) · Proposed (redesign awaiting review) · Requested (redesign asked for) · Rejected · Archived.
  */
-export type DocKind = "solution" | "image" | "waveplan" | "whatif-estate" | "whatif-case" | "request" | "playbook";
+export type DocKind = "solution" | "image" | "waveplan" | "whatif-estate" | "whatif-case" | "request" | "playbook" | "demo";
 export type DocStatus = "Current" | "Proposed" | "Requested" | "Rejected" | "Archived";
 
 export interface DocRow {

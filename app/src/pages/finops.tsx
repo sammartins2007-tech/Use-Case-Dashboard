@@ -9,6 +9,7 @@ import { useUseCases } from "@/data/repo";
 import { ACCOUNTS } from "@/data/types";
 import { usd0 as eur } from "@/lib/kpi";
 import { cn } from "@/lib/utils";
+import { MeasuredCredits } from "@/components/measured-credits";
 
 const fmtDate = (d?: string) => {
   if (!d) return "";
@@ -78,7 +79,7 @@ export function FinOpsPage() {
             AI consumed by this radar
           </h2>
           <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-            Every refresh, import and analysis is logged with its tokens and cost. Rows marked estimated are computed from the number of
+            Every refresh, import, analysis and build session is logged with its tokens and cost. Rows marked estimated are computed from the number of
             agent steps and their working context at an illustrative list price, not read from a billing meter.
           </p>
           {ai.q.isLoading ? (
@@ -175,6 +176,7 @@ export function FinOpsPage() {
               </div>
             </div>
           )}
+          {!ai.q.isLoading && !ai.q.isError && <MeasuredCredits rows={ai.rows} />}
         </section>
         )}
 

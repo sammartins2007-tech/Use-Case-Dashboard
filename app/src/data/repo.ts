@@ -323,6 +323,35 @@ export function useConsumption() {
   });
 }
 
+export interface MeterReading {
+  id: number;
+  date: string;
+  credits: number;
+  note?: string;
+  origin?: string;
+}
+
+/** Measured Cowork credits per day (settings rows tagged DocKind = meter; entered from the Cowork Usage screen). */
+export function useMeterReadings() {
+  return useQuery({
+    queryKey: ["meterReadings"],
+    staleTime: 60_000,
+    enabled: !LIVE_READ_ONLY,
+    queryFn: async (): Promise<MeterReading[]> => {
+      const result = await CustomersService.getAll({ top: 500, filter: "DocKind eq 'meter'" });
+      if (!result.success) {
+        console.error("connector error", result.error);
+        throw result.error;
+      }
+      return (result.data ?? [])
+        .map((r) => r as unknown as { ID?: number; DocKind?: string; DocRef?: string; DocSeq?: number; DocReason?: string; DocOrigin?: string })
+        .filter((r) => r.DocKind === "meter" && /^\d{4}-\d{2}-\d{2}$/.test(r.DocRef ?? "") && typeof r.DocSeq === "number")
+        .map((r) => ({ id: r.ID ?? 0, date: r.DocRef as string, credits: r.DocSeq as number, note: r.DocReason, origin: r.DocOrigin }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+    },
+  });
+}
+
 export interface CustomerSetting {
   id: number;
   account: string;

@@ -22,9 +22,13 @@ import {
   Sparkles,
   Target,
   Users,
+  PlayCircle,
   Workflow,
 } from "lucide-react";
 import { useHasSolution, useSolution } from "@/lib/solutions";
+import { FullRunBadge } from "@/components/full-run-badge";
+import { IqDemoPlayer, type IqScenario } from "@/components/iq-demo-player";
+import { useDoc } from "@/lib/content";
 import { UseCaseCoach } from "@/components/use-case-coach";
 import { UseCaseInput } from "@/components/use-case-input";
 import { UseCaseClarifications } from "@/components/clarifications";
@@ -45,6 +49,7 @@ import { RoadmapFields } from "@/components/roadmap-fields";
 import { FinOpsSizing } from "@/components/finops-sizing";
 import { OwnerCard, ParticipantsPanel } from "@/components/dossier-people";
 import { NextSteps } from "@/components/next-steps";
+import { InputContextDialog, parseEvidence, type InputRef } from "@/components/input-context";
 import { OfflineCopyAssetError, buildOfflineCopy, downloadStem, saveOfflineCopy } from "@/lib/offline-copy";
 import { openInNewTab, saveToSharePoint } from "@/lib/sharepoint-save";
 import { IS_STATIC } from "@/lib/static-copy";
@@ -224,7 +229,13 @@ export function UseCasePage() {
 function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Signal[]; features: Feature[]; nav: React.ReactNode }) {
   const hasSolution = useHasSolution();
   const design = useSolution(hasSolution(u.id) ? String(u.id) : undefined).data;
+  const designSet = useDoc<{ board?: { date?: unknown; specialists?: unknown; opinions?: unknown }; experience?: unknown }>("solution", RADAR.customerEdition ? undefined : String(u.id));
+  // A scripted demo story for this use case (kind "demo"); internal app only.
+  const demoSet = useDoc<IqScenario>("demo", RADAR.customerEdition ? undefined : String(u.id));
+  const demo = demoSet.data?.current?.data;
+  const [demoOpen, setDemoOpen] = useState(false);
   const [tab, setTab] = useState<TabId>("overview");
+  const [inputCtx, setInputCtx] = useState<InputRef | null>(null);
   const wi = useWhatIf(u.id);
   const tabs = useMemo(() => (wi ? TABS.flatMap((t) => (t.id === "solution" ? [t, { id: "whatif" as TabId, label: "What if Microsoft?" }] : [t])) : TABS), [wi]);
   useEffect(() => {
@@ -446,6 +457,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
             </span>
           )}
           {u.lastSignal && <span className="hidden text-xs text-muted-foreground md:inline">last input {fmtDate(u.lastSignal)}</span>}
+          {!RADAR.customerEdition && <FullRunBadge set={designSet.data} loading={designSet.isLoading} />}
           {u.discarded && (
             <span className="rounded-full border border-rose-300 bg-rose-50 px-2.5 py-0.5 text-xs font-medium text-rose-800">
               Discarded{u.discardReason ? ` · ${u.discardReason}` : ""}
@@ -458,6 +470,12 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
                 <ShieldCheck className="size-4" aria-hidden /> Add input
               </button>
             )}
+            {demo && Array.isArray(demo.tracks) && (
+              <button type="button" onClick={() => setDemoOpen(true)} className="inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-sm font-medium shadow-sm hover:bg-muted" style={{ borderColor: accent, color: accent }}>
+                <PlayCircle className="size-4" aria-hidden /> Play demo
+              </button>
+            )}
+            {demo && Array.isArray(demo.tracks) && <IqDemoPlayer scenario={demo} open={demoOpen} onOpenChange={setDemoOpen} />}
             {hasSolution(u.id) && (
               <Link to={`/use-case/${u.id}/solution`} className="inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-sm font-medium shadow-sm hover:bg-muted" style={{ borderColor: accent, color: accent }}>
                 <Sparkles className="size-4" aria-hidden /> Solution experience
@@ -848,15 +866,23 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
                   {[...signals]
                     .sort((a, b) => (b.signalDate ?? "").localeCompare(a.signalDate ?? ""))
                     .map((s) => (
-                      <li key={s.id} className="border-l-2 border-border pl-3">
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                          <span>{fmtDate(s.signalDate)}</span>
-                          <span>{s.sourceType}</span>
-                          {s.sender && <span>· {s.sender}</span>}
-                          <ToneBadge field="kind" value={s.kind} />
-                        </div>
-                        <p className="text-sm font-medium">{s.title}</p>
-                        {s.insight && <p className="text-sm text-muted-foreground">{s.insight}</p>}
+                      <li key={s.id}>
+                        <button
+                          type="button"
+                          onClick={() => setInputCtx({ title: s.title, date: s.signalDate, type: s.sourceType, sender: s.sender, kind: s.kind, insight: s.insight, sourceRef: s.sourceRef })}
+                          className="block w-full rounded-r-lg border-l-2 border-border py-1 pl-3 text-left transition-colors hover:border-[#0E7C86] hover:bg-[#F7F5F0] focus-visible:outline-2 focus-visible:outline-[#0E7C86]"
+                          aria-label={`${s.title}: show context and impact`}
+                        >
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                            <span>{fmtDate(s.signalDate)}</span>
+                            <span>{s.sourceType}</span>
+                            {s.sender && <span>· {s.sender}</span>}
+                            <ToneBadge field="kind" value={s.kind} />
+                          </div>
+                          <p className="text-sm font-medium">{s.title}</p>
+                          {s.insight && <p className="line-clamp-2 text-sm text-muted-foreground">{s.insight}</p>}
+                          <span className="text-xs font-medium text-[#0E7C86]">Context and impact ›</span>
+                        </button>
                       </li>
                     ))}
                 </ol>
@@ -872,9 +898,14 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
                     const href = externalUrl(s.url);
                     return (
                       <li key={i} className="border-l-2 border-border pl-3">
-                        <span className="text-xs text-muted-foreground">
-                          {s.type}
-                          {s.date ? ` · ${fmtDate(s.date)}` : ""}
+                        <span className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                          <span>
+                            {s.type}
+                            {s.date ? ` · ${fmtDate(s.date)}` : ""}
+                          </span>
+                          <button type="button" onClick={() => setInputCtx({ title: s.title, date: s.date, type: s.type, url: s.url })} className="font-medium text-[#0E7C86] hover:underline" aria-label={`${s.title}: show context and impact`}>
+                            Context ›
+                          </button>
                         </span>
                         {href ? (
                           <a href={href} target="_blank" rel="noopener noreferrer" className="flex items-start gap-1 font-medium text-primary hover:underline">
@@ -895,9 +926,18 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
               {u.evidence && (
                 <details className="mt-3 border-t border-border pt-3">
                   <summary className="cursor-pointer text-xs text-muted-foreground">Evidence trail</summary>
-                  <p className="mt-1 whitespace-pre-line text-sm text-muted-foreground">{u.evidence}</p>
+                  <ul className="mt-1 space-y-1">
+                    {parseEvidence(u.evidence).map((e, i) => (
+                      <li key={i}>
+                        <button type="button" onClick={() => setInputCtx({ title: e.source || e.text.slice(0, 80), date: e.date, type: e.type, sourceRef: e.source })} className="w-full rounded px-1 text-left text-sm text-muted-foreground hover:bg-[#F7F5F0] hover:text-foreground">
+                          {e.text}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
                 </details>
               )}
+              <InputContextDialog input={inputCtx} onOpenChange={(o) => !o && setInputCtx(null)} evidence={u.evidence} sources={u.sources} signals={signals} />
             </section>
             <div className="space-y-5">
               {related.length > 0 && (

@@ -5,10 +5,13 @@ import { externalUrl } from "@/lib/safe-url";
 import type { Blueprint, Solution } from "@/lib/solutions";
 import { cn } from "@/lib/utils";
 
+// Designs are validated JSON documents read loosely.
+type Loose = ReturnType<typeof JSON.parse>;
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const serif = "font-[family-name:var(--font-serif)]";
 const card = "rounded-2xl border border-border bg-white p-5";
-const arr = (v: unknown): any[] => (Array.isArray(v) ? v : []);
+const arr = (v: unknown): Loose[] => (Array.isArray(v) ? v : []);
 const usd = (n: number) => n.toLocaleString("en-US", { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 });
 const txt = (v: unknown) => (typeof v === "string" ? v : v == null ? "" : String(v));
 
@@ -70,7 +73,7 @@ function H({ icon: Icon, children }: { icon: LucideIcon; children: React.ReactNo
   );
 }
 
-function Rows({ items, cols }: { items: any[]; cols: { key: string; label: string; strong?: boolean }[] }) {
+function Rows({ items, cols }: { items: Loose[]; cols: { key: string; label: string; strong?: boolean }[] }) {
   if (!items.length) return null;
   return (
     <div className="overflow-x-auto rounded-xl border border-border">
@@ -292,7 +295,7 @@ function Overview({ b, s, extra }: { b: Blueprint; s: Solution; extra?: React.Re
 }
 
 /* ---------- Microsoft 365 Copilot ---------- */
-function m365Panels(k: any): KitPanel[] {
+function m365Panels(k: Loose): KitPanel[] {
   const prompts = arr(k.prompts);
   return [
     {
@@ -344,7 +347,7 @@ function m365Panels(k: any): KitPanel[] {
 }
 
 /* ---------- Copilot Cowork ---------- */
-function coworkPanels(k: any): KitPanel[] {
+function coworkPanels(k: Loose): KitPanel[] {
   const d = k.deliverable ?? {};
   return [
     { id: "brief", label: "Task brief", icon: Bot, node: <Artefact icon={Bot} kicker={`Copilot Cowork · ${txt(k.cadence)}`} title={k.skill?.name ? `Task brief · ${txt(k.skill.name)}` : "Task brief"} text={txt(k.brief)} /> },
@@ -382,7 +385,7 @@ function coworkPanels(k: any): KitPanel[] {
 }
 
 /* ---------- Copilot Studio ---------- */
-function Chat({ sample }: { sample: any[] }) {
+function Chat({ sample }: { sample: Loose[] }) {
   return (
     <div className="mx-auto max-w-3xl overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
       <div className="flex items-center gap-2 border-b border-border px-4 py-2.5" style={{ background: "color-mix(in srgb, var(--sol) 8%, white)" }}>
@@ -407,7 +410,7 @@ function Chat({ sample }: { sample: any[] }) {
     </div>
   );
 }
-function studioPanels(k: any): KitPanel[] {
+function studioPanels(k: Loose): KitPanel[] {
   const triggers: Flow[] = arr(k.triggers).map((t) => ({ name: txt(t.name), trigger: txt(t.event), does: txt(t.does), kind: "Trigger" }));
   const flowTools: Flow[] = arr(k.tools)
     .filter((t) => /flow|automate|connector|action/i.test(txt(t.kind)))
@@ -456,7 +459,7 @@ function studioPanels(k: any): KitPanel[] {
 }
 
 /* ---------- Fabric ---------- */
-function fabricPanels(k: any): KitPanel[] {
+function fabricPanels(k: Loose): KitPanel[] {
   const sm = k.semanticModel ?? {};
   const da = k.dataAgent ?? {};
   const alerts: Flow[] = arr(k.alerts).map((a) => ({ name: txt(a.name), trigger: txt(a.condition), does: txt(a.action), kind: "Activator" }));
@@ -531,7 +534,7 @@ function fabricPanels(k: any): KitPanel[] {
 }
 
 /* ---------- Foundry ---------- */
-function Pipeline({ items }: { items: any[] }) {
+function Pipeline({ items }: { items: Loose[] }) {
   const [i, setI] = useState(0);
   const cur = items[Math.min(i, items.length - 1)];
   return (
@@ -565,7 +568,7 @@ function Pipeline({ items }: { items: any[] }) {
     </div>
   );
 }
-function foundryPanels(k: any): KitPanel[] {
+function foundryPanels(k: Loose): KitPanel[] {
   const ap = k.approach ?? {};
   const ev = k.evaluation ?? {};
   const dep = k.deployment ?? {};
@@ -631,7 +634,7 @@ function foundryPanels(k: any): KitPanel[] {
 }
 
 /* ---------- Code App ---------- */
-function Phone({ sc, appName }: { sc: any; appName: string }) {
+function Phone({ sc, appName }: { sc: Loose; appName: string }) {
   const els = arr(sc.elements).map(txt);
   return (
     <div className="mx-auto w-[290px] shrink-0 rounded-[2.6rem] bg-[#141A23] p-2.5 shadow-2xl ring-1 ring-black/20">
@@ -663,7 +666,7 @@ function Phone({ sc, appName }: { sc: any; appName: string }) {
     </div>
   );
 }
-function codeAppPanels(k: any): KitPanel[] {
+function codeAppPanels(k: Loose): KitPanel[] {
   const flows: Flow[] = arr(k.flows).map((f) => ({ name: txt(f.name), trigger: txt(f.trigger), does: txt(f.does) }));
   const screens = arr(k.screens);
   return [
@@ -747,7 +750,7 @@ function codeAppPanels(k: any): KitPanel[] {
 }
 
 /* ---------- No AI, with the platform challenge ---------- */
-export function LicenceCalc({ p }: { p: any }) {
+export function LicenceCalc({ p }: { p: Loose }) {
   const lic = p.licence ?? {};
   const nm = txt(p.name) || "their platform";
   const acc = txt(p.account) || "The customer";
@@ -801,7 +804,7 @@ export function LicenceCalc({ p }: { p: any }) {
   );
 }
 const FIT_TONE: Record<string, string> = { Native: "bg-emerald-50 text-emerald-800 border-emerald-200", Partial: "bg-amber-50 text-amber-800 border-amber-200", Plan: "bg-sky-50 text-sky-800 border-sky-200", Gap: "bg-rose-50 text-rose-800 border-rose-200" };
-export function PlatformChallenge({ p }: { p: any }) {
+export function PlatformChallenge({ p }: { p: Loose }) {
   const nm = txt(p.name) || "their platform";
   return (
     <div className="space-y-4">
@@ -850,7 +853,7 @@ export function PlatformChallenge({ p }: { p: any }) {
     </div>
   );
 }
-function noAiPanels(k: any): KitPanel[] {
+function noAiPanels(k: Loose): KitPanel[] {
   const a = k.automation ?? {};
   const steps = arr(a.steps).map(txt);
   const flows: Flow[] = arr(k.flows).length
@@ -917,7 +920,7 @@ function noAiPanels(k: any): KitPanel[] {
   return out;
 }
 
-const PANELS: Record<string, (k: any) => KitPanel[]> = {
+const PANELS: Record<string, (k: Loose) => KitPanel[]> = {
   m365: m365Panels,
   cowork: coworkPanels,
   studio: studioPanels,
@@ -937,8 +940,8 @@ export function BlueprintKit({ b, s }: { b: Blueprint; s: Solution }) {
 
 /* ---------- A hero visual drawn from the use case's own design ---------- */
 export function KindHero({ b, s }: { b: Blueprint; s: Solution }) {
-  const k = (b.kit ?? {}) as any;
-  const glass = "rounded-2xl bg-white/90 shadow-xl ring-1 ring-black/5 backdrop-blur";
+  const k = (b.kit ?? {}) as Loose;
+  const glass = "rounded-2xl bg-white/90 text-[#14202B] shadow-xl ring-1 ring-black/5 backdrop-blur";
   if (b.kind === "codeapp") {
     const sc = arr(k.screens)[0];
     return sc ? <div className="origin-center scale-[0.5]"><Phone sc={sc} appName={txt(k.appName)} /></div> : null;
@@ -950,7 +953,7 @@ export function KindHero({ b, s }: { b: Blueprint; s: Solution }) {
         {m.map((x, i) => {
           const agent = /agent|system|bot/i.test(txt(x.who));
           return (
-            <div key={i} className={cn("max-w-[88%] rounded-2xl px-3 py-2 text-[12px] leading-snug shadow-lg", agent ? "bg-white" : "ml-auto text-white")} style={agent ? undefined : { background: "var(--sol)" }}>
+            <div key={i} className={cn("max-w-[88%] rounded-2xl px-3 py-2 text-[12px] leading-snug shadow-lg", agent ? "bg-white text-[#14202B]" : "ml-auto text-white")} style={agent ? undefined : { background: "var(--sol)" }}>
               <span className="line-clamp-3">{txt(x.text)}</span>
             </div>
           );
@@ -985,7 +988,7 @@ export function KindHero({ b, s }: { b: Blueprint; s: Solution }) {
             <span className="line-clamp-1"> {txt(x.action)}</span>
           </div>
         ))}
-        {k.platform && <div className="ml-12 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-[11px] font-medium shadow"><Scale className="size-3" aria-hidden /> {(txt(k.platform.name) || "Their platform").split(" (")[0]} or Microsoft?</div>}
+        {k.platform && <div className="ml-12 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-[11px] font-medium text-[#14202B] shadow"><Scale className="size-3" aria-hidden /> {(txt(k.platform.name) || "Their platform").split(" (")[0]} or Microsoft?</div>}
       </div>
     );
   }

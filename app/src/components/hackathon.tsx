@@ -6,10 +6,13 @@ import { safeUrl } from "@/lib/safe-url";
 import type { Solution } from "@/lib/solutions";
 import { cn } from "@/lib/utils";
 
+// Designs are validated JSON documents read loosely.
+type Loose = ReturnType<typeof JSON.parse>;
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const serif = "font-[family-name:var(--font-serif)]";
 const card = "rounded-2xl border border-border bg-white p-5";
-const arr = (v: unknown): any[] => (Array.isArray(v) ? v : []);
+const arr = (v: unknown): Loose[] => (Array.isArray(v) ? v : []);
 const SCOPE: Record<string, { label: string; color: string }> = {
   build: { label: "Built at the hackathon", color: "#0F7B5F" },
   stretch: { label: "Stretch goal", color: "#B7791F" },
@@ -19,7 +22,7 @@ const KIND_COLOR: Record<string, string> = { parent: "var(--sol)", child: "#5B3F
 const kindKey = (k: string) => (/parent/i.test(k) ? "parent" : /child/i.test(k) ? "child" : /topic/i.test(k) ? "topic" : "flow");
 
 export function hasHackathon(s: Solution) {
-  return Boolean((s as any).hackathon);
+  return Boolean((s as Loose).hackathon);
 }
 
 function Countdown({ dates }: { dates: string }) {
@@ -38,7 +41,7 @@ function Countdown({ dates }: { dates: string }) {
   );
 }
 
-function SignalToDeal({ stages }: { stages: any[] }) {
+function SignalToDeal({ stages }: { stages: Loose[] }) {
   const [sel, setSel] = useState(0);
   const st = stages[sel] ?? stages[0];
   if (!st) return null;
@@ -139,7 +142,7 @@ function Mini({ icon: I, label, text }: { icon: LucideIcon; label: string; text:
   );
 }
 
-function WhyPanel({ h }: { h: any }) {
+function WhyPanel({ h }: { h: Loose }) {
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <div className={card}>
@@ -174,10 +177,10 @@ function WhyPanel({ h }: { h: any }) {
   );
 }
 
-function AgentTeam({ agents }: { agents: any[] }) {
+function AgentTeam({ agents }: { agents: Loose[] }) {
   const parent = agents.find((a) => kindKey(a.kind) === "parent");
   const rest = agents.filter((a) => a !== parent);
-  const Box = ({ a }: { a: any }) => {
+  const Box = ({ a }: { a: Loose }) => {
     const c = KIND_COLOR[kindKey(a.kind)];
     return (
       <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
@@ -216,7 +219,7 @@ function AgentTeam({ agents }: { agents: any[] }) {
   );
 }
 
-function ScopePanel({ scope }: { scope: any }) {
+function ScopePanel({ scope }: { scope: Loose }) {
   const cols: { k: string; t: string; c: string; icon: LucideIcon }[] = [
     { k: "build", t: "Build in two days", c: "#0F7B5F", icon: Rocket },
     { k: "stretch", t: "Stretch goals", c: "#B7791F", icon: Target },
@@ -244,7 +247,7 @@ function ScopePanel({ scope }: { scope: any }) {
   );
 }
 
-function DemoScript({ steps, note }: { steps: any[]; note?: string }) {
+function DemoScript({ steps, note }: { steps: Loose[]; note?: string }) {
   const [sel, setSel] = useState(0);
   const st = steps[sel];
   return (
@@ -280,7 +283,7 @@ function DemoScript({ steps, note }: { steps: any[]; note?: string }) {
   );
 }
 
-function PrepPanel({ prep, team }: { prep: any[]; team: any[] }) {
+function PrepPanel({ prep, team }: { prep: Loose[]; team: Loose[] }) {
   return (
     <div className="grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
       <div className="overflow-hidden rounded-2xl border border-border bg-white">
@@ -327,7 +330,7 @@ function PrepPanel({ prep, team }: { prep: any[]; team: any[] }) {
   );
 }
 
-function AgendaPanel({ agenda }: { agenda: any[] }) {
+function AgendaPanel({ agenda }: { agenda: Loose[] }) {
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       {agenda.map((d, di) => (
@@ -357,7 +360,7 @@ function AgendaPanel({ agenda }: { agenda: any[] }) {
   );
 }
 
-function MeasurePanel({ h }: { h: any }) {
+function MeasurePanel({ h }: { h: Loose }) {
   const c = h.cost ?? {};
   const b = h.buyVsBuild;
   return (
@@ -418,7 +421,7 @@ function MeasurePanel({ h }: { h: any }) {
   );
 }
 
-function RisksAfter({ h }: { h: any }) {
+function RisksAfter({ h }: { h: Loose }) {
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
       <div className={card}>
@@ -464,7 +467,7 @@ function RisksAfter({ h }: { h: any }) {
 }
 
 export function HackathonChapter({ s }: { s: Solution }) {
-  const h = (s as any).hackathon;
+  const h = (s as Loose).hackathon;
   if (!h) return null;
   const ev = h.event ?? {};
   const panels = [

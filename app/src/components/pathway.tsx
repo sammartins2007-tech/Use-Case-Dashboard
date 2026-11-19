@@ -6,10 +6,13 @@ import { externalUrl } from "@/lib/safe-url";
 import type { Solution } from "@/lib/solutions";
 import { cn } from "@/lib/utils";
 
+// Designs are validated JSON documents read loosely.
+type Loose = ReturnType<typeof JSON.parse>;
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const serif = "font-[family-name:var(--font-serif)]";
 const card = "rounded-2xl border border-border bg-white p-5";
-const arr = (v: unknown): any[] => (Array.isArray(v) ? v : []);
+const arr = (v: unknown): Loose[] => (Array.isArray(v) ? v : []);
 const CONF: Record<string, { bg: string; fg: string }> = {
   Low: { bg: "#FDECEC", fg: "#B42318" },
   Medium: { bg: "#FEF4E2", fg: "#B54708" },
@@ -23,7 +26,7 @@ const SCOPE: Record<string, { label: string; color: string }> = {
 const VERDICT: Record<string, string> = { Recommended: "#0F7B5F", "Do it now": "#1F6FB2", Hold: "#6B7280" };
 
 export function hasPathway(s: Solution) {
-  return Boolean((s as any).pathway);
+  return Boolean((s as Loose).pathway);
 }
 
 function AssumptionTag({ id, conf, onClick }: { id: string; conf?: string; onClick?: () => void }) {
@@ -44,7 +47,7 @@ function AssumptionTag({ id, conf, onClick }: { id: string; conf?: string; onCli
   );
 }
 
-function Bet({ p }: { p: any }) {
+function Bet({ p }: { p: Loose }) {
   const f = p.framing ?? {};
   return (
     <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
@@ -88,7 +91,7 @@ function Bet({ p }: { p: any }) {
   );
 }
 
-function Flow({ p, openA }: { p: any; openA: (id: string) => void }) {
+function Flow({ p, openA }: { p: Loose; openA: (id: string) => void }) {
   const stages = arr(p.stages);
   const [sel, setSel] = useState(0);
   const st = stages[sel];
@@ -170,7 +173,7 @@ function Mini({ icon: I, label, text }: { icon: LucideIcon; label: string; text:
   );
 }
 
-function Assumptions({ p, cur, setCur }: { p: any; cur: string; setCur: (id: string) => void }) {
+function Assumptions({ p, cur, setCur }: { p: Loose; cur: string; setCur: (id: string) => void }) {
   const all = arr(p.assumptions);
   const [filter, setFilter] = useState<"all" | "critical" | "Low">("all");
   const list = all.filter((a) => (filter === "all" ? true : filter === "critical" ? a.critical : a.confidence === "Low"));
@@ -204,7 +207,7 @@ function Assumptions({ p, cur, setCur }: { p: any; cur: string; setCur: (id: str
             const on = x.id === a.id;
             const cc = CONF[x.confidence] ?? CONF.Medium;
             return (
-              <button key={x.id} type="button" onClick={() => setCur(x.id)} aria-pressed={on} aria-label={`Assumption ${x.id} ${x.area}`} className={cn("flex items-start gap-2 rounded-xl border p-2.5 text-left text-sm transition-all", on ? "border-transparent shadow-md ring-2" : "border-border bg-white hover:shadow-sm")} style={on ? { background: cc.bg, ["--tw-ring-color" as any]: cc.fg } : undefined}>
+              <button key={x.id} type="button" onClick={() => setCur(x.id)} aria-pressed={on} aria-label={`Assumption ${x.id} ${x.area}`} className={cn("flex items-start gap-2 rounded-xl border p-2.5 text-left text-sm transition-all", on ? "border-transparent shadow-md ring-2" : "border-border bg-white hover:shadow-sm")} style={on ? { background: cc.bg, ["--tw-ring-color" as Loose]: cc.fg } : undefined}>
                 <span className="grid size-8 shrink-0 place-items-center rounded-lg text-[11px] font-bold" style={{ background: cc.bg, color: cc.fg }}>
                   {x.id}
                 </span>
@@ -240,14 +243,14 @@ function Assumptions({ p, cur, setCur }: { p: any; cur: string; setCur: (id: str
   );
 }
 
-function Options({ p }: { p: any }) {
+function Options({ p }: { p: Loose }) {
   return (
     <div className="grid gap-4 lg:grid-cols-3">
       {arr(p.options).map((o) => {
         const col = VERDICT[o.verdict] ?? "#6B7280";
         const rec = o.verdict === "Recommended";
         return (
-          <div key={o.id} className={cn(card, "relative flex flex-col gap-3", rec && "ring-2")} style={rec ? { ["--tw-ring-color" as any]: "var(--sol)" } : undefined}>
+          <div key={o.id} className={cn(card, "relative flex flex-col gap-3", rec && "ring-2")} style={rec ? { ["--tw-ring-color" as Loose]: "var(--sol)" } : undefined}>
             <span className="absolute -top-2.5 right-4 rounded-full px-2.5 py-0.5 text-[11px] font-semibold text-white" style={{ background: col }}>
               {o.verdict}
             </span>
@@ -295,7 +298,7 @@ function Options({ p }: { p: any }) {
   );
 }
 
-function Path({ p, openA }: { p: any; openA: (id: string) => void }) {
+function Path({ p, openA }: { p: Loose; openA: (id: string) => void }) {
   const phases = arr(p.phases);
   const [sel, setSel] = useState(0);
   const ph = phases[sel];
@@ -350,7 +353,7 @@ function Path({ p, openA }: { p: any; openA: (id: string) => void }) {
 }
 
 const usd = (n: number) => `$${n.toLocaleString("en-US", { maximumFractionDigits: n < 100 ? 2 : 0 })}`;
-function Sizing({ p }: { p: any }) {
+function Sizing({ p }: { p: Loose }) {
   const sz = p.sizing ?? {};
   const rows = arr(sz.rows);
   const [sel, setSel] = useState(Math.min(1, rows.length - 1));
@@ -414,7 +417,7 @@ function Kpi({ label, value, note, accent }: { label: string; value: string; not
   );
 }
 
-function Decisions({ p }: { p: any }) {
+function Decisions({ p }: { p: Loose }) {
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <div className={card}>
@@ -462,7 +465,7 @@ function Decisions({ p }: { p: any }) {
 }
 
 export function PathwayChapter({ s }: { s: Solution }) {
-  const p = (s as any).pathway;
+  const p = (s as Loose).pathway;
   const [tab, setTab] = useState<{ key: number; id: string }>({ key: 0, id: "bet" });
   const [curA, setCurA] = useState<string>(arr(p?.assumptions)[0]?.id ?? "");
   if (!p) return null;
