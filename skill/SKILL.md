@@ -5,9 +5,9 @@ description: 'Set up, update or extend an "AI Use Case Radar" — a personal App
 
 # AI Use Case Radar — setup kit
 
-The kit (this folder) holds four things:
+The kit (this folder) holds:
 - `app/` — the shared app code. `app/src/**` is kit-owned; `app/radar.config.template.ts` becomes the instance's only custom file `src/radar.config.ts`.
-- `schema/lists.json` — the five SharePoint lists. Names and columns are fixed: the app code is generated from them.
+- `schema/lists.json` — the six SharePoint lists (five the app reads, plus SEAgentCalls-704f56 for the SE agent calls). Names and columns are fixed: the app code is generated from them.
 - `prompts/daily-refresh.template.md` — the Work IQ refresh (twice a day), with `{{PLACEHOLDERS}}`.
 - `prompts/source-analysis-protocol.md` — the exhaustive, auditable way every transcript and substantive email is analysed (segment ledger, dispositions, coverage check).
 - `prompts/latest-version-consolidation-brief.md` — the "latest version only" field rules and CLARIFY questions, also usable for a bulk clean-up.
@@ -18,8 +18,9 @@ The kit (this folder) holds four things:
 - `optional/read-only-customer-app/` — a read-only app per customer account, synced from the owner's lists (Operation 4).
 - `optional/customer-edition/` — a customer-safe edition and its offline HTML copy for guests (Operation 4b).
 - `optional/radar-ops/` — the toolkit zip the refresh installs in step 11 (sync, offline copy, consistency check).
+- `agents/se-specialists/` — the eight SE agents (Copilot Studio) and `agents/se-board-flow/` — the agent flow that calls them (setup steps 2b and 2c).
 
-`VERSION` is the kit version. The instance records the version it runs in `src/KIT_VERSION`.
+`VERSION` is the kit version. The repository keeps only the latest version; install and update always from it. The instance records the version it runs in `src/KIT_VERSION`.
 
 Kit rules: customer names, logos, colours and people belong ONLY in `src/radar.config.ts`, `src/assets/logos/` and the SharePoint data, never in kit code. Examples use fictitious companies (Contoso, Fabrikam).
 
@@ -61,46 +62,13 @@ Then:
 
 ## Operation 2 — Update the radar from a newer kit
 
-1. Compare kit `VERSION` with the instance's `src/KIT_VERSION`, and read `CHANGELOG.md` for the versions in between.
-2. Copy kit `app/src/**` over the instance's `src/`, keeping `src/radar.config.ts` and `src/assets/logos/`. If the changelog adds fields to `RadarConfig`, add them to `radar.config.ts` with their defaults.
+Every step is additive and safe to repeat: it creates what is missing and brings the rest in line with the kit. It applies to any instance on kit 1.8.0 or later; an older instance (designs bundled in code) is set up again with Operation 1.
+1. Compare kit `VERSION` with the instance's `src/KIT_VERSION`, and read `CHANGELOG.md`.
+2. Copy kit `app/src/**` over the instance's `src/`, keeping `src/radar.config.ts` and `src/assets/logos/`. Add to `radar.config.ts` every field of `app/radar.config.template.ts` it lacks, with its default (`siteUrl` = the site URL). Keep `src/data/services.ts` when it was customised; check its imports match the instance's generated services. Re-apply `app/SCAFFOLD.md` (the four template files, `vite.viewer.config.ts`, the `build:viewer` script, the 0.6.0 pin, `.gitignore`).
 3. Add any new list columns from `schema/lists.json` with UpdateListSchema (add only, never remove), then `appbuilder-DataSourceRefresh` for each affected list.
-4. **Agents**: compare the kit's `schema/playbook.l2-chain.json` and `schema/playbook.redesign.json` with the instance's Current playbook rows (DocBody joined in DocSeq order). When one differs, store the kit text as a new version (DocVersion + 1, DocStatus Current, the previous rows Superseded), keeping the instance's own exemplarRef values in the redesign playbook, and read it back. Check every file inside `files` of the l2-chain playbook equals the same-named file in `prompts/`. If the app has no `agentnode` data source, bind Agents (`shared_agentnode`) as in setup step 2. When `agents/se-specialists/` changed (see CHANGELOG), update each SE agent: Pull it, replace its instructions (and model or tool when they changed) with the kit's, Push with the expectedRevision the Pull returned, test it once and publish it; create any agent the owner does not have yet (setup step 2b). Create the SEAgentCalls-704f56 list, the agent flow and the `se-agents` roster row when they are missing (setup steps 1 and 2c).
-5. Re-fill the refresh template and update the scheduled prompt with EditScheduledPrompt, keeping the instance's values.
+4. **Agents**: compare the kit's `schema/playbook.l2-chain.json` and `schema/playbook.redesign.json` with the instance's Current playbook rows (DocBody joined in DocSeq order). When one differs, store the kit text as a new version (DocVersion + 1, DocStatus Current, the previous rows Superseded), keeping the instance's own exemplarRef values in the redesign playbook, and read it back. Check every file inside `files` of the l2-chain playbook equals the same-named file in `prompts/`. If the app has no `agentnode` data source, bind Agents (`shared_agentnode`) as in setup step 2. When an SE agent's instructions, model or tool differ from the kit's `agents/se-specialists/`, update it: Pull it, replace its instructions (and model or tool when they changed) with the kit's, Push with the expectedRevision the Pull returned, test it once and publish it; create any agent the owner does not have yet (setup step 2b). Create the SEAgentCalls-704f56 list, the agent flow and the `se-agents` roster row when they are missing (setup steps 1 and 2c).
+5. Re-fill the refresh template and update the scheduled prompt with EditScheduledPrompt, keeping the instance's values. When the read-only block is kept, rebuild the radar-ops toolkit zip and upload it again (`optional/radar-ops/README.md`), and replace the instance's `customer_copy.py` with the kit's (placeholders filled again).
 6. Run `npm run build:viewer`, typecheck, test every page with the mouse, run the gate, publish, open the published app in the owner's browser and check it loads with data, update `src/KIT_VERSION`, and summarise what changed in plain words (and say plainly what could not be tested).
-
-### Moving an instance to 1.13.0
-1. Create the list SEAgentCalls-704f56 (`schema/lists.json`), the agent flow (`agents/se-board-flow/`) and the `se-agents` roster row, then run the call test (setup step 2c).
-2. Store the kit's `schema/playbook.l2-chain.json` as a new l2-chain playbook version (DocVersion + 1, Current; the previous rows Superseded) and read it back.
-3. Re-fill the refresh template (step 10 now calls the eight agents and logs the calls) and update the scheduled prompt.
-4. Copy `app/src/**` (story text), typecheck, rebuild the viewer, test, publish.
-
-### Moving an instance to 1.12.0
-Create the eight SE agents (setup step 2b) when the owner does not have them yet. App code and refresh are unchanged.
-
-### Moving an instance to 1.11.1
-Copy `app/src/lib/pdf-bytes.ts` if the instance lacks it (no brief changed). Run the agents check (Operation 1, step 5) once, and bind the Agents connection as `agentnode` if Complete with AI reports a configuration error.
-
-### Moving an instance to 1.11.0
-1. Copy `app/src/**` (new: the "Inside the Radar" presenter story and the Backlog page, the sky-blue look, the source and date of every next step, the deployment view's routed and numbered connections). Optionally add `presenterBanner` to `src/radar.config.ts` (cover picture of the story).
-2. Re-fill the refresh template: one source applied to every use case it names, unreadable items retried from a content-store list, Evidence lines ending with "Impact:", People with a Contribution field and every person who intervenes, a waiting proposal never blocks a redesign, step 11 installs the radar-ops toolkit and runs the consistency check. Steps 7 and 9 are gone: move an account that used the single-customer copy or the static snapshot to the `readonly-apps` config row (team copy or customer edition).
-3. Build the radar-ops toolkit zip and upload it (`optional/radar-ops/README.md`); brand files now name their images relative to themselves.
-4. Typecheck, rebuild the viewer, test, publish.
-
-### Moving an instance to 1.9.1
-1. Replace `.aether/scripts/customer_copy.py` with the kit version (fill the placeholders again) and run it with `{"account": "ALL", "verify_only": true}`, then without `verify_only`: every copy's design links are remapped to the copy's ids.
-2. Copy `app/src/**` (dossier, hackathon, static boot and static copy changed), typecheck, rebuild the viewer, publish.
-3. Re-fill the READONLY_APPS block of the refresh template (customer editions and the in-place offline copy).
-
-### Moving an instance to 1.9.0
-1. `src/data/services.ts` is new and instance-owned: after copying `app/src/**`, check its imports match the instance's generated services (list suffix -704f56 by default) and keep it on later updates if it was customised.
-2. Apply `app/SCAFFOLD.md`: the four template files, `vite.viewer.config.ts`, the `build:viewer` script, the 0.6.0 pin and `.gitignore`.
-3. Add `siteUrl` to `src/radar.config.ts`.
-4. Bind the SharePoint actions data source if "save to SharePoint" is wanted; otherwise export a refusing `SharePointService` stub from `src/data/services.ts`.
-5. Seed the `l2-chain` playbook row (setup step 1) if it is missing.
-6. Re-fill the refresh template (new 100% coverage collection, inspiration-list rule, verified-only reporting, design every triggered use case through the L2 chain, optional read-only copies).
-
-### Moving an instance to 1.8.0 (content store)
-Versions before 1.8.0 bundled solution designs and wave plans as JSON files in `src/data/solutions/` and `src/data/wave-plans/`. From 1.8.0 the app reads them only from Customers-704f56 content rows. Before copying the new code: add the Doc* columns and the leadership columns (step 3), tag every existing customer row DocKind = "customer", and write each bundled file as content rows (solution: DocKind "solution", DocRef = use case id; wave plan: DocKind "waveplan", DocRef = "<account>-<wave>"; DocStatus "Current", DocVersion 1, DocBody pieces of at most 30,000 characters, DocSeq 0,1,2…, DocChunks = number of pieces) with Graph batch calls. Read the rows back and check that the joined DocBody equals the file before deleting the bundled folders. Seed the playbook row as in setup step 1, and set each kind's exemplarRef to one migrated design of that kind.
 
 ## Operation 3 — Add a customer
 

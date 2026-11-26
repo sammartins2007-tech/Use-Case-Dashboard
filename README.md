@@ -14,7 +14,7 @@ complexity × effort map. It also values the KPIs and sizes all AI costs (FinOps
 Optional: to make the kit a permanent Cowork skill, say "create a skill from skill/SKILL.md in the attached kit".
 
 ## Get improvements
-When a new kit version is published (see CHANGELOG.md), attach it and type **"Update my AI Use Case Radar from the attached kit."**
+Only the latest kit version is kept here. When it changes (see CHANGELOG.md), attach it and type **"Update my AI Use Case Radar from the attached kit."**
 Your customers, logos, data and settings are kept. Only the shared code, list columns and refresh rules change.
 
 ## What is in the kit
@@ -68,16 +68,16 @@ The Git repository is the master copy. Change shared code in `app/src/`, never c
 add a `CHANGELOG.md` entry, open a pull request and, after merge, publish the release zip to the shared folder.
 Keep everything customer-neutral: no customer names, logos or figures in the repository. Examples use fictitious companies.
 
-## Where content lives (1.8.0 and later)
+## Where content lives
 The app holds no use-case content in code. Solution designs, images, wave plans, what-if scenarios and redesign requests are rows in Customers-704f56 (DocKind, DocRef, DocVersion, DocStatus). The refresh proposes a new design when a use case's route changes; you accept or reject it in the app.
 
-## Sharing with account teams (1.9.0)
+## Sharing with account teams
 You edit; they read. A read-only app per customer shows that account's use cases, designs, roadmap and FinOps, without evidence, internal questions or any other customer. See `optional/read-only-customer-app/README.md`.
 
-## Sharing with the customer (1.9.1)
+## Sharing with the customer
 App Builder apps cannot be shared with guest accounts. A customer edition on a separate site strips every internal field, question, link and design part, and an offline HTML copy of it on that site is what the customer opens. See `optional/customer-edition/README.md`.
 
-## Presenting the radar (1.11.0)
+## Presenting the radar
 **Inside the Radar** (menu) tells the whole story full screen, on your own live data: what a use case is, how it is
 detected and kept current, how eight SE agents design the answer, how people decide, and the twice-daily run.
 Follow one use case through it, and switch on Show mode to mask customer and people names for an audience.
