@@ -220,7 +220,7 @@ export function Board({ ctx }: { ctx: StoryCtx }) {
             )}
             <p className="mt-auto font-mono text-[12px] uppercase tracking-[0.1em] text-[#7A5718]">Each agent receives</p>
             <ol className="mt-2 space-y-2.5 border-t border-dashed border-[#DCD5C6] pt-3">
-              {["The case file: pain, process, users, flow, systems, volumes, KPIs", "Its own role brief: one of eight specialist missions", "At least three Microsoft Learn pages it fetches and cites"].map((t, i) => (
+              {["The case file: pain, process, users, flow, systems, volumes, KPIs", "Its own instructions in Copilot Studio: one of eight specialisms", "Its Microsoft Learn tool: at least three pages it reads and cites"].map((t, i) => (
                 <li key={t} className="flex gap-2.5 text-[14px] leading-snug text-[#34465E]">
                   <span className="flex size-6 shrink-0 items-center justify-center rounded-[7px] bg-[#0D2847] text-[12px] font-semibold text-white">{i + 1}</span>
                   {t}

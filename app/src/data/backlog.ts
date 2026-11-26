@@ -29,7 +29,7 @@ export const BACKLOG: BacklogItem[] = [
   { lane: "next", area: "FinOps", size: "S", title: "Euro amounts next to dollars", why: "Value and cost shown in the customer's own currency." },
   { lane: "next", area: "FinOps", size: "M", title: "Measured credits instead of estimates", why: "Each run's cost comes from measured usage, so the FinOps page shows facts, not estimates." },
   { lane: "later", area: "Install", size: "L", title: "Team radar", why: "Several specialists feed one radar, each with their own accounts, and share one portfolio." },
-  { lane: "later", area: "Solve", size: "M", title: "SE agent feedback loop", why: "Specialists rate each agent opinion; the ratings sharpen the agents' role briefs over time." },
+  { lane: "later", area: "Solve", size: "M", title: "SE agent feedback loop", why: "Specialists rate each agent opinion; the ratings sharpen the agents' instructions in Copilot Studio over time." },
   { lane: "later", area: "Detect", size: "M", title: "CRM as a fifth source", why: "Opportunities and visit reports become signals, next to mails, chats, meetings and documents." },
   { lane: "later", area: "Learn", size: "M", title: "Agents that prepare the next meeting", why: "For each prioritised use case, a ready brief with the open questions and the designed answer." },
 ];
