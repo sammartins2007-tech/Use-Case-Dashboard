@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.11.1 — The agents, documented and checked at install
+- README: new **The agents** section. It lists every agent the radar calls (the two app agents, Use Case Coach and Input
+  Reviewer; the eight SE agents of the L2 board; the design chain; the source analysts), what each does, when it runs,
+  where it is defined and which setup step installs it. None has to be built in Copilot Studio.
+- Setup ends with an agents check: Complete with AI answers in the published app and logs its run, the playbook rows read back equal, the
+  chain's briefs equal `prompts/`, and the first design shows the eight specialist opinions.
+- Update compares the instance's playbook rows with the kit and stores a new version when the briefs changed (keeping the
+  instance's exemplars).
+- Setup names the Agents data source `agentnode`, the name the app code expects.
+- **Fresh install fixed**: `app/src/lib/pdf-bytes.ts` is now in the kit. Today's App Builder template no longer ships it,
+  so the PDF export (`lib/pdf-export.ts`) did not compile in a new app. `app/SCAFFOLD.md` says to keep a newer template's
+  library version and when to pin 0.6.0.
+- Tested as a new install: a new app built from today's template plus the kit typechecks, builds and opens every page
+  (welcome, customers, FinOps, Inside the Radar, backlog, how it works, feature radar, a use case and its Add input panel).
+- Checked against a running radar: the design chain (`schema/playbook.l2-chain.json`, its nine briefs and validators) is
+  identical to the one it runs; the redesign playbook differs only by that instance's own exemplars.
+
 ## 1.11.0 — Inside the Radar, backlog, modern look, next-step sources, clean deployment view, live refresh rules
 - **Inside the Radar** (new `pages/story.tsx`, `components/story/*`, `lib/story.ts`, menu item, route `/story`): a full-screen presenter story in seven chapters and 20 slides on the radar's live data — what a use case is (five gates, anatomy), how it is detected (sources, the sentence it was born from, the evidence ledger), how it learns (timeline, four rules, product news), the call to the eight SE agents (triggers, opinions, arbitration, solution), people decide, editions, the twice-daily run replayed, the kit, the backlog. Follow any use case; Show mode masks account and people names; keyboard and mouse navigation; links open the real pages. Hidden in read-only and customer editions. Optional cover picture: `presenterBanner` in `radar.config.ts` (new optional `RadarConfig` field); without it the cover shows a radar.
 - **Backlog** (new `pages/backlog.tsx`, `data/backlog.ts`): the improvements that could come next, in Now / Next / Later lanes; also the story's closing chapter. Hidden in read-only and customer editions.

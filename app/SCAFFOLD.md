@@ -12,10 +12,16 @@ the edits below.
 | `src/lib/console-capture.ts` | First line of `postToDevServer`: `if ((window as unknown as { __UCX__?: unknown }).__UCX__) return;` (an offline copy never sends anything). |
 | `src/components/pdf-export-button.tsx` | Import `scrubDom` from `@/lib/link-scrub`; wrap `createPdfBlob(...)` in `const restore = scrubDom(target); try { … } finally { restore(); }` (no internal Microsoft 365 links in a PDF). |
 
+Today's template no longer ships the PDF export. The kit carries the three files it needs
+(`components/pdf-export-button.tsx`, `lib/pdf-export.ts`, `lib/pdf-bytes.ts`): copy them as they are.
+
 ## Project-root files
 - `app/root/vite.viewer.config.ts` → copy to the project root as `vite.viewer.config.ts`.
 - `package.json`: add the script `"build:viewer": "vite build -c vite.viewer.config.ts"` and pin
   `"@microsoft/managed-apps": "0.6.0"` (exact; later 0.x versions turned binary uploads into a JSON number list).
+  When the template already uses a newer library (for example `npm:@microsoft/cmr-apps@0.7.0`), keep the template's
+  version: the kit builds and runs on it. Test "save to SharePoint" once and pin 0.6.0 only if the saved file
+  arrives as a list of numbers.
 - `.gitignore`: add `.viewer-dist/`.
 - Run `npm run build:viewer` after every source change and before every publish: it writes
   `public/offline-viewer.txt`, the self-contained viewer of the offline customer copies (the refresh gets it from
@@ -24,7 +30,9 @@ the edits below.
 
 ## Data sources
 - The five lists, bound as in setup (usecases_704f56 … customers_704f56).
-- Agents (`shared_agentnode`) for Complete with AI / Add input.
+- Agents (`shared_agentnode`, data source name `agentnode`) for the two app agents, Complete with AI and Add input.
+  Their Copilot Studio definition is in `src/connectors/inline-agent.ts`; nothing is created in Copilot Studio
+  (README, The agents).
 - SharePoint actions (`shared_sharepointonline`, actions mode) for "save to SharePoint"; the generated client must
   be `SharePointService` with `CreateFile`. Without it, `src/data/services.ts` can export a refusing stub (see
   `optional/read-only-customer-app/services.readonly.template.ts`) and the app only downloads files.

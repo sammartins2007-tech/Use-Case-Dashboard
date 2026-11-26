@@ -35,6 +35,27 @@ Your customers, logos, data and settings are kept. Only the shared code, list co
 | `optional/radar-ops/` | The toolkit the refresh installs to sync copies, rebuild the offline copy and check consistency |
 | `skill/SKILL.md` | The setup, update and add-customer instructions Cowork follows |
 
+## The agents
+The radar calls two kinds of agents. Both are defined entirely in this kit: a new install gets them working without
+building or publishing anything in Copilot Studio.
+
+| Agent | What it does | When it runs | Defined in | Set up by |
+|---|---|---|---|---|
+| **Use Case Coach** ("Complete with AI") | Interviews the owner one question at a time and fills the missing dossier fields, readiness, open questions and analysis | When the owner clicks Complete with AI on a use case | `app/src/lib/coach.ts` | Setup step 2: the Agents connection (`shared_agentnode`, data source `agentnode`) |
+| **Input Reviewer** ("Add input") | Challenges a new email, note or document extract like a sceptical architect and proposes changes the owner accepts one by one | When the owner clicks Add input | `app/src/lib/input-review.ts` | The same connection |
+| **Eight SE agents** (L2 specialist board) | Copilot Studio · M365 Copilot & Cowork · Power Platform · Azure AI / Foundry · Data & Knowledge Architecture · Integration & Tools · Security & Compliance · D365. Each gives its view grounded in at least three Microsoft Learn pages; the board then picks one target pattern and a lead specialist | Refresh step 10, in parallel, for every use case that needs a design: none yet, a route change, material new facts, or a request from the app | `prompts/specialists.md`, `prompts/solution-board-brief.md` | Setup step 1 stores the design chain (`schema/playbook.l2-chain.json`) as a content-store row; the refresh reads it from there |
+| **Design chain** | Technical views, KPI values, the solution experience and the creative, each checked by its validator script, then the FinOps sizing | The same step, after the board | `prompts/tech-views-*`, `prompts/kpi-quantification-brief.md`, `prompts/solution-experience-*`, `prompts/creative-*` | The same playbook row |
+| **Source analysts** | Read long transcripts and documents in parts, statement by statement, with a coverage ledger | Every refresh, for long sources | `prompts/source-analysis-protocol.md` | The refresh prompt (setup step 3) |
+
+- The two app agents are Copilot Studio agents whose definition travels in the app code (`app/src/connectors/inline-agent.ts`);
+  their instructions are built at each click from the use case. They run as the signed-in owner, are switched off in read-only
+  copies and customer editions, and every run is logged in AIConsumption.
+- The SE agents, the design chain and the source analysts are AI workers that the scheduled refresh starts in Copilot Cowork.
+  Their briefs are plain text in `prompts/`, and `schema/playbook.l2-chain.json` carries the same text: that is the copy the
+  refresh reads, so the two must stay identical. Setup and update both check it.
+- To change an agent, edit its brief in `prompts/`, copy the new text into `files` of `schema/playbook.l2-chain.json`, bump
+  `VERSION`, and run "Update my AI Use Case Radar" so every instance stores the new playbook version.
+
 ## Contributing (Git)
 The Git repository is the master copy. Change shared code in `app/src/`, never customer data. Then bump `VERSION`,
 add a `CHANGELOG.md` entry, open a pull request and, after merge, publish the release zip to the shared folder.
