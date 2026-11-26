@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.12.0 — The eight SE agents in the kit
+- New `agents/se-specialists/`: the eight L2 SE agents built in Copilot Studio (Copilot Studio; M365 Copilot & Co-Work; Power
+  Platform; Azure AI / Foundry; Data & Knowledge Architecture; Integration & Tools; Security & Compliance; D365), one folder each:
+  `agent.yaml` (instructions word for word, model, Teams and Microsoft 365 Copilot channels) and the Microsoft Learn Docs MCP tool.
+  Environment, connection, app and owner ids are removed; every definition passes the Copilot Studio validator.
+- Setup step 2b creates, tests and publishes them in the owner's Copilot Studio; an update brings them in line when the kit's
+  copies change; the agents check confirms all eight answer.
+- README, The agents: the SE agents are Copilot Studio agents. The refresh runs their eight roles in parallel from the role
+  cards in `prompts/specialists.md`; it does not call the agents one by one.
+
 ## 1.11.1 — The agents, documented and checked at install
 - README: new **The agents** section. It lists every agent the radar calls (the two app agents, Use Case Coach and Input
   Reviewer; the eight SE agents of the L2 board; the design chain; the source analysts), what each does, when it runs,
