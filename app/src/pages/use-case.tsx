@@ -10,12 +10,9 @@ import {
   ChevronRight,
   Coins,
   ExternalLink,
-  FileDown,
   Flag,
   HelpCircle,
-  Loader2,
   MoreHorizontal,
-  Download,
   Pencil,
   RotateCcw,
   ShieldCheck,
@@ -42,7 +39,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConnectorErrorState, EmptyState, LoadingState } from "@/components/states";
-import { createSectionedPdfBlob, toSafePdfExportError } from "@/lib/pdf-export";
 import { KpiTable } from "@/components/kpi-table";
 import { PriorityFitBox } from "@/components/priority-fit-box";
 import { RoadmapFields } from "@/components/roadmap-fields";
@@ -50,11 +46,7 @@ import { FinOpsSizing } from "@/components/finops-sizing";
 import { OwnerCard, ParticipantsPanel } from "@/components/dossier-people";
 import { NextSteps } from "@/components/next-steps";
 import { InputContextDialog, parseEvidence, type InputRef } from "@/components/input-context";
-import { OfflineCopyAssetError, buildOfflineCopy, downloadStem, saveOfflineCopy } from "@/lib/offline-copy";
-import { openInNewTab, saveToSharePoint } from "@/lib/sharepoint-save";
-import { IS_STATIC } from "@/lib/static-copy";
 import { LIVE_READ_ONLY, READ_ONLY, readOnlyMessage } from "@/lib/read-only";
-import { scrubDom } from "@/lib/link-scrub";
 import { EditTextDialog, FactChip, FlowChain, KpiCards, ReadinessStrip, SolutionVisual, SystemChips, TextCard, ValueTiles, VolumeTiles } from "@/components/dossier-visuals";
 import { useFeatures, useHourlyRate, useSignalsFor, useUpdateUseCase, useUseCase, useUseCases } from "@/data/repo";
 import {
@@ -147,7 +139,7 @@ function Linkified({ text }: { text: string }) {
           /* keep default */
         }
         return (
-          <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 font-medium text-[#0E7C86] underline-offset-2 hover:underline">
+          <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 font-medium text-[#0F6CBD] underline-offset-2 hover:underline">
             {label}
             <ExternalLink className="size-3" aria-hidden="true" />
             <span className="sr-only">(opens in a new tab)</span>
@@ -241,8 +233,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
   useEffect(() => {
     if (!tabs.some((t) => t.id === tab)) setTab("overview");
   }, [tabs, tab]);
-  const [printAll, setPrintAll] = useState(false);
-  const [pdfBusy, setPdfBusy] = useState(false);
+  const printAll = false;
   const headRef = useRef<HTMLDivElement>(null);
   const [coachOpen, setCoachOpen] = useState(false);
   const [inputOpen, setInputOpen] = useState(false);
@@ -269,123 +260,6 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
   const title = cleanTitle(u.title);
   const internalRef = refOf(u);
   const qs = questions(u);
-  const [dlBusy, setDlBusy] = useState(false);
-  /**
-   * Saves a downloaded file as a real file in SharePoint (radar site > Documents > Offline copies) and offers
-   * Open (download or share it from there); a local download stays available as the fallback. A download from
-   * the embedded app alone gives a blob: page tied to the app session that cannot be saved or shared.
-   */
-  const saveAndOffer = async (t: string | number, what: string, name: string, bytes: Uint8Array, blob: Blob) => {
-    const size = blob.size >= 1048576 ? `${(blob.size / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(blob.size / 1024))} KB`;
-    const local = () => saveOfflineCopy(name, blob);
-    if (IS_STATIC) {
-      local();
-      toast.success(`${what} ready`, { id: t, description: name, duration: 8000 });
-      return;
-    }
-    const localButton = (label: string) => (
-      <button type="button" className="font-medium underline underline-offset-2 hover:opacity-80" onClick={local}>
-        {label}
-      </button>
-    );
-    toast.loading(`Saving the ${what.toLowerCase()} to SharePoint…`, { id: t, description: `${name} · ${size}`, duration: Infinity });
-    try {
-      const saved = await saveToSharePoint(name, bytes);
-      toast.success(`Saved to SharePoint: ${saved.name}`, {
-        id: t,
-        description: (
-          <span>
-            {saved.isHtml
-              ? <>{size} · Documents › Offline copies. Click Download, then open it from your computer (SharePoint's preview cannot run it). Share it from that folder; the recipient downloads it too. Or {localButton("download it here")}.</>
-              : <>{size} · Documents › Offline copies. Click Open, then Download or Share. Or {localButton("download it here")}.</>}
-          </span>
-        ),
-        duration: Infinity,
-        closeButton: true,
-        richColors: true,
-        action: {
-          label: saved.isHtml ? "Download" : "Open",
-          onClick: (e) => {
-            e.preventDefault();
-            openInNewTab(saved.url);
-          },
-        },
-      });
-    } catch (e) {
-      console.error("[save to SharePoint] failed", e);
-      const reason = e instanceof Error ? e.message : String(e);
-      toast.error(`Could not save to SharePoint: ${name}`, {
-        id: t,
-        description: (
-          <span>
-            {reason} — downloading it here instead. Nothing in your Downloads? {localButton("Download it here")}.
-          </span>
-        ),
-        duration: Infinity,
-        closeButton: true,
-        richColors: true,
-      });
-      local();
-    }
-  };
-  const downloadCopy = async (edition: "internal" | "customer") => {
-    if (dlBusy) return;
-    setDlBusy(true);
-    const t = toast.loading(`Building the ${edition} offline copy…`, { description: "This takes a few seconds.", duration: Infinity });
-    try {
-      const { name, blob, bytes } = await buildOfflineCopy(u.id, edition, (msg) => toast.loading(`Building the ${edition} offline copy…`, { id: t, description: msg, duration: Infinity }));
-      await saveAndOffer(t, `${edition === "customer" ? "Customer" : "Internal"} offline copy`, name, bytes, blob);
-    } catch (e) {
-      console.error("[offline copy] failed", e);
-      toast.error("The offline copy could not be created", {
-        id: t,
-        description: e instanceof OfflineCopyAssetError ? `Could not read ${e.url} — ${e.reason}` : e instanceof Error ? `${e.name}: ${e.message}` : String(e),
-        duration: Infinity,
-        closeButton: true,
-        richColors: true,
-      });
-    } finally {
-      setDlBusy(false);
-    }
-  };
-  const exportPdf = async () => {
-    if (pdfBusy) return;
-    setPdfBusy(true);
-    setPrintAll(true);
-    const t = toast.loading("Creating the PDF…", { description: "This takes a few seconds.", duration: Infinity });
-    let restoreLinks = () => {};
-    let built: { fileName: string; blob: Blob } | undefined;
-    try {
-      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-      await new Promise((r) => setTimeout(r, 900));
-      const root = ref.current;
-      if (!root || !headRef.current) throw new Error("Dossier not ready");
-      // No link to internal Microsoft 365 items (Teams, SharePoint/OneDrive, Outlook) in a downloaded file.
-      restoreLinks = scrubDom(root);
-      const panels = Array.from(root.querySelectorAll<HTMLElement>("[data-pdf-panel]"));
-      const sections = panels.map((p) => ({ blocks: Array.from(p.children).filter((c): c is HTMLElement => c instanceof HTMLElement && !c.matches("[data-pdf-exclude]")) }));
-      if (sections[0]) sections[0].blocks.unshift(headRef.current);
-      else sections.push({ blocks: [headRef.current] });
-      const pdfName = `${downloadStem(u.account, u.id, u.title, "business-case-input")}.pdf`;
-      try {
-        built = await createSectionedPdfBlob(sections, pdfName);
-      } catch {
-        await new Promise((r) => setTimeout(r, 600));
-        built = await createSectionedPdfBlob(sections, pdfName);
-      }
-    } catch (e) {
-      console.warn("PDF export failed", e);
-      toast.error(toSafePdfExportError(e)?.message ?? "PDF export failed", { id: t, description: null, duration: Infinity, closeButton: true, richColors: true });
-    } finally {
-      restoreLinks();
-      setPrintAll(false);
-    }
-    try {
-      if (built) await saveAndOffer(t, "PDF", built.fileName, new Uint8Array(await built.blob.arrayBuffer()), built.blob);
-    } finally {
-      setPdfBusy(false);
-    }
-  };
   const brand = brandOf(u.account);
   const accent = inkOf(brand.primary);
   const route = routeOf(u.classification);
@@ -444,14 +318,14 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
 
   return (
     <div ref={ref}>
-      <div ref={headRef} className="-mx-6 border-b border-border bg-[#F7F5F0] px-6 pt-3">
+      <div ref={headRef} className="-mx-6 border-b border-border bg-[#F3F8FD] px-6 pt-3">
         {/* Brand band with the few actions */}
         <div className="flex flex-wrap items-center gap-3 overflow-hidden rounded-2xl border border-border bg-white py-1 pr-3" style={{ borderTop: `4px solid ${brand.primary}` }}>
           <Link to={`/customer/${encodeURIComponent(u.account ?? "Internal")}`} className="flex h-10 items-center px-4" aria-label={`${u.account ?? "Internal"} customer page`}>
             {brand.logo ? <img src={brand.logo} alt={`${u.account ?? "Microsoft"} logo`} className="max-h-7 max-w-[120px] object-contain" /> : <span>{u.account}</span>}
           </Link>
           {internalRef && (
-            <span className="rounded-md border border-[#D9D2C4] bg-white px-2 py-0.5 font-mono text-xs text-[#3D4757]">
+            <span className="rounded-md border border-[#C8DAEC] bg-white px-2 py-0.5 font-mono text-xs text-[#34465E]">
               <span className="sr-only">Internal customer reference </span>
               {internalRef}
             </span>
@@ -481,33 +355,20 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
                 <Sparkles className="size-4" aria-hidden /> Solution experience
               </Link>
             )}
-            {!LIVE_READ_ONLY && (
+            {!READ_ONLY && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8" aria-label="More actions">
-                  {pdfBusy || dlBusy ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <MoreHorizontal className="size-4" aria-hidden />}
+                  <MoreHorizontal className="size-4" aria-hidden />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {!RADAR.customerEdition && !READ_ONLY && (
+                {!RADAR.customerEdition && (
                   <DropdownMenuItem onSelect={() => setCoachOpen(true)}>
                     <Bot className="size-4" aria-hidden /> Complete with AI
                   </DropdownMenuItem>
                 )}
-                {!RADAR.customerEdition && !READ_ONLY && (
-                  <DropdownMenuItem onSelect={() => void downloadCopy("internal")} disabled={dlBusy}>
-                    <Download className="size-4" aria-hidden /> Download offline copy (internal)
-                  </DropdownMenuItem>
-                )}
-                {!READ_ONLY && (
-                  <DropdownMenuItem onSelect={() => void downloadCopy("customer")} disabled={dlBusy}>
-                    <Download className="size-4" aria-hidden /> Download offline copy (customer)
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem onSelect={() => void exportPdf()} disabled={pdfBusy}>
-                  <FileDown className="size-4" aria-hidden /> Export PDF
-                </DropdownMenuItem>
-                {READ_ONLY ? null : u.discarded ? (
+                {u.discarded ? (
                   <DropdownMenuItem onSelect={() => save({ discarded: false, discardReason: "" }, "Use case restored")}>
                     <RotateCcw className="size-4" aria-hidden /> Restore
                   </DropdownMenuItem>
@@ -615,7 +476,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
       </div>
 
       {/* Tabs stay visible while scrolling */}
-      <div role="tablist" aria-label="Dossier sections" className="sticky top-16 z-20 -mx-6 flex gap-1 overflow-x-auto border-b border-border bg-[#F7F5F0]/95 px-6 backdrop-blur no-scrollbar" data-pdf-exclude>
+      <div role="tablist" aria-label="Dossier sections" className="sticky top-16 z-20 -mx-6 flex gap-1 overflow-x-auto border-b border-border bg-[#F3F8FD]/95 px-6 backdrop-blur no-scrollbar" data-pdf-exclude>
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -654,7 +515,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
             <div className="space-y-6">
               <TextCard icon={Target} title="What this use case is about" value={u.description} hint="What the use case is about, for whom, and what it should achieve" tone={accent} lines={6} busy={update.isPending} onSave={(v, done) => save({ description: v }, "Description saved", done)} />
-              <NextSteps u={u} save={save} busy={update.isPending} accent={accent} />
+              <NextSteps u={u} save={save} busy={update.isPending} accent={accent} signals={signals} />
             </div>
             <div className="space-y-6">
               <OwnerCard u={u} save={save} busy={update.isPending} accent={accent} onShowAll={() => go("Participants")} />
@@ -669,7 +530,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
           "problem",
           <>
             <div className="grid gap-4 lg:grid-cols-3">
-              <TextCard icon={Workflow} title="Business process" value={u.process} hint="Which process, from which step to which step" tone="#1B2A41" lines={4} busy={update.isPending} onSave={(v, done) => save({ process: v.slice(0, 250) }, "Process saved", done)} />
+              <TextCard icon={Workflow} title="Business process" value={u.process} hint="Which process, from which step to which step" tone="#0D2847" lines={4} busy={update.isPending} onSave={(v, done) => save({ process: v.slice(0, 250) }, "Process saved", done)} />
               <TextCard icon={Users} title="Who is affected" value={u.users} hint="Roles, teams and how many people" tone="#5B3FA8" lines={4} busy={update.isPending} onSave={(v, done) => save({ users: v }, "Users saved", done)} />
               <TextCard icon={Flag} title="Today's pain" value={u.pain} hint="What goes wrong today, ideally in time, cost or risk" tone="#B4232A" lines={4} busy={update.isPending} onSave={(v, done) => save({ pain: v }, "Pain saved", done)} />
             </div>
@@ -730,7 +591,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
               <BigNumber
                 label="Net / month"
                 value={monthCost !== undefined && yearValue ? usd0.format(yearValue / 12 - monthCost) : "—"}
-                tone={monthCost !== undefined && yearValue && yearValue / 12 - monthCost < 0 ? "#B4232A" : "#1B2A41"}
+                tone={monthCost !== undefined && yearValue && yearValue / 12 - monthCost < 0 ? "#B4232A" : "#0D2847"}
               />
             </div>
             {design?.runCost && (design.runCost.drivers?.length || design.runCost.note) && (
@@ -780,7 +641,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
                       <li key={i} className="text-sm leading-relaxed">
                         {m ? (
                           <>
-                            <span className="block text-xs font-semibold uppercase tracking-wide text-[#0E7C86]">{m[1]}</span>
+                            <span className="block text-xs font-semibold uppercase tracking-wide text-[#0F6CBD]">{m[1]}</span>
                             {m[2]}
                           </>
                         ) : (
@@ -870,7 +731,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
                         <button
                           type="button"
                           onClick={() => setInputCtx({ title: s.title, date: s.signalDate, type: s.sourceType, sender: s.sender, kind: s.kind, insight: s.insight, sourceRef: s.sourceRef })}
-                          className="block w-full rounded-r-lg border-l-2 border-border py-1 pl-3 text-left transition-colors hover:border-[#0E7C86] hover:bg-[#F7F5F0] focus-visible:outline-2 focus-visible:outline-[#0E7C86]"
+                          className="block w-full rounded-r-lg border-l-2 border-border py-1 pl-3 text-left transition-colors hover:border-[#0F6CBD] hover:bg-[#F3F8FD] focus-visible:outline-2 focus-visible:outline-[#0F6CBD]"
                           aria-label={`${s.title}: show context and impact`}
                         >
                           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
@@ -881,7 +742,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
                           </div>
                           <p className="text-sm font-medium">{s.title}</p>
                           {s.insight && <p className="line-clamp-2 text-sm text-muted-foreground">{s.insight}</p>}
-                          <span className="text-xs font-medium text-[#0E7C86]">Context and impact ›</span>
+                          <span className="text-xs font-medium text-[#0F6CBD]">Context and impact ›</span>
                         </button>
                       </li>
                     ))}
@@ -903,7 +764,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
                             {s.type}
                             {s.date ? ` · ${fmtDate(s.date)}` : ""}
                           </span>
-                          <button type="button" onClick={() => setInputCtx({ title: s.title, date: s.date, type: s.type, url: s.url })} className="font-medium text-[#0E7C86] hover:underline" aria-label={`${s.title}: show context and impact`}>
+                          <button type="button" onClick={() => setInputCtx({ title: s.title, date: s.date, type: s.type, url: s.url })} className="font-medium text-[#0F6CBD] hover:underline" aria-label={`${s.title}: show context and impact`}>
                             Context ›
                           </button>
                         </span>
@@ -929,7 +790,7 @@ function UseCaseDossier({ u, signals, features, nav }: { u: UseCase; signals: Si
                   <ul className="mt-1 space-y-1">
                     {parseEvidence(u.evidence).map((e, i) => (
                       <li key={i}>
-                        <button type="button" onClick={() => setInputCtx({ title: e.source || e.text.slice(0, 80), date: e.date, type: e.type, sourceRef: e.source })} className="w-full rounded px-1 text-left text-sm text-muted-foreground hover:bg-[#F7F5F0] hover:text-foreground">
+                        <button type="button" onClick={() => setInputCtx({ title: e.source || e.text.slice(0, 80), date: e.date, type: e.type, sourceRef: e.source })} className="w-full rounded px-1 text-left text-sm text-muted-foreground hover:bg-[#F3F8FD] hover:text-foreground">
                           {e.text}
                         </button>
                       </li>

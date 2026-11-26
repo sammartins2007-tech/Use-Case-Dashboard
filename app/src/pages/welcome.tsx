@@ -93,17 +93,17 @@ export function WelcomePage() {
   return (
     <div id="work" tabIndex={-1} className="outline-none">
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-border bg-[radial-gradient(ellipse_at_top_right,#F3E6CB_0%,#F7F5F0_45%,#F7F5F0_100%)]">
+      <section className="relative overflow-hidden border-b border-border bg-[radial-gradient(ellipse_at_top_right,#F3E6CB_0%,#F3F8FD_45%,#F3F8FD_100%)]">
         <DawnArt />
         <div className="relative mx-auto grid w-full max-w-[1280px] gap-10 px-6 py-14 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)]">
           <div>
             <p className="text-sm text-[#8A6420]">{RADAR.tagline}</p>
-            <h1 className="mt-3 max-w-[640px] font-[family-name:var(--font-serif)] text-[44px] leading-[1.08] tracking-tight text-[#1B2A41]">
+            <h1 className="mt-3 max-w-[640px] font-[family-name:var(--font-serif)] text-[44px] leading-[1.08] tracking-tight text-[#0D2847]">
               From scattered signals
               <br />
-              <span className="italic text-[#0E7C86]">to AI use cases worth funding.</span>
+              <span className="italic text-[#0F6CBD]">to AI use cases worth funding.</span>
             </h1>
-            <p className="mt-5 max-w-[560px] text-[17px] leading-relaxed text-[#3D4757]">
+            <p className="mt-5 max-w-[560px] text-[17px] leading-relaxed text-[#34465E]">
               {RADAR.customerEdition
                 ? `One shared view of the AI use cases ${RADAR.customers[0]?.name ?? "the customer"} and Microsoft are shaping together: what each one solves, the value it can bring, the proposed solution and when it is planned.`
                 : "A living radar that listens to what our customers share, qualifies every idea against five gates, routes it to the right Microsoft platform and sizes what it will cost and return."}
@@ -111,13 +111,13 @@ export function WelcomePage() {
             <div className="mt-7 flex flex-wrap gap-3">
               <a
                 href="#customers"
-                className="inline-flex items-center gap-2 rounded-full bg-[#1B2A41] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#26385A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                className="inline-flex items-center gap-2 rounded-full bg-[#0D2847] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#26385A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
                 {SINGLE_CUSTOMER ? `Open ${SINGLE_CUSTOMER}` : "Choose a customer"} <ArrowRight className="size-4" aria-hidden="true" />
               </a>
               {!RADAR.customerEdition && (<Link
                 to="/method"
-                className="inline-flex items-center gap-2 rounded-full border border-[#D9D2C4] bg-white px-5 py-2.5 text-sm font-medium transition-colors hover:bg-[#FBF9F5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                className="inline-flex items-center gap-2 rounded-full border border-[#C8DAEC] bg-white px-5 py-2.5 text-sm font-medium transition-colors hover:bg-[#F7FBFE] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
                 Definitions and method
               </Link>)}
@@ -164,13 +164,13 @@ export function WelcomePage() {
                     onClick={() => setStep(i)}
                     className={cn(
                       "flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                      active ? "border-[#1B2A41] bg-[#1B2A41] text-white shadow-md" : "border-border bg-card hover:border-[#C9BFAE]",
+                      active ? "border-[#0D2847] bg-[#0D2847] text-white shadow-md" : "border-border bg-card hover:border-[#C9BFAE]",
                     )}
                   >
                     <span
                       className={cn(
                         "flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold",
-                        active ? "bg-[#D9B26A] text-[#1B2A41]" : "bg-[#F1ECE2] text-[#1B2A41]",
+                        active ? "bg-[#D9B26A] text-[#0D2847]" : "bg-[#E8F2FB] text-[#0D2847]",
                       )}
                     >
                       {i + 1}
@@ -188,7 +188,7 @@ export function WelcomePage() {
           <article aria-live="polite" className="rounded-2xl border border-border bg-card p-7 shadow-[0_1px_2px_rgba(27,42,65,0.04)]">
             <p className="text-sm text-[#8A6420]">Step {step + 1} of {STEPS.length}</p>
             <h3 className="mt-1 font-[family-name:var(--font-serif)] text-2xl">{current.title}</h3>
-            <p className="mt-2 text-[17px] text-[#3D4757]">{current.lead}</p>
+            <p className="mt-2 text-[17px] text-[#34465E]">{current.lead}</p>
             <div className="mt-6 grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
               <ul className="space-y-3">
                 {current.body.map((b) => (
@@ -213,12 +213,12 @@ export function WelcomePage() {
                 <button
                   type="button"
                   onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}
-                  className="rounded-full bg-[#0E7C86] px-4 py-2 text-sm font-medium text-white hover:bg-[#0B6A73] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                  className="rounded-full bg-[#0F6CBD] px-4 py-2 text-sm font-medium text-white hover:bg-[#0B6A73] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 >
                   Next: {STEPS[step + 1].title} →
                 </button>
               ) : (
-                <a href="#customers" className="rounded-full bg-[#0E7C86] px-4 py-2 text-sm font-medium text-white hover:bg-[#0B6A73] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+                <a href="#customers" className="rounded-full bg-[#0F6CBD] px-4 py-2 text-sm font-medium text-white hover:bg-[#0B6A73] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
                   {SINGLE_CUSTOMER ? `Open ${SINGLE_CUSTOMER} →` : "Open a customer →"}
                 </a>
               )}
@@ -230,7 +230,7 @@ export function WelcomePage() {
       )}
 
       {/* Customers */}
-      <section id="customers" aria-labelledby="cust-title" className="scroll-mt-20 border-t border-border bg-[#FBF9F5]">
+      <section id="customers" aria-labelledby="cust-title" className="scroll-mt-20 border-t border-border bg-[#F7FBFE]">
         <div className="mx-auto w-full max-w-[1280px] px-6 py-14">
           <p className="text-sm text-[#8A6420]">{SINGLE_CUSTOMER ?? "Choose a customer"}</p>
           <h2 id="cust-title" className="mt-1 font-[family-name:var(--font-serif)] text-3xl tracking-tight">
@@ -255,7 +255,7 @@ function HeroStat({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="font-[family-name:var(--font-serif)] text-3xl tabular-nums text-[#1B2A41]">{value}</dd>
+      <dd className="font-[family-name:var(--font-serif)] text-3xl tabular-nums text-[#0D2847]">{value}</dd>
     </div>
   );
 }
@@ -274,7 +274,7 @@ function AiConsumptionCard({ ai }: { ai: ReturnType<typeof useAiTotals> }) {
         <ConnectorErrorState error={ai.q.error} connector="SharePoint" />
       ) : (
         <>
-          <p className="mt-2 font-[family-name:var(--font-serif)] text-5xl tabular-nums text-[#1B2A41]">{usd.format(ai.cost)}</p>
+          <p className="mt-2 font-[family-name:var(--font-serif)] text-5xl tabular-nums text-[#0D2847]">{usd.format(ai.cost)}</p>
           <p className="mt-1 text-sm text-muted-foreground">
             {tokensFmt(ai.tokens)} tokens across {ai.runs} runs{ai.estimated ? " · estimated" : ""}
           </p>
@@ -285,14 +285,14 @@ function AiConsumptionCard({ ai }: { ai: ReturnType<typeof useAiTotals> }) {
                   <div
                     key={r.id}
                     className="flex-1 rounded-t-sm"
-                    style={{ height: `${Math.max(4, (r.costUSD / max) * 100)}%`, backgroundColor: r.kind === "Deep analysis" ? "#B8892B" : "#0E7C86", opacity: r.status === "Stalled" ? 0.4 : 1 }}
+                    style={{ height: `${Math.max(4, (r.costUSD / max) * 100)}%`, backgroundColor: r.kind === "Deep analysis" ? "#B8892B" : "#0F6CBD", opacity: r.status === "Stalled" ? 0.4 : 1 }}
                     title={`${r.title}: ${usd.format(r.costUSD)}`}
                   />
                 ))}
               </div>
               <figcaption className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="size-2 rounded-sm bg-[#0E7C86]" aria-hidden="true" /> Refreshes and imports
+                  <span className="size-2 rounded-sm bg-[#0F6CBD]" aria-hidden="true" /> Refreshes and imports
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <span className="size-2 rounded-sm bg-[#B8892B]" aria-hidden="true" /> Deep analysis
@@ -305,7 +305,7 @@ function AiConsumptionCard({ ai }: { ai: ReturnType<typeof useAiTotals> }) {
               </ul>
             </figure>
           )}
-          <Link to="/finops#consumption" className="mt-5 inline-flex text-sm font-medium text-[#0E7C86] hover:underline">
+          <Link to="/finops#consumption" className="mt-5 inline-flex text-sm font-medium text-[#0F6CBD] hover:underline">
             See every run and how it is estimated →
           </Link>
         </>
@@ -321,12 +321,12 @@ function StepVisual({ stepKey }: { stepKey: string }) {
         <svg viewBox="0 0 300 170" className="w-full" role="img" aria-label="Mail, Teams, meetings and documents flow into one use case">
           {["Mail", "Teams", "Meetings", "Documents"].map((t, i) => (
             <g key={t}>
-              <rect x="6" y={10 + i * 40} width="96" height="28" rx="14" fill="#F1ECE2" />
-              <text x="54" y={29 + i * 40} textAnchor="middle" fontSize="12" fill="#1B2A41">{t}</text>
+              <rect x="6" y={10 + i * 40} width="96" height="28" rx="14" fill="#E8F2FB" />
+              <text x="54" y={29 + i * 40} textAnchor="middle" fontSize="12" fill="#0D2847">{t}</text>
               <path d={`M102 ${24 + i * 40} C 160 ${24 + i * 40}, 160 85, 196 85`} fill="none" stroke="#D9B26A" strokeWidth="1.5" />
             </g>
           ))}
-          <rect x="196" y="60" width="98" height="50" rx="12" fill="#1B2A41" />
+          <rect x="196" y="60" width="98" height="50" rx="12" fill="#0D2847" />
           <text x="245" y="82" textAnchor="middle" fontSize="12" fill="#fff">Use case</text>
           <text x="245" y="98" textAnchor="middle" fontSize="10" fill="#D9B26A">+ evidence</text>
         </svg>
@@ -337,8 +337,8 @@ function StepVisual({ stepKey }: { stepKey: string }) {
       <Visual label="Five gates">
         <div className="flex flex-wrap gap-2">
           {["Process", "Users", "Pain", "Outcome", "Flow"].map((g, i) => (
-            <span key={g} className="flex items-center gap-2 rounded-full border border-[#D9D2C4] bg-white px-3 py-1.5 text-sm">
-              <span className="flex size-5 items-center justify-center rounded-full bg-[#0E7C86] text-[11px] text-white">{i + 1}</span>
+            <span key={g} className="flex items-center gap-2 rounded-full border border-[#C8DAEC] bg-white px-3 py-1.5 text-sm">
+              <span className="flex size-5 items-center justify-center rounded-full bg-[#0F6CBD] text-[11px] text-white">{i + 1}</span>
               {g}
             </span>
           ))}
@@ -369,12 +369,12 @@ function StepVisual({ stepKey }: { stepKey: string }) {
             )),
           )}
           {[
-            [48, 140, "#0E7C86"], [70, 128, "#1B2A41"], [100, 110, "#B8892B"], [128, 70, "#C2556B"], [160, 30, "#2A9D78"], [112, 140, "#0E7C86"], [62, 84, "#6B8E5A"],
+            [48, 140, "#0F6CBD"], [70, 128, "#0D2847"], [100, 110, "#B8892B"], [128, 70, "#C2556B"], [160, 30, "#2A9D78"], [112, 140, "#0F6CBD"], [62, 84, "#6B8E5A"],
           ].map(([x, y, c], i) => (
             <circle key={i} cx={x as number} cy={y as number} r="5" fill={c as string} />
           ))}
-          <text x="114" y="166" textAnchor="middle" fontSize="10" fill="#5B6474">Complexity →</text>
-          <text x="10" y="80" textAnchor="middle" fontSize="10" fill="#5B6474" transform="rotate(-90 10 80)">Effort →</text>
+          <text x="114" y="166" textAnchor="middle" fontSize="10" fill="#55657A">Complexity →</text>
+          <text x="10" y="80" textAnchor="middle" fontSize="10" fill="#55657A" transform="rotate(-90 10 80)">Effort →</text>
         </svg>
       </Visual>
     );
@@ -384,7 +384,7 @@ function StepVisual({ stepKey }: { stepKey: string }) {
       <div className="flex flex-wrap gap-2">
         {[
           ["Fund", "#2A9D78"],
-          ["Test", "#0E7C86"],
+          ["Test", "#0F6CBD"],
           ["Hold", "#B8892B"],
           ["Stop", "#C2556B"],
         ].map(([d, c]) => (
@@ -418,7 +418,7 @@ function SizeExample() {
         step={100}
         value={runs}
         onChange={(e) => setRuns(Number(e.target.value))}
-        className="mt-2 w-full accent-[#0E7C86]"
+        className="mt-2 w-full accent-[#0F6CBD]"
       />
       <p className="mt-1 text-xs text-muted-foreground">
         Example values: {credits} credits per run at ${price} each; {minutes} minutes saved per run.
@@ -432,7 +432,7 @@ function SizeExample() {
           <dt className="text-[11px] text-muted-foreground">Time saved / month</dt>
           <dd className="font-[family-name:var(--font-serif)] text-xl tabular-nums">{Math.round(hours).toLocaleString("en-US")} h</dd>
         </div>
-        <div className="rounded-lg bg-[#1B2A41] p-2 text-white">
+        <div className="rounded-lg bg-[#0D2847] p-2 text-white">
           <dt className="text-[11px] text-white/75">AI cost per hour saved</dt>
           <dd className="font-[family-name:var(--font-serif)] text-xl tabular-nums">{usd.format(hours ? cost / hours : 0)}</dd>
         </div>
@@ -443,7 +443,7 @@ function SizeExample() {
 
 function Visual({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <figure className="rounded-xl bg-[#FBF9F5] p-5">
+    <figure className="rounded-xl bg-[#F7FBFE] p-5">
       <figcaption className="mb-3 text-xs text-[#8A6420]">{label}</figcaption>
       {children}
     </figure>

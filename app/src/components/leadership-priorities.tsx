@@ -33,11 +33,11 @@ export function LeadershipPriorities({
           <h2 id="prio-title" className="mt-1 font-[family-name:var(--font-serif)] text-2xl">
             Leadership priorities
           </h2>
-          {s.headline && <p className="mt-2 text-[15px] leading-relaxed text-[#3D4757]">{s.headline}</p>}
+          {s.headline && <p className="mt-2 text-[15px] leading-relaxed text-[#34465E]">{s.headline}</p>}
           <p className="mt-2 text-xs text-muted-foreground">
             Source:{" "}
             {href ? (
-              <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[#0E7C86] hover:underline">
+              <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[#0F6CBD] hover:underline">
                 {s.reportTitle ?? "Annual report"}
                 <ExternalLink className="size-3" aria-hidden="true" />
                 <span className="sr-only">(opens in a new tab)</span>
@@ -60,7 +60,7 @@ export function LeadershipPriorities({
           >
             {highlighting ? "Highlighting on the map" : "Highlight on the map"}
           </button>
-          <Link to={`${base}?priority=any`} className="text-sm text-[#0E7C86] hover:underline">
+          <Link to={`${base}?priority=any`} className="text-sm text-[#0F6CBD] hover:underline">
             {fitting.length} use cases fit these priorities →
           </Link>
         </div>
@@ -77,12 +77,12 @@ export function LeadershipPriorities({
                   {p.title}
                 </h3>
               </div>
-              <p className="mt-1.5 text-sm text-[#3D4757]">{p.summary}</p>
-              {p.quote && <p className="mt-2 border-l-2 border-[#E8D9B8] pl-2 text-xs italic text-[#5B6474]">“{p.quote}”</p>}
+              <p className="mt-1.5 text-sm text-[#34465E]">{p.summary}</p>
+              {p.quote && <p className="mt-2 border-l-2 border-[#E8D9B8] pl-2 text-xs italic text-[#55657A]">“{p.quote}”</p>}
               <div className="mt-auto flex items-center justify-between gap-2 pt-3 text-sm">
                 <Link
                   to={`${base}?priority=${p.id}`}
-                  className={cn("font-medium hover:underline", n ? "text-[#0E7C86]" : "pointer-events-none text-muted-foreground")}
+                  className={cn("font-medium hover:underline", n ? "text-[#0F6CBD]" : "pointer-events-none text-muted-foreground")}
                   aria-disabled={n === 0}
                 >
                   {n} use case{n === 1 ? "" : "s"} fit{n === 1 ? "s" : ""}

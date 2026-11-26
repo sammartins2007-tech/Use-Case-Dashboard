@@ -26,10 +26,10 @@ function Ring({ g, o, total, color }: { g: number; o: number; total: number; col
     po = o / total;
   return (
     <svg viewBox="0 0 56 56" className="size-14 shrink-0" role="img" aria-label={`${g} of ${total} evidenced`}>
-      <circle cx="28" cy="28" r={r} fill="none" stroke="#EFEBE3" strokeWidth="6" />
+      <circle cx="28" cy="28" r={r} fill="none" stroke="#EAF2FA" strokeWidth="6" />
       <circle cx="28" cy="28" r={r} fill="none" stroke="#E08A1E" strokeWidth="6" strokeDasharray={`${(pg + po) * c} ${c}`} transform="rotate(-90 28 28)" strokeLinecap="round" className="transition-all duration-700" />
       <circle cx="28" cy="28" r={r} fill="none" stroke={color} strokeWidth="6" strokeDasharray={`${pg * c} ${c}`} transform="rotate(-90 28 28)" strokeLinecap="round" className="transition-all duration-700" />
-      <text x="28" y="32" textAnchor="middle" fontSize="13" fontWeight="600" fill="#1B2A41">
+      <text x="28" y="32" textAnchor="middle" fontSize="13" fontWeight="600" fill="#0D2847">
         {g}/{total}
       </text>
     </svg>
@@ -145,7 +145,7 @@ export function UseCaseCoach({ u, open, onOpenChange, accent }: { u: UseCase; op
       }}
     >
       <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-[560px]">
-        <SheetHeader className="border-b border-border p-4" style={{ background: `color-mix(in srgb, ${accent} 7%, #FFFDF8)` }}>
+        <SheetHeader className="border-b border-border p-4" style={{ background: `color-mix(in srgb, ${accent} 7%, #FAFDFF)` }}>
           <div className="flex items-center gap-3">
             <Ring g={score.g} o={score.o} total={score.total} color={accent} />
             <div className="min-w-0">
@@ -171,7 +171,7 @@ export function UseCaseCoach({ u, open, onOpenChange, accent }: { u: UseCase; op
         <div className="flex-1 space-y-4 overflow-y-auto p-4" aria-live="polite" aria-busy={ask.isPending}>
           {entries.map((e, i) =>
             e.kind === "user" ? (
-              <div key={i} className="ml-10 rounded-2xl rounded-tr-sm bg-[#1B2A41] px-4 py-2.5 text-sm text-white">
+              <div key={i} className="ml-10 rounded-2xl rounded-tr-sm bg-[#0D2847] px-4 py-2.5 text-sm text-white">
                 {e.text}
               </div>
             ) : e.kind === "error" ? (

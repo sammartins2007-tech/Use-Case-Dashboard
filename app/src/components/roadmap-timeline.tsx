@@ -28,7 +28,7 @@ export function RoadmapTimeline({ account, waves, useCases }: { account: string;
     <section aria-labelledby="tl-title" className={card}>
       <div className="flex flex-wrap items-center gap-3">
         <h3 id="tl-title" className="flex items-center gap-2 font-[family-name:var(--font-serif)] text-lg">
-          <CalendarRange className="size-4 text-[#0E7C86]" aria-hidden="true" /> Timeline
+          <CalendarRange className="size-4 text-[#0F6CBD]" aria-hidden="true" /> Timeline
         </h3>
         <div role="tablist" aria-label="Timeline view" className="inline-flex rounded-full bg-muted p-0.5 text-xs" data-pdf-exclude>
           {(
@@ -114,7 +114,7 @@ function WaveLane({ account, wave, byId }: { account: string; wave: WaveDef; byI
 
   return (
     <div className="rounded-xl border border-border">
-      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 rounded-t-xl bg-[#1B2A41] px-4 py-2.5 text-white">
+      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 rounded-t-xl bg-[#0D2847] px-4 py-2.5 text-white">
         <span className="font-[family-name:var(--font-serif)] text-lg">
           {wave.id} · {wave.label}
         </span>
@@ -167,7 +167,7 @@ function WaveLane({ account, wave, byId }: { account: string; wave: WaveDef; byI
               const items = pack(p.schedule.filter((s) => s.track === t));
               const lanes = Math.max(1, ...items.map((x) => x.lane + 1));
               return (
-                <div key={t} className={cn("relative flex border-t border-border/70", ti % 2 && "bg-[#FBF9F5]")} style={{ height: lanes * ROW_H + 8 }}>
+                <div key={t} className={cn("relative flex border-t border-border/70", ti % 2 && "bg-[#F7FBFE]")} style={{ height: lanes * ROW_H + 8 }}>
                   <div className="shrink-0 py-2 pr-3 text-xs font-medium leading-tight" style={{ width: LABEL_W }}>
                     {t}
                     <span className="block font-normal text-muted-foreground">{items.length} use cases</span>
@@ -255,7 +255,7 @@ function CustomerDates({ useCases, waves }: { useCases: UseCase[]; waves: WaveDe
     const pd = r.u.percentDone ?? 0;
     if (pd >= 100) return { c: "#2F9461", t: "done" };
     if (r.e < today) return { c: "#C94141", t: "past its target date" };
-    if (r.s <= today) return { c: "#0E7C86", t: "in progress" };
+    if (r.s <= today) return { c: "#0F6CBD", t: "in progress" };
     return { c: "#8FB8BB", t: "not started" };
   };
   return (
@@ -303,7 +303,7 @@ function CustomerDates({ useCases, waves }: { useCases: UseCase[]; waves: WaveDe
         </div>
         <p className="mt-2 flex flex-wrap gap-x-4 text-[11px] text-muted-foreground" style={{ marginLeft: LABEL_W }}>
           {[
-            ["#0E7C86", "in progress"],
+            ["#0F6CBD", "in progress"],
             ["#8FB8BB", "not started"],
             ["#C94141", "past its target date"],
             ["#2F9461", "done"],

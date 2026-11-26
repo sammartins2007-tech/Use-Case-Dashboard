@@ -28,7 +28,7 @@ export function PriorityFitBox({ u }: { u: UseCase }) {
           </li>
         ))}
       </ul>
-      {u.priorityWhy && <p className="mt-2 text-sm text-[#3D4757]">{u.priorityWhy}</p>}
+      {u.priorityWhy && <p className="mt-2 text-sm text-[#34465E]">{u.priorityWhy}</p>}
       {s.reportTitle && <p className="mt-1 text-[11px] text-muted-foreground">From {s.reportTitle}</p>}
     </section>
   );

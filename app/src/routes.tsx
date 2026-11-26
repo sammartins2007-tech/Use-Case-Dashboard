@@ -12,6 +12,8 @@ import { MethodPage } from "@/pages/method";
 import { FeaturesPage } from "@/pages/features";
 import { SolutionPage } from "@/pages/solution";
 import { WavePlanPage } from "@/pages/wave-plan";
+import { StoryPage } from "@/pages/story";
+import { BacklogPage } from "@/pages/backlog";
 
 export interface AppRoute {
   path: string;
@@ -29,5 +31,7 @@ export const routes: AppRoute[] = [
   { path: "/customer/:account/wave/:wave", element: <WavePlanPage /> },
   { path: "/finops", element: <FinOpsPage /> },
   { path: "/method", element: <MethodPage /> },
+  { path: "/story", element: <StoryPage /> },
+  { path: "/backlog", element: <BacklogPage /> },
   { path: "/features", element: <FeaturesPage /> },
 ];

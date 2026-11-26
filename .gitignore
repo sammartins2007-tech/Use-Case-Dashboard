@@ -6,3 +6,5 @@ dist/
 app/src/radar.config.ts
 app/src/assets/logos/*
 !app/src/assets/logos/microsoft.png
+app/src/assets/brand/*
+app/src/assets/presenter-banner.*

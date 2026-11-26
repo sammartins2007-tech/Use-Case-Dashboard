@@ -68,7 +68,7 @@ export function UseCaseSearch() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-[#D9D2C4] bg-white px-3 text-sm text-muted-foreground transition-colors hover:border-[#B9B1A3]"
+        className="flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-[#C8DAEC] bg-white px-3 text-sm text-muted-foreground transition-colors hover:border-[#A9B9CB]"
         aria-label="Search use cases by title or reference"
       >
         <Search className="size-4" aria-hidden="true" />

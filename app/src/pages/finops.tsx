@@ -49,23 +49,23 @@ export function FinOpsPage() {
 
   return (
     <div id="work" tabIndex={-1} className="outline-none">
-      <section className="border-b border-border bg-[radial-gradient(ellipse_at_top_left,#F3E6CB_0%,#F7F5F0_50%)]">
+      <section className="border-b border-border bg-[radial-gradient(ellipse_at_top_left,#F3E6CB_0%,#F3F8FD_50%)]">
         <div className="mx-auto w-full max-w-[1280px] px-6 py-12">
           <p className="text-sm text-[#8A6420]">AI FinOps</p>
           <h1 className="mt-1 max-w-3xl font-[family-name:var(--font-serif)] text-4xl leading-tight tracking-tight">
             Scale AI while staying in financial control,
-            <span className="italic text-[#0E7C86]"> and know it creates value.</span>
+            <span className="italic text-[#0F6CBD]"> and know it creates value.</span>
           </h1>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             {[
               ["Cost per token", "What the model charges. Falling fast, but tokens are not tasks.", "#B8892B"],
-              ["Cost per task", "Agents call models many times per task. Measure the whole run.", "#0E7C86"],
+              ["Cost per task", "Agents call models many times per task. Measure the whole run.", "#0F6CBD"],
               ["Value per outcome", "Minutes saved, errors avoided, revenue gained. This funds the next dollar.", "#2A9D78"],
             ].map(([t, d, c]) => (
               <div key={t} className="rounded-2xl border border-border bg-white/80 p-5">
                 <span className="block h-1 w-10 rounded-full" style={{ backgroundColor: c }} aria-hidden="true" />
                 <h2 className="mt-3 font-[family-name:var(--font-serif)] text-lg">{t}</h2>
-                <p className="mt-1 text-sm text-[#3D4757]">{d}</p>
+                <p className="mt-1 text-sm text-[#34465E]">{d}</p>
               </div>
             ))}
           </div>
@@ -107,7 +107,7 @@ export function FinOpsPage() {
                           <span>{k}</span>
                           <span className="tabular-nums">{usd.format(v.cost)}</span>
                         </div>
-                        <div className="mt-1 h-2 rounded-full bg-[#F1ECE2]">
+                        <div className="mt-1 h-2 rounded-full bg-[#E8F2FB]">
                           <div className="h-full rounded-full bg-[#B8892B]" style={{ width: `${(v.cost / maxKind) * 100}%` }} />
                         </div>
                         <p className="mt-0.5 text-xs text-muted-foreground">
@@ -122,7 +122,7 @@ export function FinOpsPage() {
                 <table className="w-full text-sm">
                   <caption className="sr-only">AI runs, newest first</caption>
                   <thead>
-                    <tr className="border-b border-border bg-[#FBF9F5] text-left text-xs text-muted-foreground">
+                    <tr className="border-b border-border bg-[#F7FBFE] text-left text-xs text-muted-foreground">
                       <th scope="col" className="px-4 py-2 font-medium">Date</th>
                       <th scope="col" className="px-4 py-2 font-medium">Run</th>
                       <th scope="col" className="px-4 py-2 font-medium">Status</th>
@@ -163,8 +163,8 @@ export function FinOpsPage() {
                           <td className="px-4 py-2.5 text-right font-medium tabular-nums">{usd.format(r.costUSD)}</td>
                         </tr>
                         {open === r.id && r.basis && (
-                          <tr className="border-b border-border bg-[#FBF9F5]">
-                            <td colSpan={5} className="px-4 py-2.5 text-xs text-[#3D4757]">
+                          <tr className="border-b border-border bg-[#F7FBFE]">
+                            <td colSpan={5} className="px-4 py-2.5 text-xs text-[#34465E]">
                               {r.basis}
                             </td>
                           </tr>
@@ -194,7 +194,7 @@ export function FinOpsPage() {
           ) : q.isError ? (
             <ConnectorErrorState error={q.error} connector="SharePoint" />
           ) : sized.length === 0 ? (
-            <div className="mt-4 rounded-2xl border border-dashed border-[#D9D2C4] bg-card p-6 text-sm">
+            <div className="mt-4 rounded-2xl border border-dashed border-[#C8DAEC] bg-card p-6 text-sm">
               No use case is sized yet. Open a use case, fill in its volumes and use the FinOps sizing panel; it will appear here.
             </div>
           ) : (
@@ -247,9 +247,9 @@ export function FinOpsPage() {
               ["Limit", "A budget envelope per use case, enforced, not just reported."],
               ["Alert", "A threshold that warns the owner before the envelope is reached."],
             ].map(([t, d]) => (
-              <div key={t} className="rounded-xl bg-[#FBF9F5] p-4">
+              <div key={t} className="rounded-xl bg-[#F7FBFE] p-4">
                 <h3 className="font-medium">{t}</h3>
-                <p className="mt-1 text-sm text-[#3D4757]">{d}</p>
+                <p className="mt-1 text-sm text-[#34465E]">{d}</p>
               </div>
             ))}
           </div>

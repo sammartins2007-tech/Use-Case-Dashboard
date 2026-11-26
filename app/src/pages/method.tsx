@@ -25,15 +25,15 @@ function H({ id, n, children }: { id: string; n: number; children: React.ReactNo
     </h2>
   );
 }
-const P = ({ children }: { children: React.ReactNode }) => <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-[#3D4757]">{children}</p>;
+const P = ({ children }: { children: React.ReactNode }) => <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-[#34465E]">{children}</p>;
 const Box = ({ children }: { children: React.ReactNode }) => <div className="mt-4 rounded-2xl border border-border bg-card p-5">{children}</div>;
 
 export function MethodPage() {
   return (
     <div id="work" tabIndex={-1} className="outline-none">
-      <section className="border-b border-border bg-[radial-gradient(ellipse_at_top_right,#E1EEEE_0%,#F7F5F0_55%)]">
+      <section className="border-b border-border bg-[radial-gradient(ellipse_at_top_right,#E1EEEE_0%,#F3F8FD_55%)]">
         <div className="mx-auto w-full max-w-[1200px] px-6 py-12">
-          <p className="text-sm text-[#0E7C86]">How it works</p>
+          <p className="text-sm text-[#0F6CBD]">How it works</p>
           <h1 className="mt-1 max-w-3xl font-[family-name:var(--font-serif)] text-4xl leading-tight tracking-tight">
             Every rule the radar follows, in plain words.
           </h1>
@@ -48,7 +48,7 @@ export function MethodPage() {
           <ol className="space-y-1 text-sm">
             {TOC.map(([id, l], i) => (
               <li key={id}>
-                <a href={`#${id}`} className="flex gap-2 rounded-md px-2 py-1 text-[#3D4757] hover:bg-[#F1ECE2] hover:text-foreground">
+                <a href={`#${id}`} className="flex gap-2 rounded-md px-2 py-1 text-[#34465E] hover:bg-[#E8F2FB] hover:text-foreground">
                   <span className="tabular-nums text-[#B8892B]">{String(i + 1).padStart(2, "0")}</span>
                   {l}
                 </a>
@@ -66,7 +66,7 @@ export function MethodPage() {
             </P>
             <Box>
               <p className="text-sm font-medium">Not a use case</p>
-              <p className="mt-1 text-sm text-[#3D4757]">
+              <p className="mt-1 text-sm text-[#34465E]">
                 Generic AI ideas, licensing or access requests, governance, adoption and training, product capabilities on their own,
                 executive sessions and broad transformation programmes.
               </p>
@@ -80,7 +80,7 @@ export function MethodPage() {
               feature that changes what is possible. Only signals linked to a use case are kept.
             </P>
             <Box>
-              <p className="text-sm text-[#3D4757]">
+              <p className="text-sm text-[#34465E]">
                 Ignored: agendas, invitations, logistics, dates and rooms, newsletters and anything that does not change a use case.
               </p>
             </Box>
@@ -96,7 +96,7 @@ export function MethodPage() {
               {(["gate", "input"] as const).map((g) => (
                 <Box key={g}>
                   <p className="text-sm font-medium">{g === "gate" ? "Gates (qualify)" : "Inputs (size and decide)"}</p>
-                  <ul className="mt-2 space-y-1 text-sm text-[#3D4757]">
+                  <ul className="mt-2 space-y-1 text-sm text-[#34465E]">
                     {ELEMENTS.filter((e) => e.group === g).map((e) => (
                       <li key={e.key}>· {e.label}</li>
                     ))}
@@ -110,16 +110,16 @@ export function MethodPage() {
             <H id="stages" n={4}>Stages, decisions and discard</H>
             <Box>
               <dl className="grid gap-3 text-sm sm:grid-cols-[140px_minmax(0,1fr)]">
-                <dt className="font-medium">Signal</dt><dd className="text-[#3D4757]">Heard about, not yet qualified.</dd>
-                <dt className="font-medium">Qualified</dt><dd className="text-[#3D4757]">Gates evidenced; worth shaping.</dd>
-                <dt className="font-medium">Shaping</dt><dd className="text-[#3D4757]">Solution, data and sizing being worked out with the customer.</dd>
-                <dt className="font-medium">Pilot</dt><dd className="text-[#3D4757]">Built and tested with real users.</dd>
-                <dt className="font-medium">Scale</dt><dd className="text-[#3D4757]">Rolled out, with a budget and an owner.</dd>
-                <dt className="font-medium">Parked / Stopped</dt><dd className="text-[#3D4757]">On hold or ended.</dd>
-                <dt className="font-medium">Confidence</dt><dd className="text-[#3D4757]">How well the customer's own sources evidence the use case. High: the five gates come from customer sources. Medium: most do, some are inferred. Low: only a title or a partial description.</dd>
-                <dt className="font-medium">Readiness colours</dt><dd className="text-[#3D4757]">Green: evidenced and enough for a business case. Orange: partial (vague, not quantified, or derived from another field). Red: missing.</dd>
-                <dt className="font-medium">Decision</dt><dd className="text-[#3D4757]">Undecided (not yet discussed), Fund (budget agreed to build), Test (pilot or proof of concept first), Hold (valid but paused) or Stop (will not be pursued). The account team's call, never set automatically.</dd>
-                <dt className="font-medium">Discard</dt><dd className="text-[#3D4757]">Removes a use case from maps and counts (duplicate, out of scope, customer said no). It stays restorable with its reason.</dd>
+                <dt className="font-medium">Signal</dt><dd className="text-[#34465E]">Heard about, not yet qualified.</dd>
+                <dt className="font-medium">Qualified</dt><dd className="text-[#34465E]">Gates evidenced; worth shaping.</dd>
+                <dt className="font-medium">Shaping</dt><dd className="text-[#34465E]">Solution, data and sizing being worked out with the customer.</dd>
+                <dt className="font-medium">Pilot</dt><dd className="text-[#34465E]">Built and tested with real users.</dd>
+                <dt className="font-medium">Scale</dt><dd className="text-[#34465E]">Rolled out, with a budget and an owner.</dd>
+                <dt className="font-medium">Parked / Stopped</dt><dd className="text-[#34465E]">On hold or ended.</dd>
+                <dt className="font-medium">Confidence</dt><dd className="text-[#34465E]">How well the customer's own sources evidence the use case. High: the five gates come from customer sources. Medium: most do, some are inferred. Low: only a title or a partial description.</dd>
+                <dt className="font-medium">Readiness colours</dt><dd className="text-[#34465E]">Green: evidenced and enough for a business case. Orange: partial (vague, not quantified, or derived from another field). Red: missing.</dd>
+                <dt className="font-medium">Decision</dt><dd className="text-[#34465E]">Undecided (not yet discussed), Fund (budget agreed to build), Test (pilot or proof of concept first), Hold (valid but paused) or Stop (will not be pursued). The account team's call, never set automatically.</dd>
+                <dt className="font-medium">Discard</dt><dd className="text-[#34465E]">Removes a use case from maps and counts (duplicate, out of scope, customer said no). It stays restorable with its reason.</dd>
               </dl>
             </Box>
           </section>
@@ -146,7 +146,7 @@ export function MethodPage() {
               <table className="w-full min-w-[720px] text-sm">
                 <caption className="sr-only">The eight platform routes</caption>
                 <thead>
-                  <tr className="border-b border-border bg-[#FBF9F5] text-left text-xs text-muted-foreground">
+                  <tr className="border-b border-border bg-[#F7FBFE] text-left text-xs text-muted-foreground">
                     <th scope="col" className="px-4 py-2 font-medium">Route</th>
                     <th scope="col" className="px-4 py-2 font-medium">Definition</th>
                     <th scope="col" className="px-4 py-2 font-medium">Choose it when</th>
@@ -161,9 +161,9 @@ export function MethodPage() {
                           {r.short}
                         </span>
                       </th>
-                      <td className="px-4 py-3 text-[#3D4757]">{r.definition}</td>
-                      <td className="px-4 py-3 text-[#3D4757]">{r.when}</td>
-                      <td className="px-4 py-3 text-[#3D4757]">{r.signals}</td>
+                      <td className="px-4 py-3 text-[#34465E]">{r.definition}</td>
+                      <td className="px-4 py-3 text-[#34465E]">{r.when}</td>
+                      <td className="px-4 py-3 text-[#34465E]">{r.signals}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -184,7 +184,7 @@ export function MethodPage() {
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <Box>
                 <p className="text-sm font-medium">Value (horizontal, value map)</p>
-                <p className="mt-1 text-sm text-[#3D4757]">
+                <p className="mt-1 text-sm text-[#34465E]">
                   From the counted KPI saving per year: below $50k Low, $50k to below $250k Medium, $250k and above High. Without a quantified saving
                   the analysis judges it from users, volumes, criticality and fit with leadership priorities, and says so in the value basis. Editable on
                   the use case page.
@@ -192,11 +192,11 @@ export function MethodPage() {
               </Box>
               <Box>
                 <p className="text-sm font-medium">Complexity (horizontal, complexity map)</p>
-                <p className="mt-1 text-sm text-[#3D4757]">From the customer's implementation complexity score: below 2 Low, 2 to below 3 Medium, 3 and above High.</p>
+                <p className="mt-1 text-sm text-[#34465E]">From the customer's implementation complexity score: below 2 Low, 2 to below 3 Medium, 3 and above High.</p>
               </Box>
               <Box>
                 <p className="text-sm font-medium">Effort (vertical)</p>
-                <p className="mt-1 text-sm text-[#3D4757]">From estimated effort: under 1 FTE-month or 20 days Low, up to 3 FTE-months or 60 days Medium, more is High.</p>
+                <p className="mt-1 text-sm text-[#34465E]">From estimated effort: under 1 FTE-month or 20 days Low, up to 3 FTE-months or 60 days Medium, more is High.</p>
               </Box>
             </div>
             <P>
@@ -206,7 +206,7 @@ export function MethodPage() {
             </P>
             <Box>
               <p className="text-sm font-medium">Department</p>
-              <p className="mt-1 text-sm text-[#3D4757]">
+              <p className="mt-1 text-sm text-[#34465E]">
                 The business function that owns the process (Finance, Procurement, Supply Chain & Logistics, Manufacturing & Operations, Maintenance &
                 Engineering, Quality, HSE & Sustainability, R&I / R&D, Sales & Marketing, Customer Service, HR, IT & Digital, Legal & Compliance,
                 Communication, Strategy & Management, Other), taken from the customer's process taxonomy where it exists.
@@ -214,7 +214,7 @@ export function MethodPage() {
             </Box>
             <Box>
               <p className="text-sm font-medium">Leadership priorities</p>
-              <p className="mt-1 text-sm text-[#3D4757]">
+              <p className="mt-1 text-sm text-[#34465E]">
                 For each customer we read the latest annual report (and a newer official strategy update when one exists) and summarise, in our own
                 words, the 4–6 priorities leadership commits to, with a link to the source. A use case "fits" a priority only when its process or
                 outcome directly advances what leadership committed to; generic efficiency is not enough. At most two priorities per use case.
@@ -226,7 +226,7 @@ export function MethodPage() {
             <H id="finops" n={8}>FinOps sizing</H>
             <Box>
               <p className="font-[family-name:var(--font-serif)] text-lg">AI run cost / month = the sum of every AI cost line</p>
-              <ul className="mt-2 space-y-1 text-sm text-[#3D4757]">
+              <ul className="mt-2 space-y-1 text-sm text-[#34465E]">
                 <li>· Copilot Credits (Copilot Studio agents and flows): runs × credits per run × price per credit</li>
                 <li>· Microsoft 365 Copilot licences (incl. Copilot Cowork): users × price per user × share attributed</li>
                 <li>· Model tokens (Microsoft Foundry / Azure OpenAI): runs × (input tokens × input price + output tokens × output price)</li>
@@ -236,14 +236,14 @@ export function MethodPage() {
                 <li>· Build and run effort: one-off cost ÷ months of life</li>
               </ul>
               <p className="mt-3 font-[family-name:var(--font-serif)] text-lg">Three measures: time saved (hours), cost savings ($) and revenue gain ($)</p>
-              <p className="mt-2 text-sm text-[#3D4757]">
+              <p className="mt-2 text-sm text-[#34465E]">
                 Every KPI shows its current value and expected outcome and measures one of three things: time saved, kept in hours and never
                 converted into money; cost savings in US dollars; or revenue gain in US dollars. Per use case, one KPI per measure is counted, so
                 benefits are never added twice. The three totals on every customer page follow the filters applied. FinOps value per month = the
                 dollar KPIs ÷ 12, compared with the AI run cost. Prices are illustrative list prices until the customer agreement is known.
               </p>
             </Box>
-            <Link to="/finops" className="mt-3 inline-flex text-sm text-[#0E7C86] hover:underline">Open FinOps →</Link>
+            <Link to="/finops" className="mt-3 inline-flex text-sm text-[#0F6CBD] hover:underline">Open FinOps →</Link>
           </section>
 
           <section>

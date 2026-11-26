@@ -45,7 +45,7 @@ export function CustomerPage() {
     const m = new Map<string, number>();
     for (const u of active) m.set(u.department ?? "Not set", (m.get(u.department ?? "Not set") ?? 0) + 1);
     return [...DEPARTMENTS, "Not set"]
-      .map((d) => ({ key: d, label: d, n: m.get(d) ?? 0, color: "#0E7C86", to: `${base}?dept=${encodeURIComponent(d)}` }))
+      .map((d) => ({ key: d, label: d, n: m.get(d) ?? 0, color: "#0F6CBD", to: `${base}?dept=${encodeURIComponent(d)}` }))
       .filter((b) => b.n > 0)
       .sort((a, b) => b.n - a.n);
   }, [active, base]);
@@ -83,7 +83,7 @@ export function CustomerPage() {
             <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,0.65fr)]">
               <figure className={cn(card, "min-w-0")}>
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div role="group" aria-label="Map" className="inline-flex rounded-full border border-[#D9D2C4] bg-[#FBF9F5] p-1">
+                  <div role="group" aria-label="Map" className="inline-flex rounded-full border border-[#C8DAEC] bg-[#F7FBFE] p-1">
                     {(
                       [
                         ["complexity", "Complexity × effort"],
@@ -97,7 +97,7 @@ export function CustomerPage() {
                         onClick={() => setAxis(k)}
                         className={cn(
                           "rounded-full px-4 py-1.5 font-[family-name:var(--font-serif)] text-[15px] transition-colors focus-visible:outline-2 focus-visible:outline-ring",
-                          axis === k ? "bg-[#1B2A41] text-white" : "text-[#3D4757] hover:bg-[#EFEBE3]",
+                          axis === k ? "bg-[#0D2847] text-white" : "text-[#34465E] hover:bg-[#EAF2FA]",
                         )}
                       >
                         {l}
@@ -127,7 +127,7 @@ export function CustomerPage() {
                 {axis === "value" && (
                   <p className="mt-2 text-xs text-muted-foreground">
                     Value: High ≥ $250k a year, Medium $50k–$250k, Low below $50k (counted KPI saving), or judged from the evidence when not quantified.{" "}
-                    {!RADAR.customerEdition && (<Link to="/method#map" className="text-[#0E7C86] hover:underline">
+                    {!RADAR.customerEdition && (<Link to="/method#map" className="text-[#0F6CBD] hover:underline">
                       How
                     </Link>)}
                   </p>
@@ -151,7 +151,7 @@ export function CustomerPage() {
                   <BarList bars={deptBars} />
                 </section>
                 <div className="flex flex-wrap items-center justify-between gap-2 px-1 text-sm">
-                  <Link to={base} className="font-medium text-[#0E7C86] hover:underline">
+                  <Link to={base} className="font-medium text-[#0F6CBD] hover:underline">
                     Open the full {name} portfolio →
                   </Link>
                   {all.length > active.length && (

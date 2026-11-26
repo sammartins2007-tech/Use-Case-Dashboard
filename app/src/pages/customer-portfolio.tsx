@@ -65,7 +65,7 @@ export function CustomerPortfolioPage() {
       <CustomerHeader name={name} />
       <div className="mx-auto w-full max-w-[1440px] px-6 pb-14 pt-6">
         <div className="flex flex-wrap items-center gap-3">
-          <Link to={`/customer/${encodeURIComponent(name)}`} className="text-sm text-[#0E7C86] hover:underline">
+          <Link to={`/customer/${encodeURIComponent(name)}`} className="text-sm text-[#0F6CBD] hover:underline">
             ← Back to the map
           </Link>
           <span className="text-muted-foreground" aria-hidden="true">
@@ -84,7 +84,7 @@ export function CustomerPortfolioPage() {
               else p.set("validated", "1");
               setParams(p, { replace: true });
             }}
-            className={cn("ml-auto rounded-full border px-3 py-1 text-sm", onlyValidated ? "border-[#2F9461] bg-[#2F9461] text-white" : "border-[#D9D2C4] bg-white hover:bg-[#FBF9F5]")}
+            className={cn("ml-auto rounded-full border px-3 py-1 text-sm", onlyValidated ? "border-[#2F9461] bg-[#2F9461] text-white" : "border-[#C8DAEC] bg-white hover:bg-[#F7FBFE]")}
           >
             Validated only
           </button>
@@ -120,7 +120,7 @@ export function CustomerPortfolioPage() {
         {route && route.key !== "none" && (
           <p className="mt-4 max-w-3xl rounded-xl border border-border bg-card px-4 py-3 text-sm">
             <span className="font-medium">{route.short}:</span> {route.definition}{" "}
-            {!RADAR.customerEdition && (<Link to="/method#routes" className="text-[#0E7C86] hover:underline">
+            {!RADAR.customerEdition && (<Link to="/method#routes" className="text-[#0F6CBD] hover:underline">
               How we classify
             </Link>)}
           </p>
@@ -138,7 +138,7 @@ export function CustomerPortfolioPage() {
               {COLUMNS.map((col) => {
                 const items = list.filter((u) => columnOf(u) === col);
                 return (
-                  <section key={col} aria-label={`${col}: ${items.length}`} className="min-w-[220px] rounded-2xl bg-[#F1ECE2]/70 p-3">
+                  <section key={col} aria-label={`${col}: ${items.length}`} className="min-w-[220px] rounded-2xl bg-[#E8F2FB]/70 p-3">
                     <h3 className="mb-2 flex items-center justify-between px-1 text-sm font-medium">
                       {col}
                       <span className="tabular-nums text-muted-foreground">{items.length}</span>
@@ -164,9 +164,9 @@ export function CustomerPortfolioPage() {
 
 function FilterTag({ label, onClear }: { label: string; onClear: () => void }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#D9D2C4] bg-white py-0.5 pl-3 pr-1">
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#C8DAEC] bg-white py-0.5 pl-3 pr-1">
       {label}
-      <button type="button" onClick={onClear} aria-label={`Remove filter ${label}`} className="rounded-full px-1.5 text-muted-foreground hover:bg-[#F1ECE2] hover:text-foreground">
+      <button type="button" onClick={onClear} aria-label={`Remove filter ${label}`} className="rounded-full px-1.5 text-muted-foreground hover:bg-[#E8F2FB] hover:text-foreground">
         ×
       </button>
     </span>
@@ -181,7 +181,7 @@ function Chip({ active, onClick, label, color }: { active: boolean; onClick: () 
       onClick={onClick}
       className={cn(
         "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-        active ? "border-[#1B2A41] bg-[#1B2A41] text-white" : "border-[#D9D2C4] bg-white hover:bg-[#FBF9F5]",
+        active ? "border-[#0D2847] bg-[#0D2847] text-white" : "border-[#C8DAEC] bg-white hover:bg-[#F7FBFE]",
       )}
     >
       {color && <span className="size-2.5 rounded-full ring-1 ring-white" style={{ backgroundColor: color }} aria-hidden="true" />}
@@ -215,7 +215,7 @@ function Card({ u, saving, hours }: { u: UseCase; saving?: number; hours?: numbe
       )}
       <span className="mt-2 flex items-center gap-1" aria-label={`${met} of ${GATES.length} gates evidenced`}>
         {GATES.map((g, i) => (
-          <span key={g.key} aria-hidden="true" className={cn("h-1 flex-1 rounded-full", i < met ? "bg-[#0E7C86]" : "bg-[#E4DED3]")} />
+          <span key={g.key} aria-hidden="true" className={cn("h-1 flex-1 rounded-full", i < met ? "bg-[#0F6CBD]" : "bg-[#D8E6F3]")} />
         ))}
       </span>
       <span className="mt-1.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">

@@ -28,7 +28,7 @@ export const ROUTES: Route[] = [
   {
     key: "3 · M365 Copilot",
     short: "M365 Copilot",
-    color: "#0E7C86",
+    color: "#0F6CBD",
     definition: "One person drafts, summarises, translates or researches inside Word, PowerPoint, Excel or Teams.",
     when: "The work is individual and happens document by document.",
     signals: "Drafting from templates, per-document checks, one-off research, translation.",
@@ -44,7 +44,7 @@ export const ROUTES: Route[] = [
   {
     key: "5 · Copilot Studio",
     short: "Copilot Studio",
-    color: "#1B2A41",
+    color: "#0D2847",
     definition: "A shared agent or agent flow that serves many users or runs a process.",
     when: "Knowledge Q&A, document processing, triggers, or connectors to SAP, Salesforce, ServiceNow or Helix.",
     signals: "Chatbots over SharePoint, mailbox-triggered extraction, classification and routing.",
@@ -68,7 +68,7 @@ export const ROUTES: Route[] = [
   {
     key: "8 · Unknown – not enough information",
     short: "Unknown",
-    color: "#BDB4A3",
+    color: "#ADBCCD",
     definition: "Only a title, or details deferred to a meeting: the route cannot be chosen yet.",
     when: "Ask the owner for the problem, users, data sources and volumes.",
     signals: "'To be defined', title only.",
@@ -78,7 +78,7 @@ export const ROUTES: Route[] = [
 export const UNCLASSIFIED: Route = {
   key: "none",
   short: "Not classified",
-  color: "#E4DED3",
+  color: "#D8E6F3",
   definition: "Not yet assessed.",
   when: "",
   signals: "",
@@ -90,7 +90,7 @@ export function routeOf(key?: string): Route {
 
 /** Text colour that stays readable on a route colour. */
 export function onRoute(r: Route) {
-  return ["#BDB4A3", "#E4DED3", "#B8892B", "#8A8F98"].includes(r.color) ? "#1B2A41" : "#FFFFFF";
+  return ["#ADBCCD", "#D8E6F3", "#B8892B", "#8A8F98"].includes(r.color) ? "#0D2847" : "#FFFFFF";
 }
 
 /** Lenient lookup for route keys written by agents ("5", "5 · Copilot Studio", "Copilot Studio"). */

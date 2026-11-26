@@ -171,7 +171,7 @@ export function UseCaseInput({ u, open, onOpenChange, accent, prefill }: { u: Us
       }}
     >
       <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-[680px]">
-        <SheetHeader className="border-b border-border p-4" style={{ background: `color-mix(in srgb, ${accent} 7%, #FFFDF8)` }}>
+        <SheetHeader className="border-b border-border p-4" style={{ background: `color-mix(in srgb, ${accent} 7%, #FAFDFF)` }}>
           <SheetTitle className="flex items-center gap-2 font-[family-name:var(--font-serif)] text-xl">
             <ShieldCheck className="size-5" style={{ color: accent }} aria-hidden /> Add input, challenged and reviewed
           </SheetTitle>
@@ -255,7 +255,7 @@ export function UseCaseInput({ u, open, onOpenChange, accent, prefill }: { u: Us
                     const cur = currentValue(u, c.field as ReviewField);
                     const on = !!picked[c.field];
                     return (
-                      <li key={c.field} className={cn("rounded-xl border bg-white p-3 transition-colors", on ? "border-[#1B2A41]/40" : "border-border opacity-80")}>
+                      <li key={c.field} className={cn("rounded-xl border bg-white p-3 transition-colors", on ? "border-[#0D2847]/40" : "border-border opacity-80")}>
                         <div className="flex flex-wrap items-center gap-2">
                           <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
                             <input type="checkbox" checked={on} disabled={stage !== "review"} onChange={(e) => setPicked((p) => ({ ...p, [c.field]: e.target.checked }))} className="size-4" />

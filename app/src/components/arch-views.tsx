@@ -27,7 +27,7 @@ const LAYER: Record<LayerId, { label: string; hint: string; icon: LucideIcon; ti
   intelligence: { label: "Intelligence", hint: "Agents and AI models", icon: Bot, tint: "#F3EEFB", ink: "#5B3A9E" },
   orchestration: { label: "Orchestration & integration", hint: "Flows, connectors, APIs", icon: Workflow, tint: "#EAF6F1", ink: "#1E6B4E" },
   data: { label: "Data & knowledge", hint: "Sources of record and stores", icon: Database, tint: "#FFF5E6", ink: "#8A5A12" },
-  platform: { label: "Platform, security & operations", hint: "Identity, governance, ALM, monitoring", icon: ShieldCheck, tint: "#F1F3F6", ink: "#3D4757" },
+  platform: { label: "Platform, security & operations", hint: "Identity, governance, ALM, monitoring", icon: ShieldCheck, tint: "#F1F3F6", ink: "#34465E" },
 };
 const STATUS: Record<TechComponent["status"], { label: string; cls: string }> = {
   existing: { label: "In place", cls: "border-[#B9DCC8] bg-[#E9F5EE] text-[#1E5B3E]" },
@@ -50,7 +50,7 @@ const VIEWS: { id: View; label: string; icon: LucideIcon }[] = [
 ];
 
 function Headline({ text }: { text: string }) {
-  return <h3 className="mb-4 max-w-4xl font-[family-name:var(--font-serif)] text-[22px] leading-snug text-[#1B2A41]">{text}</h3>;
+  return <h3 className="mb-4 max-w-4xl font-[family-name:var(--font-serif)] text-[22px] leading-snug text-[#0D2847]">{text}</h3>;
 }
 
 function LayersView({ v }: { v: TechViews["layers"] }) {
@@ -91,7 +91,7 @@ function LayersView({ v }: { v: TechViews["layers"] }) {
                 </div>
               </div>
               {i < v.layers.length - 1 && (
-                <div className="flex justify-center py-0.5 text-[#B9B1A3]" aria-hidden="true">
+                <div className="flex justify-center py-0.5 text-[#A9B9CB]" aria-hidden="true">
                   <ArrowDown className="size-4" />
                 </div>
               )}
@@ -122,7 +122,7 @@ function ContextView({ v }: { v: TechViews["context"] }) {
           <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">People</div>
           {v.actors.map((a) => (
             <div key={a.name} className="flex items-center gap-3 rounded-xl border border-border bg-white p-3">
-              <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#1B2A41] text-white">
+              <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#0D2847] text-white">
                 <User className="size-4" aria-hidden="true" />
               </span>
               <span className="min-w-0 flex-1">
@@ -133,7 +133,7 @@ function ContextView({ v }: { v: TechViews["context"] }) {
             </div>
           ))}
         </div>
-        <div className="mx-auto grid size-44 place-items-center rounded-full border-4 border-double p-4 text-center" style={{ borderColor: "var(--sol, #1B2A41)" }}>
+        <div className="mx-auto grid size-44 place-items-center rounded-full border-4 border-double p-4 text-center" style={{ borderColor: "var(--sol, #0D2847)" }}>
           <div>
             <div className="text-[11px] uppercase tracking-wide text-muted-foreground">The solution</div>
             <div className="mt-1 font-[family-name:var(--font-serif)] text-lg leading-tight">{v.system}</div>
@@ -169,7 +169,7 @@ function DataView({ v }: { v: TechViews["data"] }) {
       <Headline text={v.headline} />
       <div className="overflow-x-auto rounded-2xl border border-border bg-white">
         <table className="w-full min-w-[720px] text-sm">
-          <thead className="bg-[#F7F5F0] text-left text-xs text-muted-foreground">
+          <thead className="bg-[#F3F8FD] text-left text-xs text-muted-foreground">
             <tr>
               {["Data set", "Lives in", "Format", "Classification", "Volume", "How it is read"].map((h) => (
                 <th key={h} className="border-b border-border px-3 py-2 font-medium">
@@ -200,13 +200,13 @@ function DataView({ v }: { v: TechViews["data"] }) {
           <li key={`${p.stage}-${i}`} className="flex items-stretch gap-2">
             <div className="w-[190px] rounded-xl border border-border bg-white p-3">
               <div className="flex items-center gap-2">
-                <span className="grid size-5 place-items-center rounded-full bg-[#1B2A41] text-[10px] text-white">{i + 1}</span>
+                <span className="grid size-5 place-items-center rounded-full bg-[#0D2847] text-[10px] text-white">{i + 1}</span>
                 <span className="text-sm font-semibold">{p.stage}</span>
               </div>
               <p className="mt-1 text-xs leading-relaxed">{p.what}</p>
               <p className="mt-1 text-[11px] font-medium text-[#8A6420]">{p.product}</p>
             </div>
-            {i < v.pipeline.length - 1 && <ArrowRight className="size-4 self-center text-[#B9B1A3]" aria-hidden="true" />}
+            {i < v.pipeline.length - 1 && <ArrowRight className="size-4 self-center text-[#A9B9CB]" aria-hidden="true" />}
           </li>
         ))}
       </ol>
@@ -246,7 +246,7 @@ function DecisionsView({ d, n }: { d: TechViews["decisions"]; n: TechViews["nfr"
               <div className="text-sm font-semibold">{x.question}</div>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {x.options.map((o) => (
-                  <span key={o} className={cn("rounded-full border px-2.5 py-0.5 text-xs", o === x.choice ? "border-[#1B2A41] bg-[#1B2A41] text-white" : "border-border text-muted-foreground line-through decoration-[#B9B1A3]")}>
+                  <span key={o} className={cn("rounded-full border px-2.5 py-0.5 text-xs", o === x.choice ? "border-[#0D2847] bg-[#0D2847] text-white" : "border-border text-muted-foreground line-through decoration-[#A9B9CB]")}>
                     {o}
                   </span>
                 ))}
@@ -289,7 +289,7 @@ export function ArchViews({ v }: { v: TechViews }) {
               role="tab"
               aria-selected={view === x.id}
               onClick={() => setView(x.id)}
-              className={cn("inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm transition-colors", view === x.id ? "border-[#1B2A41] bg-[#1B2A41] text-white" : "border-border bg-white hover:bg-muted")}
+              className={cn("inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm transition-colors", view === x.id ? "border-[#0D2847] bg-[#0D2847] text-white" : "border-border bg-white hover:bg-muted")}
             >
               <I className="size-4" aria-hidden="true" />
               {x.label}

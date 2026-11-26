@@ -134,7 +134,7 @@ export function ClockStory({ s }: { s: Solution }) {
           })}
         </ol>
       </div>
-      <div key={i} className="mt-5 flex items-start gap-4 rounded-2xl p-4 animate-in fade-in slide-in-from-bottom-1 duration-300" style={{ background: "color-mix(in srgb, var(--sol) 8%, #FFFDF8)" }}>
+      <div key={i} className="mt-5 flex items-start gap-4 rounded-2xl p-4 animate-in fade-in slide-in-from-bottom-1 duration-300" style={{ background: "color-mix(in srgb, var(--sol) 8%, #FAFDFF)" }}>
         <span className="font-[family-name:var(--font-serif)] text-3xl tabular-nums" style={{ color: "var(--sol)" }}>
           {cur.time}
         </span>
@@ -260,7 +260,7 @@ function Swimlane({ j, icons }: { j: Step[]; icons: string[] }) {
       <div className="overflow-x-auto rounded-2xl border border-border">
         <div className="min-w-[760px]">
           {actors.map((a, ai) => (
-            <div key={a} className={cn("grid items-center", ai % 2 ? "bg-[#FBF9F5]" : "bg-white")} style={{ gridTemplateColumns: `170px repeat(${j.length}, minmax(0,1fr))` }}>
+            <div key={a} className={cn("grid items-center", ai % 2 ? "bg-[#F7FBFE]" : "bg-white")} style={{ gridTemplateColumns: `170px repeat(${j.length}, minmax(0,1fr))` }}>
               <div className="border-r border-border px-3 py-4 text-xs font-medium">{a}</div>
               {j.map((st, k) => {
                 const I = iconOf(icons[k]);
@@ -303,7 +303,7 @@ function Split({ j, icons }: { j: Step[]; icons: string[] }) {
           const I = iconOf(icons[k]);
           return (
             <li key={`${show}-${k}`} className="relative animate-in fade-in slide-in-from-left-2 fill-mode-both" style={{ animationDelay: `${k * 70}ms` }}>
-              <span className="absolute top-2 -left-10 grid size-9 place-items-center rounded-full border-2 bg-white" style={{ borderColor: show === "after" ? "var(--sol)" : "#B9B1A3" }}>
+              <span className="absolute top-2 -left-10 grid size-9 place-items-center rounded-full border-2 bg-white" style={{ borderColor: show === "after" ? "var(--sol)" : "#A9B9CB" }}>
                 <I className="size-4" style={{ color: show === "after" ? "var(--sol)" : "#8A8F98" }} aria-hidden="true" />
               </span>
               <div className={cn("rounded-2xl border p-3.5", show === "after" ? "border-transparent" : "border-border bg-white")} style={show === "after" ? { background: "color-mix(in srgb, var(--sol) 8%, white)" } : undefined}>

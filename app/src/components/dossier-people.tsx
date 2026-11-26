@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 type Save = (patch: UseCasePatch, msg: string, done?: () => void) => void;
 
 const ORG_TONE = (org: string, account?: string) =>
-  /microsoft/i.test(org) ? "#0E7C86" : account && org.toLowerCase().includes(account.toLowerCase()) ? "#1B2A41" : org ? "#7A4B12" : "#6B7280";
+  /microsoft/i.test(org) ? "#0F6CBD" : account && org.toLowerCase().includes(account.toLowerCase()) ? "#0D2847" : org ? "#7A4B12" : "#6B7280";
 
 export const CONTRIB_META: Record<Contribution, { label: string; plural: string; tone: string; hint: string }> = {
   Business: { label: "Business contributor", plural: "Business contributors", tone: "bg-amber-50 text-amber-900 ring-amber-200", hint: "Knows the process, the pain and the expected outcome" },
@@ -47,7 +47,7 @@ export function PersonCard({ p, account, accent, big }: { p: Person; account?: s
             {c.label}
           </p>
         )}
-        {p.title && <p className="text-sm text-[#3D4757]">{p.title}</p>}
+        {p.title && <p className="text-sm text-[#34465E]">{p.title}</p>}
         {(p.org || p.location) && (
           <p className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
             {p.org && (
@@ -63,7 +63,7 @@ export function PersonCard({ p, account, accent, big }: { p: Person; account?: s
           </p>
         )}
         {p.role && (
-          <p className="inline-flex items-center gap-1.5 rounded-lg bg-[#F3F1EC] px-2 py-1 text-xs font-medium text-[#3D4757]">
+          <p className="inline-flex items-center gap-1.5 rounded-lg bg-[#F3F1EC] px-2 py-1 text-xs font-medium text-[#34465E]">
             <Briefcase className="size-3.5" aria-hidden /> {p.role}
           </p>
         )}
@@ -91,7 +91,7 @@ function PeopleEditor({ open, onOpenChange, people, busy, onSave }: { open: bool
         </DialogHeader>
         <ul className="space-y-3">
           {draft.map((p, i) => (
-            <li key={i} className="grid gap-2 rounded-xl border border-border bg-[#FBF9F5] p-3 sm:grid-cols-6">
+            <li key={i} className="grid gap-2 rounded-xl border border-border bg-[#F7FBFE] p-3 sm:grid-cols-6">
               {(
                 [
                   ["name", "Name", 2],
@@ -181,7 +181,7 @@ export function OwnerCard({ u, save, busy, accent, onShowAll }: { u: UseCase; sa
       </div>
       {owner ? <PersonCard p={{ ...owner, owner: true }} account={u.account} accent={accent} big /> : <p className="rounded-2xl border border-dashed border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">No business owner named yet.</p>}
       {others > 0 && (
-        <button type="button" onClick={onShowAll} className="inline-flex items-center gap-1.5 text-sm font-medium text-[#0E7C86] hover:underline">
+        <button type="button" onClick={onShowAll} className="inline-flex items-center gap-1.5 text-sm font-medium text-[#0F6CBD] hover:underline">
           <Users className="size-4" aria-hidden /> {others} contributor{others > 1 ? "s" : ""}
         </button>
       )}

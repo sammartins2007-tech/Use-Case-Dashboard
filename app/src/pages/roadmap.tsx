@@ -95,7 +95,7 @@ export function RoadmapPage() {
 
       <div className="mx-auto w-full max-w-[1500px] space-y-6 px-6 pb-14 pt-6">
         <div className="flex flex-wrap items-center gap-3">
-          <Link to={`/customer/${encodeURIComponent(name)}`} className="text-sm text-[#0E7C86] hover:underline">
+          <Link to={`/customer/${encodeURIComponent(name)}`} className="text-sm text-[#0F6CBD] hover:underline">
             ← Back to the map
           </Link>
           <h2 className="font-[family-name:var(--font-serif)] text-2xl">Roadmap</h2>
@@ -103,7 +103,7 @@ export function RoadmapPage() {
             <label className="sr-only" htmlFor="rm-dept">
               Department
             </label>
-            <select id="rm-dept" value={dept} onChange={(e) => setDept(e.target.value)} className="h-8 rounded-full border border-[#D9D2C4] bg-white px-3 text-sm">
+            <select id="rm-dept" value={dept} onChange={(e) => setDept(e.target.value)} className="h-8 rounded-full border border-[#C8DAEC] bg-white px-3 text-sm">
               <option value="">All departments</option>
               {[...DEPARTMENTS, "Not set"].map((d) => (
                 <option key={d} value={d}>
@@ -115,7 +115,7 @@ export function RoadmapPage() {
               type="button"
               aria-pressed={decidedOnly}
               onClick={() => setDecidedOnly((v) => !v)}
-              className={cn("rounded-full border px-3 py-1 text-sm", decidedOnly ? "border-[#C8962E] bg-[#C8962E] text-white" : "border-[#D9D2C4] bg-white hover:bg-[#FBF9F5]")}
+              className={cn("rounded-full border px-3 py-1 text-sm", decidedOnly ? "border-[#C8962E] bg-[#C8962E] text-white" : "border-[#C8DAEC] bg-white hover:bg-[#F7FBFE]")}
             >
               Customer decisions only
             </button>
@@ -168,7 +168,7 @@ export function RoadmapPage() {
                       <Link
                         to={`/customer/${encodeURIComponent(name)}/wave/${encodeURIComponent(w.id)}`}
                         data-pdf-exclude
-                        className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#1B2A41] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
+                        className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#0D2847] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
                       >
                         Delivery plan →
                       </Link>
@@ -208,7 +208,7 @@ export function RoadmapPage() {
                   </section>
                 );
               })}
-              <section aria-label={`Candidates: ${candidates.length}`} className="rounded-2xl bg-[#F1ECE2]/70 p-3">
+              <section aria-label={`Candidates: ${candidates.length}`} className="rounded-2xl bg-[#E8F2FB]/70 p-3">
                 <h3 className="mb-1 flex items-baseline justify-between px-1">
                   <span className="font-[family-name:var(--font-serif)] text-lg">Candidates</span>
                   <span className="text-sm tabular-nums text-muted-foreground">{candidates.length}</span>
@@ -279,7 +279,7 @@ function RoadmapCard({
         </span>
         {place === "customer" && <span className="rounded-full bg-[#FBF4E4] px-2 py-0.5 text-[10px] font-medium text-[#7A5718]">Customer decided</span>}
         {place === "proposal" && <span className="rounded-full bg-[#EEF4F4] px-2 py-0.5 text-[10px] font-medium text-[#0B5A61]">Proposal</span>}
-        {u.customerDecision === "On hold" && <span className="rounded-full bg-[#F1ECE2] px-2 py-0.5 text-[10px]">On hold</span>}
+        {u.customerDecision === "On hold" && <span className="rounded-full bg-[#E8F2FB] px-2 py-0.5 text-[10px]">On hold</span>}
         {showScore && <span className="ml-auto text-[10px] tabular-nums text-muted-foreground">score {suggestionScore(u)}</span>}
       </div>
       <Link to={`/use-case/${u.id}`} className="mt-1.5 line-clamp-2 block font-medium hover:underline">

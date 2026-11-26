@@ -41,4 +41,7 @@ export interface RadarConfig {
   /** The radar's SharePoint site URL (where "Documents > Offline copies" lives). Saving offline copies and PDFs
    *  to SharePoint is offered only when it is set. */
   siteUrl?: string;
+  /** Optional wide picture (about 4:1) for the cover of "Inside the Radar", for example the presenter's own banner.
+   *  The left third should be calm: the title is written over it. Without it the cover shows a radar. */
+  presenterBanner?: string;
 }

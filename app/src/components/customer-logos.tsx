@@ -24,7 +24,7 @@ export function CustomerLogos({ useCases, nextToken }: { useCases: UseCase[]; ne
                     <span className="text-lg font-semibold">{a}</span>
                   )}
                 </div>
-                <div className="flex items-center justify-between border-t border-border bg-[#FBF9F5] px-4 py-2.5 text-sm">
+                <div className="flex items-center justify-between border-t border-border bg-[#F7FBFE] px-4 py-2.5 text-sm">
                   <span className="text-muted-foreground">{a === "Internal" ? "Internal" : a}</span>
                   <span className="tabular-nums">
                     <span className="font-semibold">{list.length}</span>

@@ -198,7 +198,7 @@ function ChatDemo({ d }: { d: D }) {
           const live = typing === i && k === log.length;
           return (
             <div key={k} className="space-y-2">
-              <p className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-tr-sm bg-[#1B2A41] px-3.5 py-2 text-sm text-white">{q.q}</p>
+              <p className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-tr-sm bg-[#0D2847] px-3.5 py-2 text-sm text-white">{q.q}</p>
               <div className="flex gap-2">
                 <span className="grid size-7 shrink-0 place-items-center rounded-full text-white" style={accentBg}>
                   <Bot className="size-4" aria-hidden />
@@ -311,7 +311,7 @@ function WhatIf({ d }: { d: D }) {
       </div>
       <div className="grid content-start gap-3">
         {outs.map((o: D, k: number) => (
-          <div key={k} className="rounded-2xl p-5 text-white" style={k === 0 ? accentBg : { background: "#1B2A41" }}>
+          <div key={k} className="rounded-2xl p-5 text-white" style={k === 0 ? accentBg : { background: "#0D2847" }}>
             <p className="text-xs text-white/80">{o.label}</p>
             <p className="mt-1 font-[family-name:var(--font-serif)] text-3xl tabular-nums">{fmt(o.val, o.unit)}</p>
           </div>

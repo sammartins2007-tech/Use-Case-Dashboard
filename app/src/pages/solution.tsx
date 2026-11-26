@@ -65,7 +65,7 @@ export function SolutionPage() {
   const sol = useSolution(id);
   const [preview, setPreview] = useState(false);
   const brand = brandOf(uc.data?.account);
-  const accent = inkOf(brand.primary ?? "#0E7C86");
+  const accent = inkOf(brand.primary ?? "#0F6CBD");
 
   if (sol.loading) return <div className="mx-auto max-w-5xl p-8"><LoadingState rows={6} /></div>;
   const proposal = sol.set?.proposed?.data;
@@ -224,7 +224,7 @@ function SolutionView({ s, id, account, classification, owner, accent, accent2, 
       {body}
     </div>
   );
-  const stickyBar = (inner: React.ReactNode, cls = "bg-[#F7F5F0]/95") => (
+  const stickyBar = (inner: React.ReactNode, cls = "bg-[#F3F8FD]/95") => (
     <div className={cn("sticky top-16 z-20 border-b border-border backdrop-blur", cls)}>
       <div className="mx-auto flex max-w-[1440px] items-center gap-4 px-6">
         <span className={cn(serif, "hidden shrink-0 text-lg xl:block")} style={{ color: "var(--sol)" }}>
@@ -242,7 +242,7 @@ function SolutionView({ s, id, account, classification, owner, accent, accent2, 
     const tone = look.tone ?? (layout === "console" ? "dark" : layout === "dashboard" || layout === "blueprint" ? "tint" : "light");
     const dark = tone === "dark";
     const titleCls = look.type === "mono" ? "font-mono font-semibold tracking-tight" : look.type === "sans" ? "font-semibold tracking-tight" : serif;
-    const canvas = look.canvas ?? (dark ? "#0F1B2D" : tone === "tint" ? "color-mix(in srgb, var(--sol) 7%, #FFFDF8)" : "#F7F5F0");
+    const canvas = look.canvas ?? (dark ? "#0F1B2D" : tone === "tint" ? "color-mix(in srgb, var(--sol) 7%, #FAFDFF)" : "#F3F8FD");
     return (
       <div className="min-h-[calc(100vh-4rem)] pb-8" style={style}>
         <header className={cn("relative overflow-hidden border-b border-border", dark && "text-white")} style={{ background: canvas }}>
@@ -271,7 +271,7 @@ function SolutionView({ s, id, account, classification, owner, accent, accent2, 
             </div>
           </div>
         </header>
-        {stickyBar(tabs(), dark ? "bg-[#F4F6F8]/95" : "bg-[#F7F5F0]/95")}
+        {stickyBar(tabs(), dark ? "bg-[#F4F6F8]/95" : "bg-[#F3F8FD]/95")}
         <div className="mx-auto max-w-[1440px] px-6 pt-5">{content}</div>
       </div>
     );
@@ -301,7 +301,7 @@ function SolutionView({ s, id, account, classification, owner, accent, accent2, 
             </div>
           </div>
         </header>
-        {stickyBar(<div className="lg:hidden">{tabs()}</div>, bp ? "bg-[#F3F6F9]/95 lg:hidden" : "bg-[#F7F5F0]/95 lg:hidden")}
+        {stickyBar(<div className="lg:hidden">{tabs()}</div>, bp ? "bg-[#F3F6F9]/95 lg:hidden" : "bg-[#F3F8FD]/95 lg:hidden")}
         <div className="mx-auto grid max-w-[1440px] gap-8 px-6 pt-6 lg:grid-cols-[250px_minmax(0,1fr)]">
           <nav aria-label="Chapters" className="hidden lg:sticky lg:top-20 lg:block lg:self-start">
             <p className={cn(serif, "mb-2 px-3 text-sm")} style={{ color: "var(--sol)" }}>
@@ -315,7 +315,7 @@ function SolutionView({ s, id, account, classification, owner, accent, accent2, 
                     aria-current={active === c.id ? "step" : undefined}
                     className={cn("group flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-all", active === c.id ? "bg-white shadow-sm" : "hover:bg-white/60")}
                   >
-                    <span className={cn(bp ? "font-mono" : serif, "text-lg leading-none tabular-nums")} style={{ color: active === c.id ? "var(--sol)" : "#B9B1A3" }}>
+                    <span className={cn(bp ? "font-mono" : serif, "text-lg leading-none tabular-nums")} style={{ color: active === c.id ? "var(--sol)" : "#A9B9CB" }}>
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <span className={cn(active === c.id ? "font-medium" : "text-muted-foreground")}>{c.title}</span>
@@ -336,7 +336,7 @@ function SolutionView({ s, id, account, classification, owner, accent, accent2, 
       <div className="pb-10" style={style}>
         <header className="relative isolate overflow-hidden">
           {hero && <img src={hero} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover" />}
-          <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#F7F5F0] via-[#F7F5F0]/55 to-transparent" />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#F3F8FD] via-[#F3F8FD]/55 to-transparent" />
           <div className="mx-auto flex min-h-[520px] max-w-[1440px] flex-col justify-between px-6 pt-5 pb-6">
             <span className="w-fit rounded-full bg-white/80 px-3 py-1 backdrop-blur">{back}</span>
             <div className="mx-auto max-w-3xl text-center">
@@ -352,7 +352,7 @@ function SolutionView({ s, id, account, classification, owner, accent, accent2, 
             </div>
           </div>
         </header>
-        <div className="sticky top-16 z-20 border-b border-border bg-[#F7F5F0]/95 backdrop-blur">
+        <div className="sticky top-16 z-20 border-b border-border bg-[#F3F8FD]/95 backdrop-blur">
           <ol className="mx-auto grid max-w-[1440px] grid-cols-3 gap-2 px-6 py-2 sm:grid-cols-4 lg:grid-cols-7">
             {chapters.map((c, i) => (
               <li key={c.id}>
@@ -434,7 +434,7 @@ function SolutionView({ s, id, account, classification, owner, accent, accent2, 
     <div className="pb-10" style={style}>
       <header className="relative isolate overflow-hidden">
         {hero && <img src={hero} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover animate-[sol-kenburns_24s_ease-in-out_infinite_alternate]" />}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#F7F5F0] via-[#F7F5F0]/80 to-transparent" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#F3F8FD] via-[#F3F8FD]/80 to-transparent" />
         <div className="mx-auto flex min-h-[540px] max-w-[1440px] flex-col justify-center gap-5 px-6 py-8">
           {back}
           <h1 className={cn(serif, "max-w-3xl text-6xl leading-[0.95] md:text-7xl")} style={{ color: "var(--sol)" }}>
@@ -592,7 +592,7 @@ function StorySection({ s }: { s: Solution }) {
               >
                 <span
                   className="mt-1.5 size-2.5 shrink-0 rounded-full"
-                  style={{ background: after ? "var(--sol)" : "#B9B1A3" }}
+                  style={{ background: after ? "var(--sol)" : "#A9B9CB" }}
                   aria-hidden
                 />
                 <span className="text-[15px] leading-relaxed">{t}</span>
@@ -601,7 +601,7 @@ function StorySection({ s }: { s: Solution }) {
           </ul>
         </div>
         {s.creative?.dayInTheLife?.length ? null : (
-<figure className="relative rounded-3xl p-6 md:p-8" style={{ background: "color-mix(in srgb, var(--sol) 8%, #FFFDF8)" }}>
+<figure className="relative rounded-3xl p-6 md:p-8" style={{ background: "color-mix(in srgb, var(--sol) 8%, #FAFDFF)" }}>
           <span className={cn(serif, "absolute -top-4 left-6 text-7xl leading-none")} style={{ color: "var(--sol)" }} aria-hidden>
             “
           </span>
@@ -676,18 +676,18 @@ function CurveJourney({ s }: { s: Solution }) {
       />
       <div className="rounded-3xl border border-border bg-card p-4 md:p-6">
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Experience curve before and after">
-          <line x1={padX} x2={W - padX} y1={H / 2} y2={H / 2} stroke="#E4DED3" strokeDasharray="4 6" />
+          <line x1={padX} x2={W - padX} y1={H / 2} y2={H / 2} stroke="#D8E6F3" strokeDasharray="4 6" />
           <text x={8} y={y(2) + 4} fontSize="11" fill="#8A8F98">
             great
           </text>
           <text x={8} y={y(-2) + 4} fontSize="11" fill="#8A8F98">
             painful
           </text>
-          <path d={path("feelBefore")} fill="none" stroke="#B9B1A3" strokeWidth="2.5" strokeDasharray="6 6" />
+          <path d={path("feelBefore")} fill="none" stroke="#A9B9CB" strokeWidth="2.5" strokeDasharray="6 6" />
           <path d={path("feelAfter")} fill="none" stroke="var(--sol)" strokeWidth="3.5" className="sol-draw" />
           {j.map((p, i) => (
             <g key={i} onClick={() => setSel(i)} className="cursor-pointer">
-              <circle cx={x(i)} cy={y(p.feelBefore)} r="5" fill="#B9B1A3" />
+              <circle cx={x(i)} cy={y(p.feelBefore)} r="5" fill="#A9B9CB" />
               <circle cx={x(i)} cy={y(p.feelAfter)} r={sel === i ? 10 : 7} fill={p.aiMoment ? "var(--sol)" : "#fff"} stroke="var(--sol)" strokeWidth="3" />
               {p.aiMoment && (
                 <text x={x(i)} y={y(p.feelAfter) - 16} textAnchor="middle" fontSize="13" fill="var(--sol)">
@@ -840,7 +840,7 @@ function ArchitectureSection({ s }: { s: Solution }) {
           <svg viewBox={`0 0 ${W} ${H}`} className="min-w-[760px] w-full" role="img" aria-label="Architecture diagram">
             <defs>
               <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#B9B1A3" />
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#A9B9CB" />
               </marker>
               <marker id="arr-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
                 <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--sol)" />
@@ -848,8 +848,8 @@ function ArchitectureSection({ s }: { s: Solution }) {
             </defs>
             {layers.map((l, li) => (
               <g key={l}>
-                <rect x={0} y={li * rowH + 6} width={W} height={rowH - 6} rx={14} fill={li % 2 ? "#FBF9F5" : "#F6F3EC"} />
-                <text x={16} y={li * rowH + rowH / 2 + 9} fontSize="13" fill="#5B6474" style={{ fontFamily: "var(--font-serif)" }}>
+                <rect x={0} y={li * rowH + 6} width={W} height={rowH - 6} rx={14} fill={li % 2 ? "#F7FBFE" : "#F6F3EC"} />
+                <text x={16} y={li * rowH + rowH / 2 + 9} fontSize="13" fill="#55657A" style={{ fontFamily: "var(--font-serif)" }}>
                   {LAYER_LABEL[l] ?? l}
                 </text>
               </g>
@@ -895,7 +895,7 @@ function ArchitectureSection({ s }: { s: Solution }) {
                     strokeDasharray={n.existing ? "5 4" : undefined}
                   />
                   {lines.map((t, i) => (
-                    <text key={i} x={nodeW / 2} y={nodeH / 2 + (i - (lines.length - 1) / 2) * 15 + 5} textAnchor="middle" fontSize="12.5" fontWeight={600} fill="#1B2A41">
+                    <text key={i} x={nodeW / 2} y={nodeH / 2 + (i - (lines.length - 1) / 2) * 15 + 5} textAnchor="middle" fontSize="12.5" fontWeight={600} fill="#0D2847">
                       {t}
                     </text>
                   ))}
@@ -918,7 +918,7 @@ function ArchitectureSection({ s }: { s: Solution }) {
           ))}
         </div>
         <div className="mt-3 grid gap-3 md:grid-cols-2">
-          <div className="min-h-[96px] rounded-2xl p-4" style={{ background: "color-mix(in srgb, var(--sol) 8%, #FFFDF8)" }}>
+          <div className="min-h-[96px] rounded-2xl p-4" style={{ background: "color-mix(in srgb, var(--sol) 8%, #FAFDFF)" }}>
             <p className="text-xs tracking-[0.14em] text-muted-foreground">RUNTIME STEP</p>
             {cur ? (
               <p key={stepIdx} className="mt-1.5 text-[15px] leading-relaxed animate-in fade-in duration-500">
@@ -1190,7 +1190,7 @@ function ValueSection({ s }: { s: Solution }) {
             </ul>
             <p className="mt-3 text-xs text-muted-foreground">{s.runCost.note}</p>
           </div>
-          <div className="rounded-2xl p-5" style={{ background: "color-mix(in srgb, var(--sol) 8%, #FFFDF8)" }}>
+          <div className="rounded-2xl p-5" style={{ background: "color-mix(in srgb, var(--sol) 8%, #FAFDFF)" }}>
             <h3 className={cn(serif, "text-xl")}>To confirm with the customer</h3>
             <ul className="mt-3 space-y-1.5 text-sm">
               {s.openQuestions.map((d, i) => (

@@ -27,9 +27,12 @@ kept in sync by the same `customer_copy.py` as the team copies.
    `FeatureRadar-A`, `Customers-A` on that site, syncs, cleans and verifies.
 4. Offline copy for guests:
    - `customer_snapshot_dump.py` (tool script) dumps every customer edition to `working/ce/<A>/`.
-   - Copy `brand.example.json` to `brand.<account>.json` and fill it from public sources only.
+   - Copy `brand.example.json` to `brand.<account>.json` and fill it from public sources only. Name the logo and
+     hero image by file name (for example `contoso.png`) and keep the images next to the brand file.
    - `python3 build_account_snapshot.py working/ce/<A> brand.<account>.json <app>/public/offline-viewer.txt out.html`
      (the viewer is built with `npm run build:viewer`). The copy opens on the welcome page with every use case.
+   - For the refresh, put the scripts, the brand file, its images and the viewer in the radar-ops toolkit
+     (`optional/radar-ops/README.md`): the refresh rebuilds the copy from there in every run.
    - Upload it once to the customer site's Documents and share that file (view only) with the guests.
      Later runs overwrite the same file in place, so the shared link always opens the latest version.
 5. Optional app: a new App Builder app with `customerEdition: true` and `readOnly: true` in `radar.config.ts`,

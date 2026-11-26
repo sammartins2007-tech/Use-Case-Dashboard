@@ -15,11 +15,25 @@ def row(r, k):
 uc = [row(r, "UseCases") for r in json.load(open(f"{dump}/c_UseCases.json")) if r.get("SourceId") not in (None, "") and float(r["SourceId"]) != 0]
 cu = [row(r, "Customers") for r in json.load(open(f"{dump}/c_Customers.json")) if r.get("SourceId") not in (None, "") and float(r["SourceId"]) != 0]
 b = json.load(open(brand_f))
+BASE = os.path.dirname(os.path.abspath(brand_f))
 def uri(p):
-    ext = p.rsplit(".", 1)[-1].lower(); mime = {"png":"image/png","webp":"image/webp","jpg":"image/jpeg","jpeg":"image/jpeg","svg":"image/svg+xml"}[ext]
-    return f"data:{mime};base64," + base64.b64encode(open(p, "rb").read()).decode()
-c = dict(b["customer"]); c["logo"] = uri(b["logo"])
-if c.get("identity"): c["identity"] = dict(c["identity"]); c["identity"]["hero"] = uri(b["hero"])
+    """An image as a data URL. Paths are relative to the brand file (the toolkit carries the images next to it)."""
+    if not p:
+        return None
+    if p.startswith("data:"):
+        return p
+    q = p if os.path.isabs(p) else os.path.join(BASE, p)
+    if not os.path.exists(q):
+        sys.exit(f"image not found: {p} (put it next to {os.path.basename(brand_f)} in the toolkit and name it relative to it)")
+    ext = q.rsplit(".", 1)[-1].lower(); mime = {"png":"image/png","webp":"image/webp","jpg":"image/jpeg","jpeg":"image/jpeg","svg":"image/svg+xml"}[ext]
+    return f"data:{mime};base64," + base64.b64encode(open(q, "rb").read()).decode()
+c = dict(b["customer"])
+logo = uri(b.get("logo"))
+if logo: c["logo"] = logo
+if c.get("identity"):
+    c["identity"] = dict(c["identity"])
+    hero = uri(b.get("hero"))
+    if hero: c["identity"]["hero"] = hero
 tables = {}
 for key in b["table_keys"]["UseCases"]: tables[key] = uc
 for key in b["table_keys"]["Customers"]: tables[key] = cu

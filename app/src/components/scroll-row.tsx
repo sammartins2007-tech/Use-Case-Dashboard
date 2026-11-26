@@ -43,7 +43,7 @@ export function ScrollRow({ children, className, label, dark = false, activeKey 
   const step = (dir: 1 | -1) => ref.current?.scrollBy({ left: dir * Math.max(240, (ref.current?.clientWidth ?? 600) * 0.6), behavior: "smooth" });
   const btn = cn(
     "absolute top-1/2 z-10 grid size-8 -translate-y-1/2 place-items-center rounded-full border shadow-sm transition-opacity",
-    dark ? "border-white/20 bg-[#1B2A41] text-white hover:bg-[#24364F]" : "border-border bg-white text-foreground hover:bg-muted",
+    dark ? "border-white/20 bg-[#0D2847] text-white hover:bg-[#24364F]" : "border-border bg-white text-foreground hover:bg-muted",
   );
   return (
     <div className={cn("relative", className)}>

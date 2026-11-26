@@ -17,7 +17,7 @@ export function RoadmapFields({ u, busy, onSave }: { u: UseCase; busy: boolean; 
     <div className="mt-3 rounded-xl border border-[#EADFC8] bg-white p-3" data-pdf-exclude>
       <div className="flex items-baseline justify-between gap-2">
         <p className="text-xs font-medium">Roadmap</p>
-        <Link to={`/customer/${encodeURIComponent(u.account ?? "Internal")}/roadmap`} className="text-xs text-[#0E7C86] hover:underline">
+        <Link to={`/customer/${encodeURIComponent(u.account ?? "Internal")}/roadmap`} className="text-xs text-[#0F6CBD] hover:underline">
           Open roadmap
         </Link>
       </div>

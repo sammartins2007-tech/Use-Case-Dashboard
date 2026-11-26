@@ -22,15 +22,15 @@ export function AiMeter({ className }: { className?: string }) {
     <Link
       to="/finops#consumption"
       className={cn(
-        "flex items-center gap-2 rounded-full border border-[#E8D9B8] bg-[#FBF4E4] px-3 py-1.5 text-sm text-[#1B2A41] transition-colors hover:bg-[#F6EAD0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+        "flex items-center gap-2 rounded-full border border-[#E8D9B8] bg-[#FBF4E4] px-3 py-1.5 text-sm text-[#0D2847] transition-colors hover:bg-[#F6EAD0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
         className,
       )}
       aria-label={q.isSuccess ? `AI consumed so far: ${usd.format(cost)}, ${tokensFmt(tokens)} tokens${estimated ? ", estimated" : ""}` : "AI consumed so far"}
     >
       <Sparkles className="size-4 text-[#8A6420]" aria-hidden="true" />
-      <span className="hidden whitespace-nowrap text-xs text-[#5B6474] 2xl:inline">AI used so far</span>
+      <span className="hidden whitespace-nowrap text-xs text-[#55657A] 2xl:inline">AI used so far</span>
       <span className="whitespace-nowrap font-semibold tabular-nums">{q.isSuccess ? usd.format(cost) : q.isError ? "unavailable" : "…"}</span>
-      {q.isSuccess && <span className="hidden whitespace-nowrap text-xs tabular-nums text-[#5B6474] 2xl:inline">· {tokensFmt(tokens)} tokens</span>}
+      {q.isSuccess && <span className="hidden whitespace-nowrap text-xs tabular-nums text-[#55657A] 2xl:inline">· {tokensFmt(tokens)} tokens</span>}
     </Link>
   );
 }

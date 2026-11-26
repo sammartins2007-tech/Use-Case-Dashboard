@@ -74,10 +74,10 @@ export function MatrixMap({
             return (
               <g key={`${c}-${e}`}>
                 <rect x={x + 3} y={y + 3} width={CW - 6} height={CH - 6} rx={14} fill={named?.tint ?? "#F7F3EC"} />
-                <text x={x + 16} y={y + 26} fontSize="11" fill="#5B6474">
+                <text x={x + 16} y={y + 26} fontSize="11" fill="#55657A">
                   {named ? named.name : `${c} ${xLabel.toLowerCase()} · ${e} effort`}
                 </text>
-                <text x={x + CW - 16} y={y + 26} textAnchor="end" fontSize="12" fontWeight="600" fill="#1B2A41">
+                <text x={x + CW - 16} y={y + 26} textAnchor="end" fontSize="12" fontWeight="600" fill="#0D2847">
                   {n || ""}
                 </text>
               </g>
@@ -85,19 +85,19 @@ export function MatrixMap({
           }),
         )}
         {LEVELS.map((c, ci) => (
-          <text key={c} x={PL + ci * CW + CW / 2} y={H - PB + 22} textAnchor="middle" fontSize="13" fill="#1B2A41">
+          <text key={c} x={PL + ci * CW + CW / 2} y={H - PB + 22} textAnchor="middle" fontSize="13" fill="#0D2847">
             {c}
           </text>
         ))}
-        <text x={PL + (W - PL - PR) / 2} y={H - 10} textAnchor="middle" fontSize="12" fill="#5B6474">
+        <text x={PL + (W - PL - PR) / 2} y={H - 10} textAnchor="middle" fontSize="12" fill="#55657A">
           {xLabel} →
         </text>
         {LEVELS.map((e, ei) => (
-          <text key={e} x={PL - 12} y={PT + (2 - ei) * CH + CH / 2} textAnchor="end" dominantBaseline="middle" fontSize="13" fill="#1B2A41">
+          <text key={e} x={PL - 12} y={PT + (2 - ei) * CH + CH / 2} textAnchor="end" dominantBaseline="middle" fontSize="13" fill="#0D2847">
             {e}
           </text>
         ))}
-        <text x={16} y={PT + (H - PT - PB) / 2} textAnchor="middle" fontSize="12" fill="#5B6474" transform={`rotate(-90 16 ${PT + (H - PT - PB) / 2})`}>
+        <text x={16} y={PT + (H - PT - PB) / 2} textAnchor="middle" fontSize="12" fill="#55657A" transform={`rotate(-90 16 ${PT + (H - PT - PB) / 2})`}>
           Effort →
         </text>
       </svg>

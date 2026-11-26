@@ -8,6 +8,7 @@
  */
 import microsoft from "@/assets/logos/microsoft.png";
 // import contoso from "@/assets/logos/contoso.png";
+// import presenterBanner from "@/assets/presenter-banner.webp";
 import type { RadarConfig } from "@/lib/radar-config-type";
 
 export const RADAR: RadarConfig = {
@@ -30,4 +31,8 @@ export const RADAR: RadarConfig = {
   /** Read-only customer app (optional/read-only-customer-app): true hides every edit, AI call, file write and
    *  the Evidence tab. Keep it false (or remove it) in the owner's own app. */
   // readOnly: true,
+  /** Optional wide picture (about 4:1) for the cover of "Inside the Radar", for example the presenter's own banner.
+   *  Put it in src/assets/ and import it above; the title is written over its left third. Without it the cover
+   *  shows a radar. Instance-only: never commit it to the kit. */
+  // presenterBanner,
 };

@@ -15,7 +15,7 @@ export function StaticBadge() {
     <div
       role="note"
       data-pdf-exclude
-      className="pointer-events-none fixed bottom-3 left-3 z-[9999] rounded-full bg-[#1B2A41]/90 px-3 py-1.5 text-xs text-white shadow"
+      className="pointer-events-none fixed bottom-3 left-3 z-[9999] rounded-full bg-[#0D2847]/90 px-3 py-1.5 text-xs text-white shadow"
     >
       {label} · {day}
     </div>

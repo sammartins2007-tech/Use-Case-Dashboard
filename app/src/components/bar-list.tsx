@@ -26,7 +26,7 @@ export function BarList({ bars, unit = "use cases" }: { bars: Bar[]; unit?: stri
             <span className="truncate text-sm" title={b.label}>
               {b.label}
             </span>
-            <span className="h-6 rounded-md bg-[#F1ECE2]">
+            <span className="h-6 rounded-md bg-[#E8F2FB]">
               <span
                 className="block h-full rounded-md transition-all group-hover:brightness-110"
                 style={{ width: `${(b.n / max) * 100}%`, backgroundColor: b.color, minWidth: b.n ? 6 : 0 }}

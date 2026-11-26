@@ -40,10 +40,10 @@ export function WavePlanPage() {
   const step = weeks > 30 ? 4 : weeks > 16 ? 2 : 1;
 
   return (
-    <div className="pb-24" style={{ ["--sol" as string]: inkOf(brand.primary ?? "#0E7C86") }}>
+    <div className="pb-24" style={{ ["--sol" as string]: inkOf(brand.primary ?? "#0F6CBD") }}>
       <header className="relative isolate overflow-hidden">
         <img src={themeImage("plant")} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover" />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#F7F5F0] via-[#F7F5F0]/92 to-[#F7F5F0]/20" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#F3F8FD] via-[#F3F8FD]/92 to-[#F3F8FD]/20" />
         <div className="mx-auto max-w-6xl px-5 py-8 md:px-8">
           <Link to={`/customer/${encodeURIComponent(name)}/roadmap`} className="inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-1.5 text-sm backdrop-blur hover:bg-white">
             <ArrowLeft className="size-4" aria-hidden /> Roadmap
@@ -85,7 +85,7 @@ export function WavePlanPage() {
             <h2 className={cn(serif, "text-3xl")}>What the wave delivers</h2>
             <ul className="mt-5 grid gap-3 md:grid-cols-3">
               {p.outcomes.map((o, i) => (
-                <li key={i} className="flex gap-3 rounded-2xl p-4" style={{ background: "color-mix(in srgb, var(--sol) 8%, #FFFDF8)" }}>
+                <li key={i} className="flex gap-3 rounded-2xl p-4" style={{ background: "color-mix(in srgb, var(--sol) 8%, #FAFDFF)" }}>
                   <CheckCircle2 className="mt-0.5 size-5 shrink-0" style={{ color: "var(--sol)" }} aria-hidden />
                   <span className="text-[15px] leading-relaxed">{o}</span>
                 </li>
@@ -120,7 +120,7 @@ export function WavePlanPage() {
                     <li key={i} className={cn(card, "animate-in fade-in fill-mode-both p-4 md:p-5")} style={{ animationDelay: `${i * 60}ms` }}>
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <p className="font-medium">{it.item}</p>
-                        <span className="rounded-full bg-[#1B2A41] px-2.5 py-0.5 text-xs text-white">Needed by W{it.week}</span>
+                        <span className="rounded-full bg-[#0D2847] px-2.5 py-0.5 text-xs text-white">Needed by W{it.week}</span>
                       </div>
                       <p className="mt-1.5 text-sm text-muted-foreground">{it.why}</p>
                       <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs">
@@ -160,7 +160,7 @@ export function WavePlanPage() {
                       <div key={ws.name} className="flex items-center py-1">
                         <span className="w-[260px] pr-3 text-sm font-medium">{ws.name}</span>
                         <span className="relative h-5 flex-1">
-                          <span className="absolute top-1 h-3 rounded-full bg-[#1B2A41]/80" style={{ left: `${pct(ws.startWeek)}%`, width: `${((ws.endWeek - ws.startWeek + 1) / weeks) * 100}%` }} title={ws.note} />
+                          <span className="absolute top-1 h-3 rounded-full bg-[#0D2847]/80" style={{ left: `${pct(ws.startWeek)}%`, width: `${((ws.endWeek - ws.startWeek + 1) / weeks) * 100}%` }} title={ws.note} />
                         </span>
                       </div>
                     ))}

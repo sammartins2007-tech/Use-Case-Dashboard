@@ -23,7 +23,7 @@ export function FactChip({ label, value, dot, children, wide }: { label: string;
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button type="button" className="inline-flex items-center gap-1.5 rounded-full border border-border bg-white px-2.5 py-1 text-xs hover:border-foreground/30 hover:bg-[#FBF9F5]">
+        <button type="button" className="inline-flex items-center gap-1.5 rounded-full border border-border bg-white px-2.5 py-1 text-xs hover:border-foreground/30 hover:bg-[#F7FBFE]">
           {dot && <span className="size-2 rounded-full" style={{ background: dot }} aria-hidden="true" />}
           <span className="text-muted-foreground">{label}</span>
           <span className="font-medium">{value}</span>
@@ -145,7 +145,7 @@ export function TextCard({
   title,
   value,
   hint,
-  tone = "#1B2A41",
+  tone = "#0D2847",
   lines = 5,
   busy,
   onSave,
@@ -185,7 +185,7 @@ export function TextCard({
             {text}
           </p>
           {long && (
-            <button type="button" onClick={() => setFull((v) => !v)} className="mt-1 inline-flex items-center gap-1 self-start text-xs font-medium text-[#0E7C86] hover:underline">
+            <button type="button" onClick={() => setFull((v) => !v)} className="mt-1 inline-flex items-center gap-1 self-start text-xs font-medium text-[#0F6CBD] hover:underline">
               <Expand className="size-3" aria-hidden /> {full ? "Show less" : "Show all"}
             </button>
           )}
@@ -240,13 +240,13 @@ function Chain({ steps, tone }: { steps: string[]; tone: string }) {
             </span>
             <Popover>
               <PopoverTrigger asChild>
-                <button type="button" className="min-w-0 text-left text-sm leading-snug hover:text-[#0E7C86]">
+                <button type="button" className="min-w-0 text-left text-sm leading-snug hover:text-[#0F6CBD]">
                   {m ? <span className="font-medium">{m[1]}</span> : <span style={{ display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{s}</span>}
                 </button>
               </PopoverTrigger>
               <PopoverContent className="w-80 text-sm leading-relaxed">{s}</PopoverContent>
             </Popover>
-            {i < steps.length - 1 && <ArrowRight className="absolute -right-2 top-1/2 hidden size-4 -translate-y-1/2 rounded-full bg-[#F7F5F0] text-muted-foreground xl:block" aria-hidden />}
+            {i < steps.length - 1 && <ArrowRight className="absolute -right-2 top-1/2 hidden size-4 -translate-y-1/2 rounded-full bg-[#F3F8FD] text-muted-foreground xl:block" aria-hidden />}
           </li>
         );
       })}
@@ -306,8 +306,8 @@ export function SystemChips({ text }: { text?: string }) {
           {x.detail ? (
             <Popover>
               <PopoverTrigger asChild>
-                <button type="button" className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-[#FBF9F5]">
-                  <Database className="size-3.5 text-[#0E7C86]" aria-hidden /> {x.name}
+                <button type="button" className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-[#F7FBFE]">
+                  <Database className="size-3.5 text-[#0F6CBD]" aria-hidden /> {x.name}
                   <ChevronDown className="size-3 text-muted-foreground" aria-hidden />
                 </button>
               </PopoverTrigger>
@@ -315,7 +315,7 @@ export function SystemChips({ text }: { text?: string }) {
             </Popover>
           ) : (
             <span className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-white px-3 py-1.5 text-sm font-medium">
-              <Database className="size-3.5 text-[#0E7C86]" aria-hidden /> {x.name}
+              <Database className="size-3.5 text-[#0F6CBD]" aria-hidden /> {x.name}
             </span>
           )}
         </li>
@@ -356,7 +356,7 @@ export function VolumeTiles({ text }: { text?: string }) {
 export function ValueTiles({ u }: { u: UseCase }) {
   const cv = caseValue(u.kpiValues);
   const tiles: { icon: LucideIcon; label: string; value?: string; tone: string }[] = [
-    { icon: Clock, label: "Time saved / year", value: cv.hours ? fmtHours(cv.hours) : undefined, tone: "#0E7C86" },
+    { icon: Clock, label: "Time saved / year", value: cv.hours ? fmtHours(cv.hours) : undefined, tone: "#0F6CBD" },
     { icon: DollarSign, label: "Cost savings / year", value: cv.costUsd ? usd0.format(cv.costUsd) : undefined, tone: "#2F9461" },
     { icon: TrendingUp, label: "Revenue gain / year", value: cv.revenueUsd ? usd0.format(cv.revenueUsd) : undefined, tone: "#B8892B" },
   ];
@@ -423,9 +423,9 @@ export function KpiCards({ value }: { value?: string }) {
 }
 
 const LAYER_TONE: Record<string, string> = {
-  experience: "#1B2A41",
+  experience: "#0D2847",
   orchestration: "#5B3FA8",
-  intelligence: "#0E7C86",
+  intelligence: "#0F6CBD",
   knowledge: "#B45309",
   integration: "#2F6FB0",
   trust: "#6B7280",
@@ -451,7 +451,7 @@ export function SolutionVisual({ u, route, design, hasDesign }: { u: UseCase; ro
           <ul className="mt-2 space-y-1.5">
             {(inputs.length ? inputs : ["To confirm"]).map((x) => (
               <li key={x} className="flex items-center gap-2 rounded-lg bg-[#F3F1EC] px-2.5 py-1.5 text-sm">
-                <Database className="size-3.5 shrink-0 text-[#0E7C86]" aria-hidden /> <span className="truncate">{x}</span>
+                <Database className="size-3.5 shrink-0 text-[#0F6CBD]" aria-hidden /> <span className="truncate">{x}</span>
               </li>
             ))}
           </ul>
@@ -506,7 +506,7 @@ export function SolutionVisual({ u, route, design, hasDesign }: { u: UseCase; ro
             <li key={i} className="flex items-center gap-1.5">
               <Popover>
                 <PopoverTrigger asChild>
-                  <button type="button" className={cn("rounded-full border px-3 py-1 text-xs font-medium hover:bg-[#FBF9F5]", j.aiMoment ? "border-transparent text-white" : "border-border bg-white")} style={j.aiMoment ? { background: route.color } : undefined}>
+                  <button type="button" className={cn("rounded-full border px-3 py-1 text-xs font-medium hover:bg-[#F7FBFE]", j.aiMoment ? "border-transparent text-white" : "border-border bg-white")} style={j.aiMoment ? { background: route.color } : undefined}>
                     {j.stage}
                   </button>
                 </PopoverTrigger>

@@ -28,7 +28,7 @@ export function FinOpsSizing({ u, rate, busy, onSave }: { u: UseCase; rate: numb
         {lines.map((l, i) => {
           const def = kindDef(l.kind);
           return (
-            <li key={i} className="rounded-lg bg-[#FBF9F5] p-3">
+            <li key={i} className="rounded-lg bg-[#F7FBFE] p-3">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <p className="text-sm font-medium">{def.label}</p>
                 <p className="text-sm tabular-nums">

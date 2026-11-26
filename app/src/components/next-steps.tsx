@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { LIVE_READ_ONLY, READ_ONLY } from "@/lib/read-only";
 import { format, parseISO } from "date-fns";
-import { AlertCircle, CalendarClock, Check, ChevronDown, Circle, Info, Pencil, Plus, Trash2 } from "lucide-react";
+import { AlertCircle, CalendarClock, Check, ChevronDown, Circle, FileText, Globe, Info, Mail, MessageSquare, Pencil, Plus, Radio, Sparkles, Trash2, UserCheck, Video, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { initials, parseSteps, serializeSteps, sortSteps, todayIso, type Step } from "@/lib/people-steps";
-import type { UseCase, UseCasePatch } from "@/data/types";
+import type { Signal, UseCase, UseCasePatch } from "@/data/types";
+import { InputContextDialog, parseEvidence, type InputRef } from "@/components/input-context";
+import { matchStepSources, sourceCandidates, type SourceKind, type StepSource } from "@/lib/step-source";
 import { RADAR } from "@/radar.config";
 import { cn } from "@/lib/utils";
 
@@ -34,9 +36,131 @@ function DateBlock({ due, done, overdue, accent }: { due: string; done: boolean;
   );
 }
 
-function StepCard({ s, accent, busy, onToggle }: { s: Step; accent: string; busy: boolean; onToggle: () => void }) {
+const KIND_ICON: Record<SourceKind, LucideIcon> = {
+  Email: Mail,
+  Teams: MessageSquare,
+  Meeting: Video,
+  Document: FileText,
+  Web: Globe,
+  Feature: Sparkles,
+  Owner: UserCheck,
+  Source: Radio,
+};
+
+const shortDay = (iso?: string) => {
+  if (!iso) return "";
+  const d = parseISO(iso.slice(0, 10));
+  return format(d, d.getFullYear() === new Date().getFullYear() ? "d MMM" : "d MMM yyyy");
+};
+const longDay = (iso?: string) => (iso ? format(parseISO(iso.slice(0, 10)), "EEE d MMM yyyy") : "");
+const chip = "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs";
+
+/** People of a step: split on commas, "and" and "+", but never inside brackets ("Alex (Finance, to confirm)" stays one person). */
+function splitWho(text: string): string[] {
+  const out: string[] = [];
+  let depth = 0;
+  let cur = "";
+  const flush = () => {
+    if (cur.trim()) out.push(cur.trim());
+    cur = "";
+  };
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === "(") depth += 1;
+    if (ch === ")") depth = Math.max(0, depth - 1);
+    if (depth === 0 && (ch === "," || ch === "+" || ch === ";")) {
+      flush();
+      continue;
+    }
+    if (depth === 0 && /^\s+and\s+/i.test(text.slice(i, i + 6))) {
+      flush();
+      i += /^\s+and\s+/i.exec(text.slice(i))?.[0].length ?? 0;
+      i -= 1;
+      continue;
+    }
+    cur += ch;
+  }
+  flush();
+  return out;
+}
+
+/** The step's origin on the card (kind and date); its details and the source excerpt in a pop-up. */
+function SourceChip({ s, src, onOpen }: { s: Step; src: StepSource; onOpen: (input: InputRef) => void }) {
+  const [open, setOpen] = useState(false);
+  const Icon = KIND_ICON[src.kind];
+  const when = shortDay(src.date);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          aria-label={`Source: ${src.label} ${src.title}${src.date ? `, ${longDay(src.date)}` : ""}. Show details`}
+          className={cn(chip, "border border-[#C8DAEC] bg-[#F3F8FD] font-medium text-[#0A4F8F] hover:border-[#0F6CBD] hover:bg-[#E3F0FB]")}
+        >
+          <Icon className="size-3.5" aria-hidden />
+          {src.label}
+          {when && <span className="font-normal text-[#34465E]">· {when}</span>}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-[min(26rem,calc(100vw-2rem))] p-0 text-sm">
+        {s.detail && (
+          <div className="border-b border-border px-4 py-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Details</p>
+            <p className="mt-1 leading-relaxed">{s.detail}</p>
+          </div>
+        )}
+        <div className="px-4 py-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Where it comes from</p>
+          <div className="mt-2 flex gap-2.5">
+            <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[#E3F0FB] text-[#0F6CBD]">
+              <Icon className="size-4" aria-hidden />
+            </span>
+            <div className="min-w-0">
+              <p className="font-medium leading-snug">{src.title}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">{[src.label, longDay(src.date), src.sender].filter(Boolean).join(" · ")}</p>
+            </div>
+          </div>
+          {src.excerpt && <p className="mt-2.5 line-clamp-5 rounded-lg bg-[#F3F8FD] px-3 py-2 text-[13px] leading-relaxed">{src.excerpt}</p>}
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <p className="text-[11px] leading-snug text-muted-foreground">Matched with this use case&apos;s evidence trail</p>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="h-7 shrink-0"
+              onClick={() => {
+                setOpen(false);
+                onOpen(src.input);
+              }}
+            >
+              Full context
+            </Button>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function DetailsChip({ detail, noSource }: { detail: string; noSource?: boolean }) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button type="button" className={cn(chip, "border border-border text-muted-foreground hover:bg-muted")}>
+          <Info className="size-3.5" aria-hidden /> Details
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 text-sm leading-relaxed">
+        {detail}
+        {noSource && <p className="mt-2 border-t border-border pt-2 text-xs text-muted-foreground">No source on record: no input of this use case mentions this step.</p>}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function StepCard({ s, src, traced, accent, busy, onToggle, onOpenSource }: { s: Step; src?: StepSource; traced: boolean; accent: string; busy: boolean; onToggle: () => void; onOpenSource: (input: InputRef) => void }) {
   const overdue = !s.done && Boolean(s.due) && s.due < todayIso();
-  const who = s.who.split(/\s*,\s*|\s+and\s+|\s*\+\s*/).filter(Boolean);
+  const who = splitWho(s.who);
   return (
     <li className={cn("flex items-center gap-3 rounded-2xl border bg-white p-3", overdue ? "border-[#E8B4B4]" : "border-border", s.done && "bg-[#F7F7F5]")}>
       <DateBlock due={s.due} done={s.done} overdue={overdue} accent={accent} />
@@ -46,25 +170,23 @@ function StepCard({ s, accent, busy, onToggle }: { s: Step; accent: string; busy
           {who.map((w) => (
             <span key={w} className="inline-flex items-center gap-1 rounded-full bg-[#F3F1EC] py-0.5 pl-0.5 pr-2 text-xs">
               <span className="grid size-5 place-items-center rounded-full text-[9px] font-semibold text-white" style={{ background: accent }} aria-hidden>
-                {initials(w)}
+                {initials(w.replace(/\s*\(.*$/, ""))}
               </span>
               {w}
             </span>
           ))}
           {overdue && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#FBE9E8] px-2 py-0.5 text-xs font-medium text-[#8A2B2B]">
+            <span className={cn(chip, "bg-[#FBE9E8] font-medium text-[#8A2B2B]")}>
               <AlertCircle className="size-3.5" aria-hidden /> {LIVE_READ_ONLY ? "Date passed" : "Date passed. Done?"}
             </span>
           )}
-          {s.detail && (
-            <Popover>
-              <PopoverTrigger asChild>
-                <button type="button" className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground hover:bg-muted">
-                  <Info className="size-3.5" aria-hidden /> Details
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80 text-sm leading-relaxed">{s.detail}</PopoverContent>
-            </Popover>
+          {traced && src ? (
+            <SourceChip s={s} src={src} onOpen={onOpenSource} />
+          ) : (
+            <>
+              {s.detail && <DetailsChip detail={s.detail} noSource={traced} />}
+              {traced && !s.detail && <span className={cn(chip, "border border-dashed border-border text-muted-foreground")}>No source on record</span>}
+            </>
           )}
         </div>
       </div>
@@ -107,7 +229,7 @@ function StepsEditor({ open, onOpenChange, steps, busy, onSave }: { open: boolea
         </DialogHeader>
         <ul className="space-y-3">
           {draft.map((s, i) => (
-            <li key={i} className="grid gap-2 rounded-xl border border-border bg-[#FBF9F5] p-3 sm:grid-cols-6">
+            <li key={i} className="grid gap-2 rounded-xl border border-border bg-[#F7FBFE] p-3 sm:grid-cols-6">
               <label className="space-y-1 text-xs text-muted-foreground sm:col-span-4">
                 Action
                 <Input value={s.action} maxLength={90} onChange={(e) => set(i, { action: e.target.value })} className="h-8 bg-white text-sm text-foreground" />
@@ -151,11 +273,23 @@ function StepsEditor({ open, onOpenChange, steps, busy, onSave }: { open: boolea
   );
 }
 
-/** Next steps as date cards: tick one when it is done; the refresh also closes steps it sees happen. */
-export function NextSteps({ u, save, busy, accent }: { u: UseCase; save: Save; busy: boolean; accent: string }) {
+/** Sources are evidence: shown only in the owner's own radar, never in a read-only or customer copy. */
+const TRACED = !RADAR.customerEdition && !READ_ONLY;
+
+/** Next steps as date cards with where each one comes from: tick one when it is done; the refresh also closes steps it sees happen. */
+
+export function NextSteps({ u, save, busy, accent, signals = [] }: { u: UseCase; save: Save; busy: boolean; accent: string; signals?: Signal[] }) {
   const [open, setOpen] = useState(false);
   const [showDone, setShowDone] = useState(false);
+  const [ctx, setCtx] = useState<InputRef | null>(null);
   const steps = sortSteps(parseSteps(u.steps));
+  const sources = useMemo(() => {
+    if (!TRACED) return new Map<string, StepSource>();
+    const list = sortSteps(parseSteps(u.steps));
+    const found = matchStepSources(list, sourceCandidates(signals, parseEvidence(u.evidence)), u.account);
+    return new Map(list.flatMap((x, i) => (found[i] ? [[`${x.action}|${x.due}`, found[i] as StepSource] as const] : [])));
+  }, [u.steps, u.evidence, u.account, signals]);
+  const srcOf = (x: Step) => sources.get(`${x.action}|${x.due}`);
   const openSteps = steps.filter((s) => !s.done);
   const done = steps.filter((s) => s.done);
   const write = (list: Step[], msg: string, after?: () => void) => {
@@ -181,7 +315,7 @@ export function NextSteps({ u, save, busy, accent }: { u: UseCase; save: Save; b
       {openSteps.length > 0 && (
         <ol className="space-y-2">
           {openSteps.map((s, i) => (
-            <StepCard key={`${s.action}-${i}`} s={s} accent={accent} busy={busy} onToggle={() => toggle(s)} />
+            <StepCard key={`${s.action}-${i}`} s={s} src={srcOf(s)} traced={TRACED} accent={accent} busy={busy} onToggle={() => toggle(s)} onOpenSource={setCtx} />
           ))}
         </ol>
       )}
@@ -200,13 +334,14 @@ export function NextSteps({ u, save, busy, accent }: { u: UseCase; save: Save; b
           {showDone && (
             <ol className="mt-2 space-y-2">
               {done.map((s, i) => (
-                <StepCard key={`d-${s.action}-${i}`} s={s} accent={accent} busy={busy} onToggle={() => toggle(s)} />
+                <StepCard key={`d-${s.action}-${i}`} s={s} src={srcOf(s)} traced={TRACED} accent={accent} busy={busy} onToggle={() => toggle(s)} onOpenSource={setCtx} />
               ))}
             </ol>
           )}
         </div>
       )}
       <StepsEditor open={open} onOpenChange={setOpen} steps={steps} busy={busy} onSave={(list) => write(list, "Next steps saved", () => setOpen(false))} />
+      {TRACED && <InputContextDialog input={ctx} onOpenChange={(o) => !o && setCtx(null)} evidence={u.evidence} sources={u.sources} signals={signals} />}
     </section>
   );
 }

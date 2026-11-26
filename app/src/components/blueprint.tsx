@@ -41,7 +41,7 @@ function Artefact({ title, kicker, text, icon: Icon = FileText }: { title: strin
   const parts = text.split(/(\[[^\]]+\])/g);
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
-      <div className="flex items-center gap-2 border-b border-border bg-[#FBF9F5] px-4 py-2.5">
+      <div className="flex items-center gap-2 border-b border-border bg-[#F7FBFE] px-4 py-2.5">
         <Icon className="size-4" style={{ color: "var(--sol)" }} aria-hidden />
         <div className="min-w-0 flex-1">
           {kicker && <p className="text-[11px] text-muted-foreground">{kicker}</p>}
@@ -78,7 +78,7 @@ function Rows({ items, cols }: { items: Loose[]; cols: { key: string; label: str
   return (
     <div className="overflow-x-auto rounded-xl border border-border">
       <table className="w-full text-sm">
-        <thead className="bg-[#FBF9F5] text-left text-xs text-muted-foreground">
+        <thead className="bg-[#F7FBFE] text-left text-xs text-muted-foreground">
           <tr>{cols.map((c) => <th key={c.key} className="px-3 py-2 font-medium">{c.label}</th>)}</tr>
         </thead>
         <tbody>
@@ -121,19 +121,19 @@ export function BlueprintAnswer({ b, s }: { b: Blueprint; s: Solution }) {
         <p className={cn(serif, "mt-1 text-2xl leading-snug")}>{b.answer}</p>
         <p className="mt-2 max-w-4xl text-[15px] leading-relaxed text-foreground/80">{b.whatItIs}</p>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
-          <div className="rounded-xl bg-[#FBF9F5] p-3">
+          <div className="rounded-xl bg-[#F7FBFE] p-3">
             <p className="text-xs text-muted-foreground">Effort</p>
             <p className="text-lg font-medium">
               {b.effort.value} {b.effort.value === 1 ? b.effort.unit.replace(/s$/, "") : b.effort.unit}
             </p>
             <p className="text-xs text-muted-foreground">{b.effort.who}</p>
           </div>
-          <div className="rounded-xl bg-[#FBF9F5] p-3">
+          <div className="rounded-xl bg-[#F7FBFE] p-3">
             <p className="text-xs text-muted-foreground">Run cost</p>
             <p className="text-lg font-medium">{b.runCost.monthlyUSD != null ? `$${usd(b.runCost.monthlyUSD)} / month` : b.runCost.model}</p>
             <p className="text-xs text-muted-foreground">{b.runCost.monthlyUSD != null ? b.runCost.model : /included|existing|covered/i.test(b.runCost.model + b.runCost.basis) ? "No extra run cost" : "Monthly total depends on volumes still to confirm"}</p>
           </div>
-          <div className="rounded-xl bg-[#FBF9F5] p-3">
+          <div className="rounded-xl bg-[#F7FBFE] p-3">
             <p className="text-xs text-muted-foreground">What we do not build</p>
             <p className="text-sm">{b.notThis}</p>
           </div>
@@ -226,7 +226,7 @@ export function FlowCards({ flows, empty }: { flows: Flow[]; empty?: string }) {
               </span>
             </div>
             <div className="space-y-0 p-4">
-              <div className="flex gap-3 rounded-xl border border-border bg-[#FBF9F5] p-3">
+              <div className="flex gap-3 rounded-xl border border-border bg-[#F7FBFE] p-3">
                 <span className="grid size-8 shrink-0 place-items-center rounded-lg text-white" style={{ background: t.tone }}>
                   <TI className="size-4" aria-hidden />
                 </span>
@@ -270,7 +270,7 @@ function Picker<T>({ items, label, render, title }: { items: T[]; label: (x: T, 
             className={cn("flex w-full items-center gap-2.5 rounded-xl border px-3 py-2 text-left text-sm transition-all", j === cur ? "border-transparent bg-white font-medium shadow-md" : "border-border/60 bg-white/50 hover:bg-white")}
             style={j === cur ? { boxShadow: "0 0 0 2px var(--sol)" } : undefined}
           >
-            <span className="grid size-6 shrink-0 place-items-center rounded-full text-[11px] text-white" style={{ background: j === cur ? "var(--sol)" : "#B9B1A3" }}>
+            <span className="grid size-6 shrink-0 place-items-center rounded-full text-[11px] text-white" style={{ background: j === cur ? "var(--sol)" : "#A9B9CB" }}>
               {j + 1}
             </span>
             <span className="line-clamp-2">{label(x, j)}</span>
@@ -393,7 +393,7 @@ function Chat({ sample }: { sample: Loose[] }) {
         <p className="text-sm font-medium">Conversation preview</p>
         <span className="ml-auto inline-flex items-center gap-1 text-[11px] text-emerald-700"><span className="size-1.5 rounded-full bg-emerald-500" /> illustrative</span>
       </div>
-      <div className="max-h-[440px] space-y-3 overflow-auto bg-[#FBF9F5] p-4">
+      <div className="max-h-[440px] space-y-3 overflow-auto bg-[#F7FBFE] p-4">
         {sample.map((m, i) => {
           const agent = /agent|system|bot/i.test(txt(m.who));
           return (
@@ -473,7 +473,7 @@ function fabricPanels(k: Loose): KitPanel[] {
           <div className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_auto_minmax(0,1fr)]">
             <div className="space-y-2">
               {arr(k.sources).map((x, i) => (
-                <div key={i} className="rounded-xl border border-border bg-[#FBF9F5] px-3 py-2 text-sm">
+                <div key={i} className="rounded-xl border border-border bg-[#F7FBFE] px-3 py-2 text-sm">
                   <p className="font-medium">{txt(x.system)} <span className="ml-1 rounded-full bg-white px-2 py-0.5 text-[11px] text-muted-foreground">{txt(x.ingest)}</span></p>
                   <p className="text-xs text-muted-foreground">{txt(x.data)}</p>
                 </div>
@@ -501,7 +501,7 @@ function fabricPanels(k: Loose): KitPanel[] {
           <Artefact icon={Bot} kicker="Fabric data agent · instructions" title={txt(da.name)} text={txt(da.instructions)} />
           <div className={card}>
             <H icon={MessageSquare}>Questions people ask</H>
-            <ul className="space-y-2 text-sm">{arr(da.questions).map((q, i) => <li key={i} className="rounded-xl bg-[#F1ECE2] px-3 py-2">“{txt(q)}”</li>)}</ul>
+            <ul className="space-y-2 text-sm">{arr(da.questions).map((q, i) => <li key={i} className="rounded-xl bg-[#E8F2FB] px-3 py-2">“{txt(q)}”</li>)}</ul>
           </div>
         </div>
       ),
@@ -638,7 +638,7 @@ function Phone({ sc, appName }: { sc: Loose; appName: string }) {
   const els = arr(sc.elements).map(txt);
   return (
     <div className="mx-auto w-[290px] shrink-0 rounded-[2.6rem] bg-[#141A23] p-2.5 shadow-2xl ring-1 ring-black/20">
-      <div className="overflow-hidden rounded-[2.1rem] bg-[#FBF9F5]">
+      <div className="overflow-hidden rounded-[2.1rem] bg-[#F7FBFE]">
         <div className="flex items-center justify-between px-6 pt-2.5 pb-1 text-[10px] font-medium text-foreground/70">
           <span>22:20</span>
           <span className="h-4 w-16 rounded-full bg-[#141A23]" />
@@ -681,7 +681,7 @@ function codeAppPanels(k: Loose): KitPanel[] {
           title={`For ${txt(k.users)}`}
           label={(sc) => txt(sc.name)}
           render={(sc) => (
-            <div className="flex flex-col items-center gap-6 rounded-3xl p-5 md:flex-row md:items-start" style={{ background: "radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--sol) 14%, white), #FFFDF8 70%)" }}>
+            <div className="flex flex-col items-center gap-6 rounded-3xl p-5 md:flex-row md:items-start" style={{ background: "radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--sol) 14%, white), #FAFDFF 70%)" }}>
               <Phone sc={sc} appName={txt(k.appName)} />
               <div className="min-w-0 flex-1 space-y-3 pt-2">
                 <p className="text-xs tracking-[0.14em] text-muted-foreground">{txt(k.appType).toUpperCase()}</p>
@@ -826,7 +826,7 @@ export function PlatformChallenge({ p }: { p: Loose }) {
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <div className="overflow-x-auto rounded-2xl border border-border bg-white">
           <table className="w-full text-sm">
-            <thead className="bg-[#FBF9F5] text-left text-xs text-muted-foreground">
+            <thead className="bg-[#F7FBFE] text-left text-xs text-muted-foreground">
               <tr><th className="px-3 py-2 font-medium">What it needs</th><th className="px-3 py-2 font-medium">{nm}</th><th className="px-3 py-2 font-medium">Microsoft</th><th className="px-3 py-2 font-medium">Fit</th></tr>
             </thead>
             <tbody>
@@ -869,7 +869,7 @@ function noAiPanels(k: Loose): KitPanel[] {
       badge: arr(k.rules).length,
       node: (
         <div className="space-y-4">
-          <div className="rounded-2xl p-5" style={{ background: "color-mix(in srgb, var(--sol) 7%, #FFFDF8)" }}>
+          <div className="rounded-2xl p-5" style={{ background: "color-mix(in srgb, var(--sol) 7%, #FAFDFF)" }}>
             <p className="text-xs text-muted-foreground">Why no AI</p>
             <p className={cn(serif, "mt-1 text-lg")}>{txt(k.whyNoAI)}</p>
             <p className="mt-2 text-sm">Tool: <span className="font-medium">{txt(k.tool)}</span></p>
@@ -879,7 +879,7 @@ function noAiPanels(k: Loose): KitPanel[] {
               <div key={i} className="rounded-2xl border border-border bg-white p-4 text-sm shadow-sm">
                 <p className="font-mono text-[11px] tracking-wider" style={{ color: "var(--sol)" }}>RULE {String(i + 1).padStart(2, "0")}</p>
                 <p className="mt-1 font-medium">{txt(r.rule)}</p>
-                <p className="mt-2 text-xs"><span className="rounded bg-[#F1ECE2] px-1.5 py-0.5 font-mono">IF</span> {txt(r.threshold)}</p>
+                <p className="mt-2 text-xs"><span className="rounded bg-[#E8F2FB] px-1.5 py-0.5 font-mono">IF</span> {txt(r.threshold)}</p>
                 <p className="mt-1 text-xs"><span className="rounded px-1.5 py-0.5 font-mono text-white" style={{ background: "var(--sol)" }}>THEN</span> {txt(r.action)}</p>
               </div>
             ))}
@@ -982,7 +982,7 @@ export function KindHero({ b, s }: { b: Blueprint; s: Solution }) {
       <div className="w-[360px] space-y-2">
         {r.map((x, i) => (
           <div key={i} className={cn(glass, "px-3 py-2 text-[12px]")} style={{ marginLeft: i * 18 }}>
-            <span className="mr-1 rounded bg-[#F1ECE2] px-1 font-mono text-[10px]">IF</span>
+            <span className="mr-1 rounded bg-[#E8F2FB] px-1 font-mono text-[10px]">IF</span>
             <span className="line-clamp-1 inline">{txt(x.threshold)}</span>
             <span className="ml-1 rounded px-1 font-mono text-[10px] text-white" style={{ background: "var(--sol)" }}>THEN</span>
             <span className="line-clamp-1"> {txt(x.action)}</span>

@@ -43,7 +43,7 @@ export function ValueMetrics({
             </span>
             <div className="min-w-0">
               <dt className={cn("text-xs", dark ? "text-white/80" : "text-[#1E5B3E]")}>{it.label}</dt>
-              <dd className={cn("font-[family-name:var(--font-serif)] tabular-nums leading-tight", compact ? "text-2xl" : "text-3xl", dark ? "text-white" : "text-[#1B2A41]")}>
+              <dd className={cn("font-[family-name:var(--font-serif)] tabular-nums leading-tight", compact ? "text-2xl" : "text-3xl", dark ? "text-white" : "text-[#0D2847]")}>
                 {it.value}
                 <span className={cn("ml-1 text-sm", dark ? "text-white/70" : "text-muted-foreground")}>{it.unit}</span>
               </dd>

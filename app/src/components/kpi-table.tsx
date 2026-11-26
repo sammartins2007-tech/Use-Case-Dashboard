@@ -24,7 +24,7 @@ export function KpiTable({ value, busy, onSave }: { value?: string; rate: number
         }}
       >
         {draft.map((k, i) => (
-          <fieldset key={i} className="grid gap-2 rounded-xl border border-border bg-[#FBF9F5] p-3 sm:grid-cols-6">
+          <fieldset key={i} className="grid gap-2 rounded-xl border border-border bg-[#F7FBFE] p-3 sm:grid-cols-6">
             <legend className="sr-only">KPI {i + 1}</legend>
             <div className="space-y-1 sm:col-span-3">
               <Label htmlFor={`k-name-${i}`} className="text-xs text-muted-foreground">KPI</Label>
@@ -108,7 +108,7 @@ export function KpiTable({ value, busy, onSave }: { value?: string; rate: number
           <table className="w-full min-w-[640px] text-sm">
             <caption className="sr-only">KPIs with current value, expected outcome and annual gain</caption>
             <thead>
-              <tr className="border-b border-border bg-[#FBF9F5] text-left text-xs text-muted-foreground">
+              <tr className="border-b border-border bg-[#F7FBFE] text-left text-xs text-muted-foreground">
                 <th scope="col" className="px-3 py-2 font-medium">KPI</th>
                 <th scope="col" className="px-3 py-2 font-medium">Current value</th>
                 <th scope="col" className="px-3 py-2 font-medium">Expected outcome</th>

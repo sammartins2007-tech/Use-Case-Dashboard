@@ -16,6 +16,8 @@ The kit (this folder) holds four things:
 - `schema/playbook.l2-chain.json` — the design chain (eight-specialist board, tech views, KPIs, solution experience, creative, FinOps) with the full text of its briefs and validators, stored as a content row (setup step 1).
 - `app/SCAFFOLD.md` — the four template files the radar edits, the project-root files and the data sources.
 - `optional/read-only-customer-app/` — a read-only app per customer account, synced from the owner's lists (Operation 4).
+- `optional/customer-edition/` — a customer-safe edition and its offline HTML copy for guests (Operation 4b).
+- `optional/radar-ops/` — the toolkit zip the refresh installs in step 11 (sync, offline copy, consistency check).
 
 `VERSION` is the kit version. The instance records the version it runs in `src/KIT_VERSION`.
 
@@ -46,11 +48,11 @@ Then:
 2. **App**: follow the app-generation skill to create an App Builder app (title = app title). Then:
    - Copy every file under kit `app/src/` over the app's `src/`, overwriting, and delete `src/pages/home.tsx`. Four of them are template files the radar edits (`App.tsx`, `main.tsx`, `lib/console-capture.ts`, `components/pdf-export-button.tsx`): follow `app/SCAFFOLD.md` (copy, or re-apply the listed edits when the template has changed). Never touch any other protected scaffold file: config files, `index.html`, `src/components/ui/**`, and spatial/model/pen/shortcut components.
    - Project root, as in `app/SCAFFOLD.md`: copy `app/root/vite.viewer.config.ts`, add the `build:viewer` script, pin `@microsoft/managed-apps` to 0.6.0, add `.viewer-dist/` to `.gitignore`.
-   - Write `src/radar.config.ts` from the template with the gathered values (including `siteUrl` = the site URL), put logos in `src/assets/logos/`, and write the kit VERSION into `src/KIT_VERSION`.
+   - Write `src/radar.config.ts` from the template with the gathered values (including `siteUrl` = the site URL; `presenterBanner` only if the owner gives a cover picture for "Inside the Radar"), put logos in `src/assets/logos/`, and write the kit VERSION into `src/KIT_VERSION`.
    - Bind the five lists with `appbuilder-DataSourceAdd` (connector `shared_sharepointonline`, mode `table`, dataset = site URL, table = the list name). The data source names must come out as usecases_704f56, signals_704f56, featureradar_704f56, aiconsumption_704f56 and customers_704f56. Also bind Agents (`shared_agentnode`) and the SharePoint actions (`shared_sharepointonline`, actions) and check `src/data/services.ts` maps the generated services (see `app/SCAFFOLD.md`).
    - Run `npm run build:viewer` (writes `public/offline-viewer.txt`).
    - Typecheck and lint, run the pre-deploy gate, then publish.
-3. **Refresh**: fill `prompts/daily-refresh.template.md`: owner, app title, site URL, the site's Graph id (`{{SITE_GRAPH_ID}}`, host,site-id,web-id), the five list ids, accounts sentence, `{{FX_RULE}}` (default "€1 = $1.08"), and keep or remove the optional blocks (Teams channels, single-customer copy, customer edition and snapshot, read-only customer apps). Create it with SetupScheduledPrompt: twice a day (for example 07:00 and 14:00 local time), separate execution, with the tools named in the template header. Warn the user that the first runs may wait for a one-time tool approval.
+3. **Refresh**: fill `prompts/daily-refresh.template.md`: owner, app title, site URL, the site's Graph id (`{{SITE_GRAPH_ID}}`, host,site-id,web-id), the five list ids, accounts sentence, `{{FX_RULE}}` (default "€1 = $1.08"), and keep or remove the optional blocks (Teams channels; read-only customer apps and customer editions). When the read-only block is kept, build the radar-ops toolkit zip and upload it to the site's Documents, folder RadarOps (`optional/radar-ops/README.md`). Create it with SetupScheduledPrompt: twice a day (for example 07:00 and 14:00 local time), separate execution, with the tools named in the template header. Warn the user that the first runs may wait for a one-time tool approval.
 4. **First fill (optional, ask)**: run the refresh once now. Or, if the user attaches a customer pipeline (Excel), import it: one UseCases row per item, reference in InternalRef, Stage Signal. Also import the customer's own roadmap decisions when the pipeline has them (a prioritised/wave column, status, start and target dates, % done) into Wave, CustomerDecision, WaveSource "Customer pipeline <date>", CustomerStatus, StartDate, TargetDate and PercentDone, and write the wave list to Customers-704f56.Waves ("W1 | Wave 1 | start YYYY-MM | end YYYY-MM", dates blank when unknown). Then run `prompts/dossier-rewrite-brief.md` and `prompts/kpi-quantification-brief.md` with 6–8 parallel sub-agents of about 30 records each, and write the results back with UpdateListItem in a script. Log each bulk run as one AIConsumption-704f56 row (Estimated = true; same pricing as the template).
 5. Tell the user the app link, the site, what the refresh reads, and that AI figures are estimates.
 
@@ -61,6 +63,12 @@ Then:
 3. Add any new list columns from `schema/lists.json` with UpdateListSchema (add only, never remove), then `appbuilder-DataSourceRefresh` for each affected list.
 4. Re-fill the refresh template and update the scheduled prompt with EditScheduledPrompt, keeping the instance's values.
 5. Run `npm run build:viewer`, typecheck, test every page with the mouse, run the gate, publish, open the published app in the owner's browser and check it loads with data, update `src/KIT_VERSION`, and summarise what changed in plain words (and say plainly what could not be tested).
+
+### Moving an instance to 1.11.0
+1. Copy `app/src/**` (new: the "Inside the Radar" presenter story and the Backlog page, the sky-blue look, the source and date of every next step, the deployment view's routed and numbered connections). Optionally add `presenterBanner` to `src/radar.config.ts` (cover picture of the story).
+2. Re-fill the refresh template: one source applied to every use case it names, unreadable items retried from a content-store list, Evidence lines ending with "Impact:", People with a Contribution field and every person who intervenes, a waiting proposal never blocks a redesign, step 11 installs the radar-ops toolkit and runs the consistency check. Steps 7 and 9 are gone: move an account that used the single-customer copy or the static snapshot to the `readonly-apps` config row (team copy or customer edition).
+3. Build the radar-ops toolkit zip and upload it (`optional/radar-ops/README.md`); brand files now name their images relative to themselves.
+4. Typecheck, rebuild the viewer, test, publish.
 
 ### Moving an instance to 1.9.1
 1. Replace `.aether/scripts/customer_copy.py` with the kit version (fill the placeholders again) and run it with `{"account": "ALL", "verify_only": true}`, then without `verify_only`: every copy's design links are remapped to the copy's ids.
@@ -84,11 +92,11 @@ Add the customer to `radar.config.ts` (colours and an optional logo). Add the na
 
 ## Operation 4 — Read-only app for one customer's account team (optional)
 
-Follow `optional/read-only-customer-app/README.md`: copy lists on the SAME site (UseCases-A, Signals-A, FeatureRadar-A, Customers-A, created and synced by `customer_copy.py`), a second app with `readOnly: true` bound to them, the master config row "readonly-apps", and the refresh's read-only block. The copy never holds evidence (Evidence, Sources, LastSignal, SignalCount are blank; no Signals rows), internal CLARIFY questions stay hidden, and no other customer's name appears in it. Share the app individually or with a security group; the team needs read access to the site, which only the site owner can grant. The older two-way single-customer copy on a customer Team's own site remains possible (refresh block SINGLE_CUSTOMER_COPY) but the read-only app is preferred: one owner edits, everyone else reads.
+Follow `optional/read-only-customer-app/README.md`: copy lists on the SAME site (UseCases-A, Signals-A, FeatureRadar-A, Customers-A, created and synced by `customer_copy.py`), a second app with `readOnly: true` bound to them, the master config row "readonly-apps", and the refresh's read-only block. The copy never holds evidence (Evidence, Sources, LastSignal, SignalCount are blank; no Signals rows), internal CLARIFY questions stay hidden, and no other customer's name appears in it. Share the app individually or with a security group; the team needs read access to the site, which only the site owner can grant. One owner edits, everyone else reads. (The older two-way single-customer copy and the static snapshot were removed in 1.11.0.)
 
 ## Operation 4b — Customer edition for guests (optional)
 
-Follow `optional/customer-edition/README.md`: a config line `<Account> | edition customer | site <url>`, the same `customer_copy.py` syncing customer-safe lists on that separate site, and an offline HTML copy uploaded once and overwritten in place by the refresh. Guests cannot open App Builder apps; share the offline file (view only). Review the copy once for internal names or actions in free text before sharing.
+Follow `optional/customer-edition/README.md`: a config line `<Account> | edition customer | site <url>`, the same `customer_copy.py` syncing customer-safe lists on that separate site, and an offline HTML copy uploaded once and overwritten in place by the refresh. The refresh rebuilds the offline file from the radar-ops toolkit (`optional/radar-ops/`). Guests cannot open App Builder apps; share the offline file (view only). Review the copy once for internal names or actions in free text before sharing.
 
 ## Operation 5 — Deep re-analysis or catch-up (on request)
 When the owner doubts a source was analysed deeply enough, or asks for a catch-up:

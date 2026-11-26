@@ -53,8 +53,8 @@ function Choice({ c, e }: { c: WhatIfCase; e: WhatIfEstate }) {
         <p className="text-sm text-muted-foreground">{e.role}</p>
         <p className="mt-4 text-[15px] leading-relaxed">{c.choice}</p>
         <div className="mt-4 flex flex-wrap gap-2 text-xs">
-          <span className="rounded-full border border-border bg-[#FBF9F5] px-2.5 py-1">Status: <span className="font-medium">{c.status}</span></span>
-          <span className="rounded-full border border-border bg-[#FBF9F5] px-2.5 py-1">The route classification stays as it is</span>
+          <span className="rounded-full border border-border bg-[#F7FBFE] px-2.5 py-1">Status: <span className="font-medium">{c.status}</span></span>
+          <span className="rounded-full border border-border bg-[#F7FBFE] px-2.5 py-1">The route classification stays as it is</span>
         </div>
       </div>
       <div className="rounded-2xl p-6 text-white" style={{ background: "linear-gradient(140deg, var(--sol), var(--sol2))" }}>
@@ -99,7 +99,7 @@ function SideBySide({ c, e }: { c: WhatIfCase; e: WhatIfEstate }) {
     <div className="overflow-x-auto rounded-2xl border border-border bg-white">
       <table className="w-full text-sm">
         <caption className="sr-only">{e.name} compared with Microsoft</caption>
-        <thead className="bg-[#FBF9F5] text-left text-xs text-muted-foreground">
+        <thead className="bg-[#F7FBFE] text-left text-xs text-muted-foreground">
           <tr><th className="px-4 py-2.5 font-medium">What it needs</th><th className="px-4 py-2.5 font-medium">{e.name}</th><th className="px-4 py-2.5 font-medium">Microsoft</th><th className="px-4 py-2.5 font-medium">Fit</th></tr>
         </thead>
         <tbody>
@@ -161,7 +161,7 @@ function Estate({ id, e, cases }: { id: string; e: WhatIfEstate; cases: Record<s
     const v = w ? VERDICT[w.tone] : undefined;
     const on = x === id;
     return (
-      <Link key={x} to={`/use-case/${x}`} className={cn("group flex items-center justify-between gap-2 rounded-xl border px-3 py-2 text-sm transition-colors hover:shadow-sm", on ? "border-transparent text-white" : "border-border bg-white hover:bg-[#FBF9F5]")} style={on ? { background: "linear-gradient(135deg, var(--sol), var(--sol2))" } : undefined}>
+      <Link key={x} to={`/use-case/${x}`} className={cn("group flex items-center justify-between gap-2 rounded-xl border px-3 py-2 text-sm transition-colors hover:shadow-sm", on ? "border-transparent text-white" : "border-border bg-white hover:bg-[#F7FBFE]")} style={on ? { background: "linear-gradient(135deg, var(--sol), var(--sol2))" } : undefined}>
         <span className="font-mono text-xs">#{x}</span>
         <span className={cn("truncate text-xs", on ? "text-white/85" : "text-muted-foreground")}>{dep ? "reads " + e.name : v?.label ?? ""}</span>
       </Link>

@@ -18,7 +18,8 @@ the edits below.
   `"@microsoft/managed-apps": "0.6.0"` (exact; later 0.x versions turned binary uploads into a JSON number list).
 - `.gitignore`: add `.viewer-dist/`.
 - Run `npm run build:viewer` after every source change and before every publish: it writes
-  `public/offline-viewer.txt`, the self-contained viewer the "Download offline copy" menu uses. It holds no
+  `public/offline-viewer.txt`, the self-contained viewer of the offline customer copies (the refresh gets it from
+  the radar-ops toolkit, see `optional/radar-ops/README.md`). It holds no
   use-case data and no customer configuration.
 
 ## Data sources

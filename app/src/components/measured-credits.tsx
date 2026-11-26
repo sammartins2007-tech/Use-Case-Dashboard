@@ -60,7 +60,7 @@ export function MeasuredCredits({ rows }: { rows: ConsumptionRow[] }) {
         estimates logged per run. A day well above the usual credits-per-dollar ratio had work that was never logged.
       </p>
       {data.lines.length === 0 ? (
-        <p className="mt-4 rounded-xl border border-dashed border-[#D9D2C4] p-4 text-sm">
+        <p className="mt-4 rounded-xl border border-dashed border-[#C8DAEC] p-4 text-sm">
           No measured credits recorded for this period yet.
         </p>
       ) : (

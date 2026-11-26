@@ -13,7 +13,7 @@ export function RoadmapTeaser({ name, useCases }: { name: string; useCases: UseC
   return (
     <section aria-labelledby="rm-teaser" className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl border border-[#CFE3E4] bg-[#F1F8F8] px-5 py-4">
       <h2 id="rm-teaser" className="flex items-center gap-2 font-[family-name:var(--font-serif)] text-xl">
-        <MapIcon className="size-5 text-[#0E7C86]" aria-hidden="true" /> Roadmap
+        <MapIcon className="size-5 text-[#0F6CBD]" aria-hidden="true" /> Roadmap
       </h2>
       {waves.length ? (
         <ul className="flex flex-wrap gap-2 text-sm">
@@ -28,7 +28,7 @@ export function RoadmapTeaser({ name, useCases }: { name: string; useCases: UseC
               </li>
             );
           })}
-          <li className="rounded-full border border-dashed border-[#D9D2C4] bg-white px-3 py-1">
+          <li className="rounded-full border border-dashed border-[#C8DAEC] bg-white px-3 py-1">
             Candidates · <span className="tabular-nums">{candidates}</span>
           </li>
         </ul>
@@ -37,7 +37,7 @@ export function RoadmapTeaser({ name, useCases }: { name: string; useCases: UseC
       )}
       <Link
         to={`/customer/${encodeURIComponent(name)}/roadmap`}
-        className="ml-auto rounded-full bg-[#0E7C86] px-4 py-2 text-sm font-medium text-white hover:bg-[#0B6A73] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        className="ml-auto rounded-full bg-[#0F6CBD] px-4 py-2 text-sm font-medium text-white hover:bg-[#0B6A73] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
         Open the roadmap →
       </Link>

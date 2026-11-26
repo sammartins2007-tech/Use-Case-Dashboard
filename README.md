@@ -31,6 +31,8 @@ Your customers, logos, data and settings are kept. Only the shared code, list co
 | `schema/playbook.l2-chain.json` | The design chain (eight specialists, views, KPIs, experience, creative, FinOps) stored in the content store |
 | `app/SCAFFOLD.md` | The template files and project settings the radar changes |
 | `optional/read-only-customer-app/` | A read-only app per customer account team, synced from your lists |
+| `optional/customer-edition/` | A customer-safe edition and its offline HTML copy for guests |
+| `optional/radar-ops/` | The toolkit the refresh installs to sync copies, rebuild the offline copy and check consistency |
 | `skill/SKILL.md` | The setup, update and add-customer instructions Cowork follows |
 
 ## Contributing (Git)
@@ -46,6 +48,13 @@ You edit; they read. A read-only app per customer shows that account's use cases
 
 ## Sharing with the customer (1.9.1)
 App Builder apps cannot be shared with guest accounts. A customer edition on a separate site strips every internal field, question, link and design part, and an offline HTML copy of it on that site is what the customer opens. See `optional/customer-edition/README.md`.
+
+## Presenting the radar (1.11.0)
+**Inside the Radar** (menu) tells the whole story full screen, on your own live data: what a use case is, how it is
+detected and kept current, how eight SE agents design the answer, how people decide, and the twice-daily run.
+Follow one use case through it, and switch on Show mode to mask customer and people names for an audience.
+The **Backlog** page lists the improvements that could come next. Each next step shows where it came from and when;
+the deployment view draws every connection around the boxes, numbered, with the list below it.
 
 ## Notes
 - AI consumption figures in the app are estimates (agent steps × context at list price). Billing is in the Microsoft 365 admin centre.

@@ -123,7 +123,7 @@ export function InputContextDialog({
                 {facts.length ? (
                   <ul className="space-y-1.5">
                     {facts.map((f, i) => (
-                      <li key={i} className="rounded-lg bg-[#F7F5F0] px-3 py-2">{f}</li>
+                      <li key={i} className="rounded-lg bg-[#F3F8FD] px-3 py-2">{f}</li>
                     ))}
                   </ul>
                 ) : (

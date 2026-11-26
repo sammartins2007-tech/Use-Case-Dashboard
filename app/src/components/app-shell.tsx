@@ -7,7 +7,7 @@ import { PageBoundary } from "@/components/page-boundary";
 import { cn } from "@/lib/utils";
 import { RADAR } from "@/radar.config";
 import { SINGLE_CUSTOMER } from "@/lib/brands";
-import { LIVE_READ_ONLY } from "@/lib/read-only";
+import { LIVE_READ_ONLY, READ_ONLY } from "@/lib/read-only";
 
 const NAV = [
   { to: "/", label: "Welcome", end: true },
@@ -16,6 +16,8 @@ const NAV = [
     : { to: "/customers", label: "Customers", end: false },
   ...(SINGLE_CUSTOMER ? [{ to: `/customer/${encodeURIComponent(SINGLE_CUSTOMER)}/roadmap`, label: "Roadmap", end: false }] : []),
   { to: "/finops", label: "FinOps", end: false },
+  ...(RADAR.customerEdition || READ_ONLY ? [] : [{ to: "/story", label: "Inside the Radar", end: false }]),
+  ...(RADAR.customerEdition || READ_ONLY ? [] : [{ to: "/backlog", label: "Backlog", end: false }]),
   ...(RADAR.customerEdition ? [] : [{ to: "/method", label: "How it works", end: false }]),
   ...(RADAR.customerEdition ? [] : [{ to: "/features", label: "Feature radar", end: false }]),
 ];
@@ -31,7 +33,7 @@ export function AppShell() {
       >
         Skip to content
       </a>
-      <header className="sticky top-0 z-30 border-b border-border bg-[#F7F5F0]/95 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-border bg-[#F3F8FD]/95 backdrop-blur">
         <div className="mx-auto flex h-16 w-full max-w-[1440px] items-center gap-4 px-6">
           <NavLink to="/" className="flex shrink-0 items-center gap-3 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
             <RadarMark />
@@ -40,7 +42,7 @@ export function AppShell() {
               <span className="block whitespace-nowrap text-[11px] text-muted-foreground">{RADAR.owner} · {RADAR.team}</span>
             </span>
           </NavLink>
-          <nav aria-label="Main" className="flex min-w-0 items-center gap-0.5">
+          <nav aria-label="Main" className="no-scrollbar flex min-w-0 items-center gap-0.5 overflow-x-auto">
             {NAV.map((n) => (
               <NavLink
                 key={n.to}
@@ -48,10 +50,10 @@ export function AppShell() {
                 end={n.end}
                 className={({ isActive }) =>
                   cn(
-                    "whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                    "whitespace-nowrap rounded-full px-2.5 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
                     isActive || (n.label !== "Welcome" && n.label !== "Roadmap" && n.to.startsWith("/customer") && inCustomer && !pathname.endsWith("/roadmap"))
-                      ? "bg-[#1B2A41] text-white"
-                      : "text-[#3D4757] hover:bg-[#EFEBE3]",
+                      ? "bg-[#0D2847] text-white"
+                      : "text-[#34465E] hover:bg-[#EAF2FA]",
                   )
                 }
               >
@@ -69,7 +71,7 @@ export function AppShell() {
               </PageBoundary>
             )}
             {LIVE_READ_ONLY && (
-              <span role="note" className="whitespace-nowrap rounded-full border border-[#D9D2C4] bg-white px-3 py-1 text-xs text-[#3D4757]">
+              <span role="note" className="whitespace-nowrap rounded-full border border-[#C8DAEC] bg-white px-3 py-1 text-xs text-[#34465E]">
                 Read-only · maintained by {RADAR.owner}
               </span>
             )}
@@ -97,7 +99,7 @@ export function AppShell() {
 function RadarMark() {
   return (
     <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
-      <circle cx="17" cy="17" r="16" fill="#1B2A41" />
+      <circle cx="17" cy="17" r="16" fill="#0D2847" />
       <circle cx="17" cy="17" r="11" fill="none" stroke="#E8D9B8" strokeWidth="1" opacity="0.6" />
       <circle cx="17" cy="17" r="6" fill="none" stroke="#E8D9B8" strokeWidth="1" opacity="0.6" />
       <path d="M17 17 L28 9" stroke="#D9B26A" strokeWidth="2" strokeLinecap="round" />
