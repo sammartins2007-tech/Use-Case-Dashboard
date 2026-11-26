@@ -1,5 +1,5 @@
 {
-  "_readme": "List designs for one AI Use Case Radar instance. Create all five lists on the instance's SharePoint site with EXACTLY these names (the app code is generated from them). Replace the Account choices placeholder {{ACCOUNTS}} with the customer names from radar.config.ts plus \"Internal\" if used. Never rename a list or a column. Single-line text columns (Process, Owner, CustomerStatus, Products, Readiness, Flag, InternalRef, Wave, WaveSource, PriorityFit, Doc* text) hold at most 255 characters; keep detail in the multi-line columns. Kit 1.8.0: Customers-704f56 also holds the content store (Doc* columns); seed it with schema/playbook.redesign.json as described in skill/SKILL.md.",
+  "_readme": "List designs for one AI Use Case Radar instance. Create all six lists on the instance's SharePoint site with EXACTLY these names (the app code is generated from them). Replace the Account choices placeholder {{ACCOUNTS}} with the customer names from radar.config.ts plus \"Internal\" if used. Never rename a list or a column. Single-line text columns (Process, Owner, CustomerStatus, Products, Readiness, Flag, InternalRef, Wave, WaveSource, PriorityFit, Doc* text) hold at most 255 characters; keep detail in the multi-line columns. Kit 1.8.0: Customers-704f56 also holds the content store (Doc* columns); seed it with schema/playbook.redesign.json as described in skill/SKILL.md. The sixth list, SEAgentCalls-704f56, is not bound to the app: the refresh writes one call per SE agent into it and the agent flow 'Radar - call SE agent' writes each answer back.",
   "lists": [
     {
       "name": "UseCases-704f56",
@@ -541,6 +541,63 @@
           "type": "text"
         }
       ]
+    },
+    {
+      "name": "SEAgentCalls-704f56",
+      "description": "Calls from the radar refresh to the owner's eight Copilot Studio SE agents: one row per agent per use case. The agent flow 'Radar - call SE agent' answers each Requested row.",
+      "columns": [
+        {
+          "name": "UseCaseRef",
+          "type": "text"
+        },
+        {
+          "name": "Role",
+          "type": "text"
+        },
+        {
+          "name": "AgentSchema",
+          "type": "text"
+        },
+        {
+          "name": "Message",
+          "type": "multiline text"
+        },
+        {
+          "name": "Status",
+          "type": "text"
+        },
+        {
+          "name": "Response",
+          "type": "multiline text"
+        },
+        {
+          "name": "ConversationId",
+          "type": "text"
+        },
+        {
+          "name": "AnsweredAt",
+          "type": "date/time"
+        },
+        {
+          "name": "Error",
+          "type": "multiline text"
+        },
+        {
+          "name": "RunRef",
+          "type": "text"
+        }
+      ],
+      "default_view": {
+        "name": "All calls",
+        "fields": [
+          "Title",
+          "UseCaseRef",
+          "Role",
+          "Status",
+          "AnsweredAt",
+          "RunRef"
+        ]
+      }
     }
   ]
 }

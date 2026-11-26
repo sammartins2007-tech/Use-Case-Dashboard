@@ -1,0 +1,771 @@
+{
+  "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+  "actions": {
+    "Route_To_SE_Agent": {
+      "cases": {
+        "Case_Azure_AI_Foundry_L2": {
+          "actions": {
+            "Ask_SE_Azure_AI_Foundry_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_agentnode",
+                  "connectionName": "shared_agentnode",
+                  "operationId": "InvokeAgent"
+                },
+                "parameters": {
+                  "body/agentId": "{{AGENT_AZURE_AI_FOUNDRY}}",
+                  "body/isHitlEscalationEnabled": false,
+                  "body/prompt": "@triggerOutputs()?['body/Message']"
+                }
+              },
+              "limit": {
+                "timeout": "PT15M"
+              },
+              "metadata": {
+                "description": "Run agent: SE - Azure AI / Foundry L2",
+                "nodeId": "Ask_SE_Azure_AI_Foundry_L2"
+              },
+              "type": "OpenApiConnection"
+            },
+            "Mark_Failed_Azure_AI_Foundry_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/Error": "@concat('Agent node ', coalesce(actions('Ask_SE_Azure_AI_Foundry_L2')?['status'], ''), ' (', coalesce(actions('Ask_SE_Azure_AI_Foundry_L2')?['code'], ''), '). Error: ', string(coalesce(actions('Ask_SE_Azure_AI_Foundry_L2')?['error'], '')), ' Body: ', string(coalesce(actions('Ask_SE_Azure_AI_Foundry_L2')?['outputs']?['body'], '')))",
+                  "item/Status": "Failed",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Failed with the agent node's error",
+                "nodeId": "Mark_Failed_Azure_AI_Foundry_L2"
+              },
+              "runAfter": {
+                "Ask_SE_Azure_AI_Foundry_L2": [
+                  "Failed",
+                  "TimedOut"
+                ]
+              },
+              "type": "OpenApiConnection"
+            },
+            "Write_Answer_Azure_AI_Foundry_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/ConversationId": "@coalesce(body('Ask_SE_Azure_AI_Foundry_L2')?['conversationId'], workflow()?['run']?['name'])",
+                  "item/Response": "@coalesce(body('Ask_SE_Azure_AI_Foundry_L2')?['result'], body('Ask_SE_Azure_AI_Foundry_L2')?['message'])",
+                  "item/Status": "Done",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Done with the agent's answer",
+                "nodeId": "Write_Answer_Azure_AI_Foundry_L2"
+              },
+              "runAfter": {
+                "Ask_SE_Azure_AI_Foundry_L2": [
+                  "Succeeded"
+                ]
+              },
+              "type": "OpenApiConnection"
+            }
+          },
+          "case": "{{AGENT_AZURE_AI_FOUNDRY}}"
+        },
+        "Case_Copilot_Studio_L2": {
+          "actions": {
+            "Ask_SE_Copilot_Studio_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_agentnode",
+                  "connectionName": "shared_agentnode",
+                  "operationId": "InvokeAgent"
+                },
+                "parameters": {
+                  "body/agentId": "{{AGENT_COPILOT_STUDIO}}",
+                  "body/isHitlEscalationEnabled": false,
+                  "body/prompt": "@triggerOutputs()?['body/Message']"
+                }
+              },
+              "limit": {
+                "timeout": "PT15M"
+              },
+              "metadata": {
+                "description": "Run agent: SE - Copilot Studio L2",
+                "nodeId": "Ask_SE_Copilot_Studio_L2"
+              },
+              "type": "OpenApiConnection"
+            },
+            "Mark_Failed_Copilot_Studio_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/Error": "@concat('Agent node ', coalesce(actions('Ask_SE_Copilot_Studio_L2')?['status'], ''), ' (', coalesce(actions('Ask_SE_Copilot_Studio_L2')?['code'], ''), '). Error: ', string(coalesce(actions('Ask_SE_Copilot_Studio_L2')?['error'], '')), ' Body: ', string(coalesce(actions('Ask_SE_Copilot_Studio_L2')?['outputs']?['body'], '')))",
+                  "item/Status": "Failed",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Failed with the agent node's error",
+                "nodeId": "Mark_Failed_Copilot_Studio_L2"
+              },
+              "runAfter": {
+                "Ask_SE_Copilot_Studio_L2": [
+                  "Failed",
+                  "TimedOut"
+                ]
+              },
+              "type": "OpenApiConnection"
+            },
+            "Write_Answer_Copilot_Studio_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/ConversationId": "@coalesce(body('Ask_SE_Copilot_Studio_L2')?['conversationId'], workflow()?['run']?['name'])",
+                  "item/Response": "@coalesce(body('Ask_SE_Copilot_Studio_L2')?['result'], body('Ask_SE_Copilot_Studio_L2')?['message'])",
+                  "item/Status": "Done",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Done with the agent's answer",
+                "nodeId": "Write_Answer_Copilot_Studio_L2"
+              },
+              "runAfter": {
+                "Ask_SE_Copilot_Studio_L2": [
+                  "Succeeded"
+                ]
+              },
+              "type": "OpenApiConnection"
+            }
+          },
+          "case": "{{AGENT_COPILOT_STUDIO}}"
+        },
+        "Case_D365": {
+          "actions": {
+            "Ask_SE_D365": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_agentnode",
+                  "connectionName": "shared_agentnode",
+                  "operationId": "InvokeAgent"
+                },
+                "parameters": {
+                  "body/agentId": "{{AGENT_D365}}",
+                  "body/isHitlEscalationEnabled": false,
+                  "body/prompt": "@triggerOutputs()?['body/Message']"
+                }
+              },
+              "limit": {
+                "timeout": "PT15M"
+              },
+              "metadata": {
+                "description": "Run agent: SE - D365",
+                "nodeId": "Ask_SE_D365"
+              },
+              "type": "OpenApiConnection"
+            },
+            "Mark_Failed_D365": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/Error": "@concat('Agent node ', coalesce(actions('Ask_SE_D365')?['status'], ''), ' (', coalesce(actions('Ask_SE_D365')?['code'], ''), '). Error: ', string(coalesce(actions('Ask_SE_D365')?['error'], '')), ' Body: ', string(coalesce(actions('Ask_SE_D365')?['outputs']?['body'], '')))",
+                  "item/Status": "Failed",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Failed with the agent node's error",
+                "nodeId": "Mark_Failed_D365"
+              },
+              "runAfter": {
+                "Ask_SE_D365": [
+                  "Failed",
+                  "TimedOut"
+                ]
+              },
+              "type": "OpenApiConnection"
+            },
+            "Write_Answer_D365": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/ConversationId": "@coalesce(body('Ask_SE_D365')?['conversationId'], workflow()?['run']?['name'])",
+                  "item/Response": "@coalesce(body('Ask_SE_D365')?['result'], body('Ask_SE_D365')?['message'])",
+                  "item/Status": "Done",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Done with the agent's answer",
+                "nodeId": "Write_Answer_D365"
+              },
+              "runAfter": {
+                "Ask_SE_D365": [
+                  "Succeeded"
+                ]
+              },
+              "type": "OpenApiConnection"
+            }
+          },
+          "case": "{{AGENT_D365}}"
+        },
+        "Case_Data_Knowledge_Architecture_L2": {
+          "actions": {
+            "Ask_SE_Data_Knowledge_Architecture_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_agentnode",
+                  "connectionName": "shared_agentnode",
+                  "operationId": "InvokeAgent"
+                },
+                "parameters": {
+                  "body/agentId": "{{AGENT_DATA_KNOWLEDGE}}",
+                  "body/isHitlEscalationEnabled": false,
+                  "body/prompt": "@triggerOutputs()?['body/Message']"
+                }
+              },
+              "limit": {
+                "timeout": "PT15M"
+              },
+              "metadata": {
+                "description": "Run agent: SE - Data & Knowledge Architecture L2",
+                "nodeId": "Ask_SE_Data_Knowledge_Architecture_L2"
+              },
+              "type": "OpenApiConnection"
+            },
+            "Mark_Failed_Data_Knowledge_Architecture_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/Error": "@concat('Agent node ', coalesce(actions('Ask_SE_Data_Knowledge_Architecture_L2')?['status'], ''), ' (', coalesce(actions('Ask_SE_Data_Knowledge_Architecture_L2')?['code'], ''), '). Error: ', string(coalesce(actions('Ask_SE_Data_Knowledge_Architecture_L2')?['error'], '')), ' Body: ', string(coalesce(actions('Ask_SE_Data_Knowledge_Architecture_L2')?['outputs']?['body'], '')))",
+                  "item/Status": "Failed",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Failed with the agent node's error",
+                "nodeId": "Mark_Failed_Data_Knowledge_Architecture_L2"
+              },
+              "runAfter": {
+                "Ask_SE_Data_Knowledge_Architecture_L2": [
+                  "Failed",
+                  "TimedOut"
+                ]
+              },
+              "type": "OpenApiConnection"
+            },
+            "Write_Answer_Data_Knowledge_Architecture_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/ConversationId": "@coalesce(body('Ask_SE_Data_Knowledge_Architecture_L2')?['conversationId'], workflow()?['run']?['name'])",
+                  "item/Response": "@coalesce(body('Ask_SE_Data_Knowledge_Architecture_L2')?['result'], body('Ask_SE_Data_Knowledge_Architecture_L2')?['message'])",
+                  "item/Status": "Done",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Done with the agent's answer",
+                "nodeId": "Write_Answer_Data_Knowledge_Architecture_L2"
+              },
+              "runAfter": {
+                "Ask_SE_Data_Knowledge_Architecture_L2": [
+                  "Succeeded"
+                ]
+              },
+              "type": "OpenApiConnection"
+            }
+          },
+          "case": "{{AGENT_DATA_KNOWLEDGE}}"
+        },
+        "Case_Integration_Tools_L2": {
+          "actions": {
+            "Ask_SE_Integration_Tools_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_agentnode",
+                  "connectionName": "shared_agentnode",
+                  "operationId": "InvokeAgent"
+                },
+                "parameters": {
+                  "body/agentId": "{{AGENT_INTEGRATION_TOOLS}}",
+                  "body/isHitlEscalationEnabled": false,
+                  "body/prompt": "@triggerOutputs()?['body/Message']"
+                }
+              },
+              "limit": {
+                "timeout": "PT15M"
+              },
+              "metadata": {
+                "description": "Run agent: SE - Integration & Tools L2",
+                "nodeId": "Ask_SE_Integration_Tools_L2"
+              },
+              "type": "OpenApiConnection"
+            },
+            "Mark_Failed_Integration_Tools_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/Error": "@concat('Agent node ', coalesce(actions('Ask_SE_Integration_Tools_L2')?['status'], ''), ' (', coalesce(actions('Ask_SE_Integration_Tools_L2')?['code'], ''), '). Error: ', string(coalesce(actions('Ask_SE_Integration_Tools_L2')?['error'], '')), ' Body: ', string(coalesce(actions('Ask_SE_Integration_Tools_L2')?['outputs']?['body'], '')))",
+                  "item/Status": "Failed",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Failed with the agent node's error",
+                "nodeId": "Mark_Failed_Integration_Tools_L2"
+              },
+              "runAfter": {
+                "Ask_SE_Integration_Tools_L2": [
+                  "Failed",
+                  "TimedOut"
+                ]
+              },
+              "type": "OpenApiConnection"
+            },
+            "Write_Answer_Integration_Tools_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/ConversationId": "@coalesce(body('Ask_SE_Integration_Tools_L2')?['conversationId'], workflow()?['run']?['name'])",
+                  "item/Response": "@coalesce(body('Ask_SE_Integration_Tools_L2')?['result'], body('Ask_SE_Integration_Tools_L2')?['message'])",
+                  "item/Status": "Done",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Done with the agent's answer",
+                "nodeId": "Write_Answer_Integration_Tools_L2"
+              },
+              "runAfter": {
+                "Ask_SE_Integration_Tools_L2": [
+                  "Succeeded"
+                ]
+              },
+              "type": "OpenApiConnection"
+            }
+          },
+          "case": "{{AGENT_INTEGRATION_TOOLS}}"
+        },
+        "Case_M365_Copilot_CoWork_L2": {
+          "actions": {
+            "Ask_SE_M365_Copilot_CoWork_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_agentnode",
+                  "connectionName": "shared_agentnode",
+                  "operationId": "InvokeAgent"
+                },
+                "parameters": {
+                  "body/agentId": "{{AGENT_M365_COPILOT_COWORK}}",
+                  "body/isHitlEscalationEnabled": false,
+                  "body/prompt": "@triggerOutputs()?['body/Message']"
+                }
+              },
+              "limit": {
+                "timeout": "PT15M"
+              },
+              "metadata": {
+                "description": "Run agent: SE - M365 Copilot & Co-Work L2",
+                "nodeId": "Ask_SE_M365_Copilot_CoWork_L2"
+              },
+              "type": "OpenApiConnection"
+            },
+            "Mark_Failed_M365_Copilot_CoWork_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/Error": "@concat('Agent node ', coalesce(actions('Ask_SE_M365_Copilot_CoWork_L2')?['status'], ''), ' (', coalesce(actions('Ask_SE_M365_Copilot_CoWork_L2')?['code'], ''), '). Error: ', string(coalesce(actions('Ask_SE_M365_Copilot_CoWork_L2')?['error'], '')), ' Body: ', string(coalesce(actions('Ask_SE_M365_Copilot_CoWork_L2')?['outputs']?['body'], '')))",
+                  "item/Status": "Failed",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Failed with the agent node's error",
+                "nodeId": "Mark_Failed_M365_Copilot_CoWork_L2"
+              },
+              "runAfter": {
+                "Ask_SE_M365_Copilot_CoWork_L2": [
+                  "Failed",
+                  "TimedOut"
+                ]
+              },
+              "type": "OpenApiConnection"
+            },
+            "Write_Answer_M365_Copilot_CoWork_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/ConversationId": "@coalesce(body('Ask_SE_M365_Copilot_CoWork_L2')?['conversationId'], workflow()?['run']?['name'])",
+                  "item/Response": "@coalesce(body('Ask_SE_M365_Copilot_CoWork_L2')?['result'], body('Ask_SE_M365_Copilot_CoWork_L2')?['message'])",
+                  "item/Status": "Done",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Done with the agent's answer",
+                "nodeId": "Write_Answer_M365_Copilot_CoWork_L2"
+              },
+              "runAfter": {
+                "Ask_SE_M365_Copilot_CoWork_L2": [
+                  "Succeeded"
+                ]
+              },
+              "type": "OpenApiConnection"
+            }
+          },
+          "case": "{{AGENT_M365_COPILOT_COWORK}}"
+        },
+        "Case_Power_Platform_L2": {
+          "actions": {
+            "Ask_SE_Power_Platform_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_agentnode",
+                  "connectionName": "shared_agentnode",
+                  "operationId": "InvokeAgent"
+                },
+                "parameters": {
+                  "body/agentId": "{{AGENT_POWER_PLATFORM}}",
+                  "body/isHitlEscalationEnabled": false,
+                  "body/prompt": "@triggerOutputs()?['body/Message']"
+                }
+              },
+              "limit": {
+                "timeout": "PT15M"
+              },
+              "metadata": {
+                "description": "Run agent: SE - Power Platform - L2",
+                "nodeId": "Ask_SE_Power_Platform_L2"
+              },
+              "type": "OpenApiConnection"
+            },
+            "Mark_Failed_Power_Platform_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/Error": "@concat('Agent node ', coalesce(actions('Ask_SE_Power_Platform_L2')?['status'], ''), ' (', coalesce(actions('Ask_SE_Power_Platform_L2')?['code'], ''), '). Error: ', string(coalesce(actions('Ask_SE_Power_Platform_L2')?['error'], '')), ' Body: ', string(coalesce(actions('Ask_SE_Power_Platform_L2')?['outputs']?['body'], '')))",
+                  "item/Status": "Failed",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Failed with the agent node's error",
+                "nodeId": "Mark_Failed_Power_Platform_L2"
+              },
+              "runAfter": {
+                "Ask_SE_Power_Platform_L2": [
+                  "Failed",
+                  "TimedOut"
+                ]
+              },
+              "type": "OpenApiConnection"
+            },
+            "Write_Answer_Power_Platform_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/ConversationId": "@coalesce(body('Ask_SE_Power_Platform_L2')?['conversationId'], workflow()?['run']?['name'])",
+                  "item/Response": "@coalesce(body('Ask_SE_Power_Platform_L2')?['result'], body('Ask_SE_Power_Platform_L2')?['message'])",
+                  "item/Status": "Done",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Done with the agent's answer",
+                "nodeId": "Write_Answer_Power_Platform_L2"
+              },
+              "runAfter": {
+                "Ask_SE_Power_Platform_L2": [
+                  "Succeeded"
+                ]
+              },
+              "type": "OpenApiConnection"
+            }
+          },
+          "case": "{{AGENT_POWER_PLATFORM}}"
+        },
+        "Case_Security_Compliance_L2": {
+          "actions": {
+            "Ask_SE_Security_Compliance_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_agentnode",
+                  "connectionName": "shared_agentnode",
+                  "operationId": "InvokeAgent"
+                },
+                "parameters": {
+                  "body/agentId": "{{AGENT_SECURITY_COMPLIANCE}}",
+                  "body/isHitlEscalationEnabled": false,
+                  "body/prompt": "@triggerOutputs()?['body/Message']"
+                }
+              },
+              "limit": {
+                "timeout": "PT15M"
+              },
+              "metadata": {
+                "description": "Run agent: SE - Security & Compliance L2",
+                "nodeId": "Ask_SE_Security_Compliance_L2"
+              },
+              "type": "OpenApiConnection"
+            },
+            "Mark_Failed_Security_Compliance_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/Error": "@concat('Agent node ', coalesce(actions('Ask_SE_Security_Compliance_L2')?['status'], ''), ' (', coalesce(actions('Ask_SE_Security_Compliance_L2')?['code'], ''), '). Error: ', string(coalesce(actions('Ask_SE_Security_Compliance_L2')?['error'], '')), ' Body: ', string(coalesce(actions('Ask_SE_Security_Compliance_L2')?['outputs']?['body'], '')))",
+                  "item/Status": "Failed",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Failed with the agent node's error",
+                "nodeId": "Mark_Failed_Security_Compliance_L2"
+              },
+              "runAfter": {
+                "Ask_SE_Security_Compliance_L2": [
+                  "Failed",
+                  "TimedOut"
+                ]
+              },
+              "type": "OpenApiConnection"
+            },
+            "Write_Answer_Security_Compliance_L2": {
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "{{SITE_URL}}",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "item/AnsweredAt": "@utcNow()",
+                  "item/ConversationId": "@coalesce(body('Ask_SE_Security_Compliance_L2')?['conversationId'], workflow()?['run']?['name'])",
+                  "item/Response": "@coalesce(body('Ask_SE_Security_Compliance_L2')?['result'], body('Ask_SE_Security_Compliance_L2')?['message'])",
+                  "item/Status": "Done",
+                  "item/Title": "@triggerOutputs()?['body/Title']",
+                  "table": "{{LIST_SEAGENTCALLS}}"
+                }
+              },
+              "metadata": {
+                "description": "Update item: Done with the agent's answer",
+                "nodeId": "Write_Answer_Security_Compliance_L2"
+              },
+              "runAfter": {
+                "Ask_SE_Security_Compliance_L2": [
+                  "Succeeded"
+                ]
+              },
+              "type": "OpenApiConnection"
+            }
+          },
+          "case": "{{AGENT_SECURITY_COMPLIANCE}}"
+        }
+      },
+      "default": {
+        "actions": {
+          "Mark_Row_Unknown_Agent": {
+            "inputs": {
+              "host": {
+                "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                "connectionName": "shared_sharepointonline",
+                "operationId": "PatchItem"
+              },
+              "parameters": {
+                "dataset": "{{SITE_URL}}",
+                "id": "@triggerOutputs()?['body/ID']",
+                "item/AnsweredAt": "@utcNow()",
+                "item/Error": "@concat('Unknown agent schema: ', coalesce(triggerOutputs()?['body/AgentSchema'], ''))",
+                "item/Status": "Failed",
+                "item/Title": "@triggerOutputs()?['body/Title']",
+                "table": "{{LIST_SEAGENTCALLS}}"
+              }
+            },
+            "metadata": {
+              "description": "Update item: Failed, unknown agent schema",
+              "nodeId": "Mark_Row_Unknown_Agent"
+            },
+            "type": "OpenApiConnection"
+          }
+        }
+      },
+      "expression": "@triggerOutputs()?['body/AgentSchema']",
+      "metadata": {
+        "description": "Route the row to the SE agent its AgentSchema names",
+        "nodeId": "Route_To_SE_Agent"
+      },
+      "runAfter": {},
+      "type": "Switch"
+    }
+  },
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "telemetryMetadata": {
+      "creationSource": "Cowork",
+      "modifiedSources": "Cowork"
+    }
+  },
+  "outputs": {},
+  "parameters": {
+    "$authentication": {
+      "defaultValue": {},
+      "type": "SecureObject"
+    },
+    "$connections": {
+      "defaultValue": {},
+      "type": "Object"
+    }
+  },
+  "triggers": {
+    "When_an_Agent_Call_Row_Is_Created": {
+      "conditions": [
+        {
+          "expression": "@equals(triggerOutputs()?['body/Status'], 'Requested')"
+        }
+      ],
+      "inputs": {
+        "authentication": "@parameters('$authentication')",
+        "host": {
+          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+          "connectionName": "shared_sharepointonline",
+          "operationId": "GetOnNewItems"
+        },
+        "parameters": {
+          "dataset": "{{SITE_URL}}",
+          "table": "{{LIST_SEAGENTCALLS}}"
+        }
+      },
+      "metadata": {
+        "description": "When an item is created in SEAgentCalls-704f56 with Status Requested"
+      },
+      "recurrence": {
+        "frequency": "Minute",
+        "interval": 1
+      },
+      "splitOn": "@triggerOutputs()?['body/value']",
+      "type": "OpenApiConnection"
+    }
+  }
+}

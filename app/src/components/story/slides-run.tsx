@@ -181,9 +181,9 @@ const RUN_STEPS: { icon: typeof Bot; name: string; text: string; calls: string[]
   { icon: Database, name: "Update", text: "Fields, signals and red questions", calls: ["SharePoint lists"] },
   { icon: Gauge, name: "Analyse", text: "Readiness, route, value, priorities, people, next steps", calls: ["SharePoint lists"] },
   { icon: Newspaper, name: "Watch", text: "Product news every morning, leadership priorities monthly", calls: ["Microsoft Learn", "Public sites"] },
-  { icon: Users, name: "Design", text: "8 SE agents and the chain, validators must pass", calls: ["Sub-agents", "Microsoft Learn"] },
+  { icon: Users, name: "Design", text: "Your 8 Copilot Studio SE agents, then the chain; validators must pass", calls: ["Copilot Studio agents", "Agent flow"] },
   { icon: Share2, name: "Share & audit", text: "Copies synced, offline file rebuilt, audit at zero", calls: ["Copy sites"] },
-  { icon: ClipboardList, name: "Log the cost", text: "Tokens and dollars, sub-agents included", calls: ["AI consumption list"] },
+  { icon: ClipboardList, name: "Log the cost", text: "Tokens and dollars, agent calls included", calls: ["AI consumption list"] },
 ];
 
 export function Pipeline({ ctx }: { ctx: StoryCtx }) {
@@ -231,8 +231,8 @@ export function Pipeline({ ctx }: { ctx: StoryCtx }) {
           <p className="mt-1 text-[15.5px] leading-snug text-[#34465E]">Mail, Teams chats and channels, meetings with transcripts and documents, read through the Microsoft 365 tools.</p>
         </div>
         <div className="rounded-[14px] border border-[#D8E6F3] bg-white px-5 py-4">
-          <p className="font-mono text-[12px] uppercase tracking-[0.1em] text-[#7A5718]">Sub-agents</p>
-          <p className="mt-1 text-[15.5px] leading-snug text-[#34465E]">Parallel helpers for long transcripts and the eight SE agents of every design, each with its own brief.</p>
+          <p className="font-mono text-[12px] uppercase tracking-[0.1em] text-[#7A5718]">Copilot Studio</p>
+          <p className="mt-1 text-[15.5px] leading-snug text-[#34465E]">Your eight SE agents, called through an agent flow for every design: their answers are the board.</p>
         </div>
         <div className="rounded-[14px] border border-[#D8E6F3] bg-white px-5 py-4">
           <p className="font-mono text-[12px] uppercase tracking-[0.1em] text-[#7A5718]">The app</p>

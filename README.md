@@ -22,7 +22,7 @@ Your customers, logos, data and settings are kept. Only the shared code, list co
 |---|---|
 | `app/src/` | Shared app code (do not edit per customer) |
 | `app/radar.config.template.ts` | The one file that holds your customers, colours, logos and names |
-| `schema/lists.json` | The five SharePoint lists (Customers-704f56 also holds the content store) |
+| `schema/lists.json` | The six SharePoint lists (Customers-704f56 also holds the content store; SEAgentCalls-704f56 carries the SE agent calls) |
 | `prompts/daily-refresh.template.md` | The Work IQ refresh (twice a day) |
 | `prompts/source-analysis-protocol.md` | How every transcript and email is analysed, statement by statement, with a coverage check |
 | `prompts/latest-version-consolidation-brief.md` | One current statement per field; contradictions become red CLARIFY questions |
@@ -30,6 +30,7 @@ Your customers, logos, data and settings are kept. Only the shared code, list co
 | `prompts/*-brief.md` | Bulk analysis briefs (dossier rewrite, KPI values) |
 | `schema/playbook.l2-chain.json` | The design chain (eight specialists, views, KPIs, experience, creative, FinOps) stored in the content store |
 | `agents/se-specialists/` | The eight SE agents (Copilot Studio), one folder each: instructions, model, channels and the Microsoft Learn tool |
+| `agents/se-board-flow/` | The agent flow "Radar - call SE agent" that calls each SE agent and writes its answer back |
 | `app/SCAFFOLD.md` | The template files and project settings the radar changes |
 | `optional/read-only-customer-app/` | A read-only app per customer account team, synced from your lists |
 | `optional/customer-edition/` | A customer-safe edition and its offline HTML copy for guests |
@@ -44,21 +45,23 @@ environment.
 |---|---|---|---|---|
 | **Use Case Coach** ("Complete with AI") | Interviews the owner one question at a time and fills the missing dossier fields, readiness, open questions and analysis | When the owner clicks Complete with AI on a use case | `app/src/lib/coach.ts` | Setup step 2: the Agents connection (`shared_agentnode`, data source `agentnode`) |
 | **Input Reviewer** ("Add input") | Challenges a new email, note or document extract like a sceptical architect and proposes changes the owner accepts one by one | When the owner clicks Add input | `app/src/lib/input-review.ts` | The same connection |
-| **Eight SE agents** (L2 specialist board) | Copilot Studio agents, one per specialism: Copilot Studio · M365 Copilot & Co-Work · Power Platform · Azure AI / Foundry · Data & Knowledge Architecture · Integration & Tools · Security & Compliance · D365. Each assesses a use case from its own role, grounded in Microsoft Learn through the Microsoft Learn Docs MCP tool, and returns structured findings to an orchestrator; the board then picks one target pattern and a lead specialist | In every refresh (step 10) for each use case that needs a design: none yet, a route change, material new facts, or a request from the app. Any time in Teams or Microsoft 365 Copilot, where they are published | `agents/se-specialists/<role>/` (the agents); `prompts/specialists.md` and `prompts/solution-board-brief.md` (the board the refresh runs) | Setup step 2b creates, tests and publishes the agents; setup step 1 stores the board in the content store |
+| **Eight SE agents** (L2 specialist board) | Copilot Studio agents, one per specialism: Copilot Studio · M365 Copilot & Co-Work · Power Platform · Azure AI / Foundry · Data & Knowledge Architecture · Integration & Tools · Security & Compliance · D365. Each assesses a use case from its own role, grounded in Microsoft Learn through its Microsoft Learn Docs MCP tool. Their answers ARE the board; the radar never writes a specialist opinion itself | In every refresh (step 10), for each use case that needs a design (none yet, a route change, material new facts, or a request from the app): the refresh writes one call per agent into SEAgentCalls-704f56, the agent flow "Radar - call SE agent" calls the agent (an agent node calling the published agent) and writes its answer back. Also available any time in Teams and Microsoft 365 Copilot | `agents/se-specialists/<role>/` (the agents), `agents/se-board-flow/` (the flow), `prompts/specialists.md` (roster and message) and `prompts/solution-board-brief.md` (calling, waiting, arbitration) | Setup steps 1 (list), 2b (agents), 2c (flow and the `se-agents` roster row) |
 | **Design chain** | Technical views, KPI values, the solution experience and the creative, each checked by its validator script, then the FinOps sizing | The same step, after the board | `prompts/tech-views-*`, `prompts/kpi-quantification-brief.md`, `prompts/solution-experience-*`, `prompts/creative-*` | The same playbook row |
 | **Source analysts** | Read long transcripts and documents in parts, statement by statement, with a coverage ledger | Every refresh, for long sources | `prompts/source-analysis-protocol.md` | The refresh prompt (setup step 3) |
 
 - The two app agents are Copilot Studio agents whose definition travels in the app code (`app/src/connectors/inline-agent.ts`);
   their instructions are built at each click from the use case. They run as the signed-in owner, are switched off in read-only
   copies and customer editions, and every run is logged in AIConsumption.
-- The eight SE agents live in Copilot Studio. The refresh does not call them one by one: it runs their eight roles in parallel in
-  Copilot Cowork from the role cards in `prompts/specialists.md` (common rules, the output contract the app reads, and about
-  1,000 characters per role; the agents' own instructions run to 5,000–12,000 characters). The design chain and the source
-  analysts are Cowork workers too. `schema/playbook.l2-chain.json` carries the same text as `prompts/`: that is the copy the
-  refresh reads, so the two must stay identical. Setup and update both check it.
-- To change an SE agent, edit its `agent.yaml` in `agents/se-specialists/` and its role card in `prompts/specialists.md`, copy the
-  card into `files` of `schema/playbook.l2-chain.json`, bump `VERSION`, and run "Update my AI Use Case Radar": every instance
-  updates its agents and stores the new playbook version.
+- The eight SE agents live in Copilot Studio and the refresh calls them for every design: one row per agent in
+  SEAgentCalls-704f56, answered by the agent flow. A use case designs only when all eight have answered; there is no
+  fallback. Each call is kept in the list (message, answer, conversation id) and each opinion in the design keeps the
+  agent's full answer, so every verdict can be traced back. The calls use Copilot Credits in the owner's environment.
+- The design chain after the board (views, KPIs, experience, creative, FinOps) and the source analysts are Cowork
+  workers. `schema/playbook.l2-chain.json` carries the same text as `prompts/`: that is the copy the refresh reads,
+  so the two must stay identical. Setup and update both check it.
+- To change an SE agent, edit its `agent.yaml` in `agents/se-specialists/`, bump `VERSION`, and run "Update my AI Use Case
+  Radar": every instance updates its agents. To change how they are called, edit `prompts/specialists.md` or
+  `prompts/solution-board-brief.md` and copy the text into `files` of `schema/playbook.l2-chain.json`.
 
 ## Contributing (Git)
 The Git repository is the master copy. Change shared code in `app/src/`, never customer data. Then bump `VERSION`,

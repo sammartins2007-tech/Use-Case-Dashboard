@@ -198,7 +198,7 @@ export function Board({ ctx }: { ctx: StoryCtx }) {
       <SlideHead
         eyebrow={`04 · The SE agent call${d.date ? ` · design of ${new Date(`${d.date}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}` : ""}`}
         title={agents.length ? `${agents.length === 8 ? "Eight" : agents.length} SE agents examine the case. One solution wins.` : "One solution, designed end to end."}
-        lead="Called in parallel, each agent reads Microsoft Learn itself and returns one structured opinion. The orchestrator arbitrates."
+        lead="Your eight Copilot Studio agents are called in parallel. Each reads Microsoft Learn with its own tool and answers. The orchestrator arbitrates."
       />
       <div className="mt-4 grid min-h-0 flex-1 grid-cols-[350px_700px_minmax(0,1fr)] grid-rows-[minmax(0,1fr)] gap-5">
         <Reveal i={0} from="left" className="h-full">
