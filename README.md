@@ -4,9 +4,15 @@ A personal app that tracks AI use cases per customer. Twice a day Work IQ feeds 
 It qualifies each use case against five gates, classifies it into one of eight platform routes and places it on a
 complexity × effort map. It also values the KPIs and sizes all AI costs (FinOps), so every use case is ready for a business case.
 
+Open **START-HERE.html** for the visual install guide.
+
+## Get the kit
+There is one kit file, always the latest version: **AI-Use-Case-Radar-kit.zip** in the shared folder "AI Use Case Radar - Kit".
+The name never changes; the version is in the `VERSION` file inside. Ask the kit owner for the link.
+
 ## Set it up (about 30 minutes, mostly unattended)
 1. Open Cowork and start a new task.
-2. Attach this kit (the zip, or the folder from the shared location).
+2. Attach AI-Use-Case-Radar-kit.zip.
 3. Type: **"Set up my AI Use Case Radar for Contoso and Fabrikam using the attached kit."** Use your own customer names.
 4. Answer the one round of questions: customers, brand colours or logos, the Teams channels to listen to, and your hourly cost.
 5. Cowork creates your SharePoint site and lists, builds and publishes the app, and schedules the daily refresh.
@@ -14,7 +20,7 @@ complexity × effort map. It also values the KPIs and sizes all AI costs (FinOps
 Optional: to make the kit a permanent Cowork skill, say "create a skill from skill/SKILL.md in the attached kit".
 
 ## Get improvements
-Only the latest kit version is kept here. When it changes (see CHANGELOG.md), attach it and type **"Update my AI Use Case Radar from the attached kit."**
+Only the latest kit version is kept. When it changes (see CHANGELOG.md), download AI-Use-Case-Radar-kit.zip again from the same folder, attach it and type **"Update my AI Use Case Radar from the attached kit."**
 Your customers, logos, data and settings are kept. Only the shared code, list columns and refresh rules change.
 
 ## What is in the kit
@@ -36,6 +42,7 @@ Your customers, logos, data and settings are kept. Only the shared code, list co
 | `optional/customer-edition/` | A customer-safe edition and its offline HTML copy for guests |
 | `optional/radar-ops/` | The toolkit the refresh installs to sync copies, rebuild the offline copy and check consistency |
 | `skill/SKILL.md` | The setup, update and add-customer instructions Cowork follows |
+| `START-HERE.html` | The visual install guide (also shared next to the zip) |
 
 ## The agents
 The radar works with two kinds of agents, and the kit carries both. Setup creates every one of them in the new owner's
@@ -63,9 +70,13 @@ environment.
   Radar": every instance updates its agents. To change how they are called, edit `prompts/specialists.md` or
   `prompts/solution-board-brief.md` and copy the text into `files` of `schema/playbook.l2-chain.json`.
 
-## Contributing (Git)
-The Git repository is the master copy. Change shared code in `app/src/`, never customer data. Then bump `VERSION`,
-add a `CHANGELOG.md` entry, open a pull request and, after merge, publish the release zip to the shared folder.
+## Contributing and releasing (Git)
+The Git repository is the master copy of the sources; it never holds use cases, run results or customer data.
+Change shared code in `app/src/`, never customer data. Then bump `VERSION`, replace the top `CHANGELOG.md` entry and push.
+Releasing = rebuilding the one distributed zip from the repository: run `Publish-RadarKit.ps1` (kit owner only). It builds
+AI-Use-Case-Radar-kit.zip from the latest commit (without the script itself and `.gitignore`), overwrites it in the shared
+folder "AI Use Case Radar - Kit" and copies START-HERE.html next to it as AI-Use-Case-Radar-install-guide.html, so the link
+never changes. No version tags and no GitHub releases: earlier versions live only in the Git history.
 Keep everything customer-neutral: no customer names, logos or figures in the repository. Examples use fictitious companies.
 
 ## Where content lives

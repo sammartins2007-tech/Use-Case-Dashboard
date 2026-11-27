@@ -20,7 +20,7 @@ The kit (this folder) holds:
 - `optional/radar-ops/` — the toolkit zip the refresh installs in step 11 (sync, offline copy, consistency check).
 - `agents/se-specialists/` — the eight SE agents (Copilot Studio) and `agents/se-board-flow/` — the agent flow that calls them (setup steps 2b and 2c).
 
-`VERSION` is the kit version. The repository keeps only the latest version; install and update always from it. The instance records the version it runs in `src/KIT_VERSION`.
+`VERSION` is the kit version. Only the latest version is distributed (one file, AI-Use-Case-Radar-kit.zip, fixed name); install and update always from it. `START-HERE.html` is the visual guide for people; it plays no part in setup. The instance records the version it runs in `src/KIT_VERSION`.
 
 Kit rules: customer names, logos, colours and people belong ONLY in `src/radar.config.ts`, `src/assets/logos/` and the SharePoint data, never in kit code. Examples use fictitious companies (Contoso, Fabrikam).
 

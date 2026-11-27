@@ -2,6 +2,15 @@
 
 Only the latest kit version is kept and distributed. Earlier versions remain in the Git history only.
 
+## 1.13.2 — One kit file, one visual guide
+- New `START-HERE.html`: the visual install guide (what the radar does, the eight-agent board, what to have ready, the five
+  install steps with copy buttons, how to update, FAQ). It is in the zip and also shared next to it.
+- Distribution: one file with a fixed name, AI-Use-Case-Radar-kit.zip, overwritten in the shared folder "AI Use Case Radar -
+  Kit" at each version, so the link never changes. No version tags or GitHub releases.
+- `Publish-RadarKit.ps1` now works the other way round: Git is the source, the script builds the zip from the latest commit
+  and writes it (plus the guide) into the shared folder. It no longer looks for versioned zips or creates tags.
+- README: where to get the kit and how releasing works.
+
 ## 1.13.1 — Refresh wording aligned with the reference instance; latest version only
 - Refresh template step 10: the expert review spells out the SE agent calls (roster first, eight Requested rows per use
   case, polling every 1–2 minutes, one retry with a new row after a failure or 30 minutes without answer, no sub-agent,

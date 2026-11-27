@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>AI Use Case Radar · Install guide · kit 1.13.2</title>
+<style>
+:root{
+  --bg:#07111f; --bg2:#0b1a2e; --card:#0f2238; --card2:#13294a; --line:#1f3a5f;
+  --ink:#eaf3ff; --muted:#9bb3cf; --sky:#38bdf8; --sky2:#7dd3fc; --teal:#2dd4bf;
+  --violet:#a78bfa; --amber:#fbbf24; --rose:#fb7185; --green:#34d399;
+  --radius:18px; --shadow:0 20px 50px rgba(0,0,0,.35);
+}
+@media (prefers-color-scheme: light){:root{--bg:#07111f}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;overflow-x:hidden}
+a{color:var(--sky2)}
+.wrap{max-inline-size:1180px;margin-inline:auto;padding-inline:28px}
+/* nav */
+nav.top{position:sticky;inset-block-start:0;z-index:20;background:rgba(7,17,31,.78);backdrop-filter:blur(10px);border-block-end:1px solid var(--line)}
+nav.top .wrap{display:flex;align-items:center;gap:22px;block-size:58px}
+nav.top .brand{font-weight:700;letter-spacing:.2px;display:flex;align-items:center;gap:10px}
+nav.top .dot{inline-size:10px;block-size:10px;border-radius:50%;background:var(--sky);box-shadow:0 0 12px var(--sky);animation:pulse 2s infinite}
+nav.top .links{margin-inline-start:auto;display:flex;gap:18px;font-size:14px}
+nav.top .links a{color:var(--muted);text-decoration:none}
+nav.top .links a:hover{color:var(--ink)}
+.pill{display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(56,189,248,.12);color:var(--sky2);border:1px solid rgba(56,189,248,.35);font-size:13px;font-weight:600}
+/* hero */
+header.hero{position:relative;padding-block:70px 90px;background:radial-gradient(900px 500px at 75% 40%,rgba(56,189,248,.16),transparent 60%),radial-gradient(700px 400px at 10% 80%,rgba(167,139,250,.12),transparent 60%)}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.hero h1{font-size:clamp(34px,4.3vw,54px);line-height:1.04;margin:18px 0 18px;letter-spacing:-1px}
+.grad{background:linear-gradient(90deg,var(--sky2),var(--teal) 45%,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.lead{font-size:19px;color:var(--muted);max-inline-size:560px}
+.cta{display:flex;gap:14px;margin-block-start:28px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:12px;font-weight:700;text-decoration:none;border:1px solid var(--line);color:var(--ink);background:var(--card)}
+.btn.primary{background:linear-gradient(135deg,var(--sky),#0ea5e9);color:#04203a;border:0;box-shadow:0 10px 30px rgba(56,189,248,.35)}
+.btn:hover{transform:translateY(-2px);transition:.2s}
+.stats{display:flex;gap:28px;margin-block-start:34px;flex-wrap:wrap}
+.stat b{display:block;font-size:30px;color:var(--ink)}
+.stat span{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:1px}
+/* radar */
+.radar{position:relative;aspect-ratio:1;inline-size:100%;max-inline-size:440px;margin-inline:auto;border-radius:50%;
+  background:radial-gradient(circle,rgba(56,189,248,.10) 0 1px,transparent 1px) 0 0/22px 22px, radial-gradient(circle at center,#0d2440 0%,#071526 70%);
+  border:1px solid rgba(56,189,248,.35);box-shadow:0 0 80px rgba(56,189,248,.18),inset 0 0 60px rgba(0,0,0,.6);overflow:hidden}
+.radar .ring{position:absolute;inset:0;margin:auto;border-radius:50%;border:1px solid rgba(56,189,248,.22)}
+.radar .r1{inline-size:25%;block-size:25%}.radar .r2{inline-size:50%;block-size:50%}.radar .r3{inline-size:75%;block-size:75%}
+.radar .axis{position:absolute;background:rgba(56,189,248,.18)}
+.radar .ax{inset-block-start:50%;inset-inline:0;block-size:1px}.radar .ay{inset-inline-start:50%;inset-block:0;inline-size:1px}
+.radar .sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(56,189,248,.55),rgba(56,189,248,.12) 40deg,transparent 70deg);animation:spin 4.5s linear infinite}
+.blip{position:absolute;inline-size:12px;block-size:12px;margin:-6px;border-radius:50%;background:var(--c);box-shadow:0 0 14px var(--c);animation:blip 4.5s infinite;animation-delay:var(--d)}
+.blip i{position:absolute;inset-inline-start:16px;inset-block-start:-6px;white-space:nowrap;font-style:normal;font-size:11px;font-weight:600;color:var(--ink);background:rgba(7,17,31,.8);padding:2px 7px;border-radius:6px;border:1px solid var(--line)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blip{0%,100%{opacity:.25;transform:scale(.8)}8%{opacity:1;transform:scale(1.35)}30%{opacity:.85;transform:scale(1)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+/* sections */
+section{padding-block:80px}
+section.alt{background:linear-gradient(180deg,var(--bg2),var(--bg))}
+.kicker{color:var(--sky);font-weight:700;text-transform:uppercase;letter-spacing:2px;font-size:13px}
+h2{font-size:clamp(28px,3.4vw,42px);margin:10px 0 14px;letter-spacing:-.5px}
+.sub{color:var(--muted);max-inline-size:720px;font-size:17px}
+/* flow */
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-block-start:44px;position:relative}
+.flow:before{content:"";position:absolute;inset-inline:6%;inset-block-start:46px;block-size:3px;background:repeating-linear-gradient(90deg,var(--sky) 0 14px,transparent 14px 26px);background-size:26px 3px;animation:dash 1s linear infinite;opacity:.6}
+@keyframes dash{to{background-position:26px 0}}
+.node{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 18px;box-shadow:var(--shadow)}
+.node .ico{inline-size:52px;block-size:52px;border-radius:14px;display:grid;place-items:center;font-size:26px;background:linear-gradient(135deg,var(--a),var(--b));margin-block-end:14px;box-shadow:0 8px 22px rgba(0,0,0,.35)}
+.node h3{margin:0 0 6px;font-size:17px}
+.node p{margin:0;color:var(--muted);font-size:14px}
+.node .tag{position:absolute;inset-block-start:14px;inset-inline-end:14px;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+/* board */
+.board{display:grid;grid-template-columns:1fr 1.2fr;gap:40px;align-items:center;margin-block-start:40px}
+.ringboard{position:relative;aspect-ratio:1;max-inline-size:420px;inline-size:100%;margin-inline:auto}
+.ringboard .core{position:absolute;inset:32%;border-radius:50%;background:radial-gradient(circle,#1b3c66,#0e223b);border:1px solid var(--sky);display:grid;place-items:center;text-align:center;font-weight:700;font-size:14px;box-shadow:0 0 40px rgba(56,189,248,.35)}
+.ringboard .core small{display:block;color:var(--muted);font-weight:500;font-size:11px}
+.orbit{position:absolute;inset:0;animation:spin 40s linear infinite}
+.se{position:absolute;inline-size:86px;margin-inline-start:-43px;margin-block-start:-20px;text-align:center;font-size:11px;font-weight:700;padding:8px 4px;border-radius:12px;background:var(--card2);border:1px solid var(--c);color:var(--ink);box-shadow:0 0 18px color-mix(in srgb,var(--c) 40%,transparent);animation:spin 40s linear infinite reverse}
+.bullets{list-style:none;padding:0;margin:0;display:grid;gap:14px}
+.bullets li{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.bullets li b{color:var(--ink)}
+.bullets li span.n{flex:none;inline-size:30px;block-size:30px;border-radius:50%;display:grid;place-items:center;background:rgba(56,189,248,.15);color:var(--sky2);font-weight:800;font-size:14px}
+.bullets li p{margin:0;color:var(--muted);font-size:15px}
+/* prereqs */
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-block-start:36px}
+.req{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;position:relative;overflow:hidden}
+.req:after{content:"";position:absolute;inset-block-start:0;inset-inline:0;block-size:4px;background:var(--c)}
+.req .big{font-size:30px}
+.req h3{margin:10px 0 6px;font-size:17px}
+.req p{margin:0;color:var(--muted);font-size:14px}
+/* steps */
+.steps{display:grid;gap:18px;margin-block-start:40px;counter-reset:s}
+.step{display:grid;grid-template-columns:90px 1fr auto;gap:22px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px 26px;box-shadow:var(--shadow)}
+.step .num{font-size:46px;font-weight:800;line-height:1;background:linear-gradient(180deg,var(--sky2),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.step h3{margin:0 0 4px;font-size:19px}
+.step p{margin:0;color:var(--muted)}
+.step .time{font-size:13px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px;white-space:nowrap}
+.prompt{margin-block-start:12px;display:flex;align-items:center;gap:12px;background:#051020;border:1px dashed rgba(56,189,248,.55);border-radius:12px;padding:12px 14px;font-family:Consolas,"Cascadia Code",monospace;font-size:14.5px;color:var(--sky2)}
+.prompt code{flex:1}
+.copy{flex:none;cursor:pointer;border:0;border-radius:8px;padding:7px 12px;font-weight:700;font-size:12px;background:var(--sky);color:#04203a}
+.copy.done{background:var(--green)}
+.built{display:flex;flex-wrap:wrap;gap:10px;margin-block-start:14px}
+.built span{font-size:13px;padding:6px 12px;border-radius:10px;background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.35);color:#99f6e4}
+/* architecture svg */
+.arch{margin-block-start:36px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.arch svg{inline-size:100%;block-size:auto;display:block}
+.arch .flowline{stroke-dasharray:7 7;animation:dashsvg 1.2s linear infinite}
+@keyframes dashsvg{to{stroke-dashoffset:-28}}
+/* kit tiles */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-block-start:34px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;transition:.25s}
+.tile:hover{border-color:var(--sky);transform:translateY(-3px)}
+.tile code{color:var(--amber);font-size:13.5px}
+.tile p{margin:6px 0 0;color:var(--muted);font-size:14px}
+/* update + faq */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-block-start:34px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
+.panel h3{margin-block-start:0}
+.keep{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-block-start:14px}
+.keep div{padding:10px 12px;border-radius:10px;font-size:14px}
+.keep .k{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.35)}
+.keep .c{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.35)}
+details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-block-end:12px}
+details summary{cursor:pointer;font-weight:700}
+details p{color:var(--muted);margin:10px 0 2px}
+footer{padding-block:40px;border-block-start:1px solid var(--line);color:var(--muted);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+/* reveal */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.rv.in{opacity:1;transform:none}
+@media (max-width:900px){
+  .hero .wrap,.board,.split{grid-template-columns:1fr}
+  .flow{grid-template-columns:1fr 1fr}.flow:before{display:none}
+  .grid4{grid-template-columns:1fr 1fr}.tiles{grid-template-columns:1fr}
+  .step{grid-template-columns:60px 1fr}.step .time{display:none}
+  nav.top .links{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+@media print{nav.top{display:none}.rv{opacity:1;transform:none}body{background:#fff;color:#000}}
+</style>
+</head>
+<body>
+
+<nav class="top"><div class="wrap">
+  <div class="brand"><span class="dot"></span>AI Use Case Radar</div>
+  <span class="pill">Kit 1.13.2</span>
+  <div class="links"><a href="#what">What it does</a><a href="#board">The SE board</a><a href="#before">Before you start</a><a href="#install">Install</a><a href="#update">Update</a><a href="#faq">FAQ</a></div>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div>
+    <span class="pill">Install guide · about 30 minutes, mostly unattended</span>
+    <h1>Your AI use cases,<br><span class="grad">always up to date.</span></h1>
+    <p class="lead">A personal app that finds AI use cases in your mail, Teams, meetings and documents, keeps them current twice a day, gets eight Microsoft specialist agents to design the answer and sizes every AI cost before the business case.</p>
+    <div class="cta">
+      <a class="btn primary" href="#install">Install in 5 steps</a>
+      <a class="btn" href="#what">See how it works</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><b data-count="2">0</b><span>refreshes a day</span></div>
+      <div class="stat"><b data-count="8">0</b><span>SE agents</span></div>
+      <div class="stat"><b data-count="6">0</b><span>SharePoint lists</span></div>
+      <div class="stat"><b data-count="1">0</b><span>question round</span></div>
+    </div>
+  </div>
+  <div class="radar" aria-hidden="true">
+    <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+    <div class="axis ax"></div><div class="axis ay"></div>
+    <div class="sweep"></div>
+    <div class="blip" style="--c:#38bdf8;--d:.4s;inset-block-start:26%;inset-inline-start:62%"><i>Invoice triage</i></div>
+    <div class="blip" style="--c:#2dd4bf;--d:1.1s;inset-block-start:60%;inset-inline-start:62%"><i>R&amp;D knowledge</i></div>
+    <div class="blip" style="--c:#a78bfa;--d:2.1s;inset-block-start:74%;inset-inline-start:40%"><i>Field reports</i></div>
+    <div class="blip" style="--c:#fbbf24;--d:3s;inset-block-start:40%;inset-inline-start:20%"><i>Supplier bids</i></div>
+    <div class="blip" style="--c:#fb7185;--d:3.8s;inset-block-start:18%;inset-inline-start:36%"><i>HR onboarding</i></div>
+  </div>
+</div></header>
+
+<section id="what" class="alt"><div class="wrap">
+  <div class="kicker rv">What it does</div>
+  <h2 class="rv">From a sentence in a meeting to a costed design</h2>
+  <p class="sub rv">Every morning and afternoon the radar reads what reached you, decides what is a real use case, and moves it forward. You review and decide; it does the legwork.</p>
+  <div class="flow">
+    <div class="node rv"><span class="tag">Work IQ</span><div class="ico" style="--a:#0ea5e9;--b:#38bdf8">📡</div><h3>Capture</h3><p>Mail, chats, channels, meeting transcripts and documents, read in full with a coverage ledger.</p></div>
+    <div class="node rv"><span class="tag">5 gates</span><div class="ico" style="--a:#14b8a6;--b:#2dd4bf">✅</div><h3>Qualify</h3><p>Process, users, pain, outcome and flow must all be evidenced. Noise never becomes a use case.</p></div>
+    <div class="node rv"><span class="tag">8 routes</span><div class="ico" style="--a:#7c3aed;--b:#a78bfa">🧭</div><h3>Route</h3><p>No AI, Code App, M365 Copilot, Cowork, Copilot Studio, Fabric, Foundry or Unknown, on a complexity × effort map.</p></div>
+    <div class="node rv"><span class="tag">8 agents</span><div class="ico" style="--a:#d97706;--b:#fbbf24">🧠</div><h3>Design</h3><p>Eight Copilot Studio SE agents review it, grounded in Microsoft Learn; a design chain builds the solution.</p></div>
+    <div class="node rv"><span class="tag">FinOps</span><div class="ico" style="--a:#e11d48;--b:#fb7185">💲</div><h3>Size</h3><p>KPI values, time saved, savings, revenue and the low / mid / high AI run cost, ready for a business case.</p></div>
+  </div>
+</div></section>
+
+<section id="board"><div class="wrap">
+  <div class="kicker rv">The SE board</div>
+  <h2 class="rv">Eight specialist agents. Real answers. No shortcuts.</h2>
+  <p class="sub rv">Setup creates eight Copilot Studio agents in your own environment. The refresh calls them for every use case that needs a design; their answers are the board.</p>
+  <div class="board">
+    <div class="ringboard rv" aria-hidden="true">
+      <div class="core">The SE board<small>one call per agent</small></div>
+      <div class="orbit">
+        <div class="se" style="--c:#38bdf8;inset-block-start:4%;inset-inline-start:50%">Copilot Studio</div>
+        <div class="se" style="--c:#2dd4bf;inset-block-start:17%;inset-inline-start:84%">M365 Copilot &amp; Cowork</div>
+        <div class="se" style="--c:#a78bfa;inset-block-start:50%;inset-inline-start:96%">Power Platform</div>
+        <div class="se" style="--c:#fbbf24;inset-block-start:83%;inset-inline-start:84%">Azure AI / Foundry</div>
+        <div class="se" style="--c:#fb7185;inset-block-start:96%;inset-inline-start:50%">Data &amp; Knowledge</div>
+        <div class="se" style="--c:#34d399;inset-block-start:83%;inset-inline-start:16%">Integration &amp; Tools</div>
+        <div class="se" style="--c:#f472b6;inset-block-start:50%;inset-inline-start:4%">Security &amp; Compliance</div>
+        <div class="se" style="--c:#60a5fa;inset-block-start:17%;inset-inline-start:16%">D365</div>
+      </div>
+    </div>
+    <ul class="bullets">
+      <li class="rv"><span class="n">1</span><div><b>One call per agent.</b><p>The refresh writes eight requests into a SharePoint list, one per specialist.</p></div></li>
+      <li class="rv"><span class="n">2</span><div><b>An agent flow answers.</b><p>"Radar - call SE agent" runs each published agent and writes its full answer back, with its Microsoft Learn sources.</p></div></li>
+      <li class="rv"><span class="n">3</span><div><b>Eight answers, or no design.</b><p>No stand-ins and no fallback. A missing answer is retried once; otherwise the use case waits for the next run.</p></div></li>
+      <li class="rv"><span class="n">4</span><div><b>Every verdict is traceable.</b><p>The design keeps each agent's answer, so you can show where every recommendation came from.</p></div></li>
+    </ul>
+  </div>
+
+  <div class="arch rv">
+    <svg viewBox="0 0 1100 300" role="img" aria-label="Architecture: your Microsoft 365 sources feed the twice-daily refresh, which writes to your SharePoint lists read by your app, and calls the eight SE agents through the call list and the agent flow">
+      <defs>
+        <linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#0ea5e9"/><stop offset="1" stop-color="#38bdf8"/></linearGradient>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#38bdf8"/></marker>
+      </defs>
+      <g font-family="Segoe UI, sans-serif" font-size="14" fill="#eaf3ff">
+        <rect x="20" y="40" width="190" height="220" rx="16" fill="#0b1a2e" stroke="#1f3a5f"/>
+        <text x="115" y="70" text-anchor="middle" font-weight="700">Your Microsoft 365</text>
+        <text x="115" y="108" text-anchor="middle" fill="#9bb3cf">✉ Mail</text>
+        <text x="115" y="138" text-anchor="middle" fill="#9bb3cf">💬 Teams chats &amp; channels</text>
+        <text x="115" y="168" text-anchor="middle" fill="#9bb3cf">🎙 Meetings &amp; transcripts</text>
+        <text x="115" y="198" text-anchor="middle" fill="#9bb3cf">📄 Documents</text>
+        <text x="115" y="236" text-anchor="middle" fill="#38bdf8" font-size="12">read by Work IQ</text>
+
+        <rect x="290" y="95" width="200" height="110" rx="16" fill="url(#g1)"/>
+        <text x="390" y="140" text-anchor="middle" font-weight="800" fill="#04203a">Cowork refresh</text>
+        <text x="390" y="164" text-anchor="middle" fill="#04203a">twice a day, unattended</text>
+
+        <rect x="570" y="30" width="220" height="110" rx="16" fill="#0f2238" stroke="#2dd4bf"/>
+        <text x="680" y="70" text-anchor="middle" font-weight="700">Your SharePoint site</text>
+        <text x="680" y="96" text-anchor="middle" fill="#9bb3cf">use cases · signals · features</text>
+        <text x="680" y="118" text-anchor="middle" fill="#9bb3cf">AI costs · designs</text>
+
+        <rect x="870" y="30" width="210" height="110" rx="16" fill="#0f2238" stroke="#a78bfa"/>
+        <text x="975" y="72" text-anchor="middle" font-weight="700">Your radar app</text>
+        <text x="975" y="98" text-anchor="middle" fill="#9bb3cf">map · dossiers · FinOps</text>
+        <text x="975" y="120" text-anchor="middle" fill="#9bb3cf">"Inside the Radar" story</text>
+
+        <rect x="570" y="170" width="220" height="100" rx="16" fill="#0f2238" stroke="#fbbf24"/>
+        <text x="680" y="208" text-anchor="middle" font-weight="700">SE agent call list</text>
+        <text x="680" y="234" text-anchor="middle" fill="#9bb3cf">+ agent flow</text>
+
+        <rect x="870" y="170" width="210" height="100" rx="16" fill="#0f2238" stroke="#fb7185"/>
+        <text x="975" y="208" text-anchor="middle" font-weight="700">8 SE agents</text>
+        <text x="975" y="234" text-anchor="middle" fill="#9bb3cf">Copilot Studio + Learn</text>
+
+        <g stroke="#38bdf8" stroke-width="2.5" fill="none" marker-end="url(#ar)">
+          <path class="flowline" d="M212 150 H286"/>
+          <path class="flowline" d="M492 130 C530 130 530 85 566 85"/>
+          <path class="flowline" d="M792 85 H866"/>
+          <path class="flowline" d="M492 170 C530 170 530 220 566 220"/>
+          <path class="flowline" d="M792 210 H866"/>
+          <path class="flowline" d="M866 235 H796"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+</div></section>
+
+<section id="before" class="alt"><div class="wrap">
+  <div class="kicker rv">Before you start</div>
+  <h2 class="rv">Four things to have ready</h2>
+  <p class="sub rv">Check these once. If one is missing, setup stops at that step and tells you what to fix.</p>
+  <div class="grid4">
+    <div class="req rv" style="--c:#38bdf8"><div class="big">🤝</div><h3>Copilot Cowork</h3><p>With App Builder available, to build and publish your personal app.</p></div>
+    <div class="req rv" style="--c:#2dd4bf"><div class="big">🗂️</div><h3>SharePoint</h3><p>The right to create a site (or an existing site you own) for your six lists.</p></div>
+    <div class="req rv" style="--c:#a78bfa"><div class="big">🧩</div><h3>Copilot Studio</h3><p>An environment where you can create and publish agents and an agent flow.</p></div>
+    <div class="req rv" style="--c:#fbbf24"><div class="big">⚡</div><h3>Copilot Credits</h3><p>The eight SE agent calls run in your environment and use its credits.</p></div>
+  </div>
+</div></section>
+
+<section id="install"><div class="wrap">
+  <div class="kicker rv">Install</div>
+  <h2 class="rv">Five steps. One conversation.</h2>
+  <p class="sub rv">You talk; Cowork builds. Your customers, colours and data never leave your own site.</p>
+  <div class="steps">
+    <div class="step rv"><div class="num">01</div><div><h3>Download the kit</h3><p>Take <b>AI-Use-Case-Radar-kit.zip</b> from the shared kit folder. It is always the latest version.</p></div><span class="time">1 min</span></div>
+    <div class="step rv"><div class="num">02</div><div><h3>Open Cowork and start a new task</h3><p>Attach the zip to your first message.</p></div><span class="time">1 min</span></div>
+    <div class="step rv"><div class="num">03</div><div><h3>Ask for your radar</h3><p>Use your own customer names:</p>
+      <div class="prompt"><code id="p1">Set up my AI Use Case Radar for Contoso and Fabrikam using the attached kit.</code><button class="copy" type="button" data-copy="p1">Copy</button></div></div><span class="time">10 sec</span></div>
+    <div class="step rv"><div class="num">04</div><div><h3>Answer one round of questions</h3><p>Your customers, their brand colours or logos, the Teams channels to listen to, and your hourly cost.</p></div><span class="time">5 min</span></div>
+    <div class="step rv"><div class="num">05</div><div><h3>Let it build, then check</h3><p>Cowork creates everything and tests it. Approve the one-time permissions it asks for.</p>
+      <div class="built"><span>SharePoint site + 6 lists</span><span>Your radar app, published</span><span>8 SE agents, tested</span><span>Agent flow, switched on</span><span>Twice-daily refresh</span></div></div><span class="time">~25 min</span></div>
+  </div>
+</div></section>
+
+<section class="alt"><div class="wrap">
+  <div class="kicker rv">Inside the kit</div>
+  <h2 class="rv">What the zip holds</h2>
+  <p class="sub rv">Shared code and rules only. No customer data, names or figures; examples use fictitious companies.</p>
+  <div class="tiles">
+    <div class="tile rv"><code>skill/</code><p>The setup, update and add-customer instructions Cowork follows.</p></div>
+    <div class="tile rv"><code>app/</code><p>The shared app code and the one settings file that holds your customers, colours and logos.</p></div>
+    <div class="tile rv"><code>schema/</code><p>The six SharePoint lists and the design rule books.</p></div>
+    <div class="tile rv"><code>prompts/</code><p>The twice-daily refresh and the analysis and design briefs.</p></div>
+    <div class="tile rv"><code>agents/</code><p>The eight SE agents and the agent flow that calls them.</p></div>
+    <div class="tile rv"><code>optional/</code><p>Read-only apps for account teams and a customer-safe edition for guests.</p></div>
+  </div>
+</div></section>
+
+<section id="update"><div class="wrap">
+  <div class="kicker rv">Stay current</div>
+  <h2 class="rv">Update in one sentence</h2>
+  <div class="split">
+    <div class="panel rv">
+      <h3>When a new kit is published</h3>
+      <p class="sub">Download the zip again (same link, same name), attach it to a new Cowork task and type:</p>
+      <div class="prompt"><code id="p2">Update my AI Use Case Radar from the attached kit.</code><button class="copy" type="button" data-copy="p2">Copy</button></div>
+      <p class="sub" style="margin-block-start:14px">The version you run and the version in the kit are compared first; nothing is changed without your OK.</p>
+    </div>
+    <div class="panel rv">
+      <h3>What changes, what stays</h3>
+      <div class="keep">
+        <div class="k">✔ Your customers &amp; logos</div><div class="c">↻ Shared app code</div>
+        <div class="k">✔ Your use cases &amp; designs</div><div class="c">↻ New list columns</div>
+        <div class="k">✔ Your settings &amp; schedule</div><div class="c">↻ Refresh rules</div>
+        <div class="k">✔ Your agents' history</div><div class="c">↻ SE agent instructions</div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section id="faq" class="alt"><div class="wrap">
+  <div class="kicker rv">Good to know</div>
+  <h2 class="rv">Questions people ask</h2>
+  <div style="margin-block-start:26px">
+    <details class="rv"><summary>Where does my data live?</summary><p>Only in your own SharePoint site and your own Copilot Studio environment. The kit itself never holds customer data.</p></details>
+    <details class="rv"><summary>Can I share it with my account team or the customer?</summary><p>Yes, as optional extras: a read-only app per account team, and a customer-safe edition with an offline copy for guests. Nothing is shared without your approval.</p></details>
+    <details class="rv"><summary>What does it cost to run?</summary><p>The app shows an estimate of every AI run (refresh, coach, reviews). The eight SE agent calls use Copilot Credits in your environment. Actual billing is in the Microsoft 365 admin centre.</p></details>
+    <details class="rv"><summary>Why does the first refresh wait for me?</summary><p>The first runs may ask a one-time approval for the tools they use. Approve once and the refresh runs on its own afterwards.</p></details>
+    <details class="rv"><summary>Does it invent anything?</summary><p>No. A missing fact stays empty or marked "to confirm", and contradictions become red questions for you to settle in the app.</p></details>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <span>AI Use Case Radar · Install guide · kit 1.13.2 · 27 November 2026</span>
+  <span>AI figures in the app are estimates.</span>
+</div></footer>
+
+<script>
+(function(){
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll('.rv').forEach(function(el,i){el.style.transitionDelay=(i%5)*70+'ms';io.observe(el);});
+  document.querySelectorAll('[data-count]').forEach(function(el){
+    var end=+el.getAttribute('data-count'),t0=null;
+    function tick(t){if(!t0)t0=t;var p=Math.min((t-t0)/1200,1);el.textContent=Math.round(end*p);if(p<1)requestAnimationFrame(tick);}
+    requestAnimationFrame(tick);
+  });
+  document.querySelectorAll('.copy').forEach(function(b){
+    b.addEventListener('click',function(){
+      var txt=document.getElementById(b.getAttribute('data-copy')).textContent;
+      function ok(){b.textContent='Copied ✓';b.classList.add('done');setTimeout(function(){b.textContent='Copy';b.classList.remove('done');},1800);}
+      if(navigator.clipboard){navigator.clipboard.writeText(txt).then(ok,ok);}else{ok();}
+    });
+  });
+})();
+</script>
+</body>
+</html>
